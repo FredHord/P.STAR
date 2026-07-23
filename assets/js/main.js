@@ -86,6 +86,37 @@
     });
   }
 
+  // Waiting-list form. No backend is wired up yet: submissions are
+  // acknowledged in the UI only. Point WAITLIST_ENDPOINT at a form
+  // service (Formspree, Buttondown, Mailchimp...) to start collecting.
+  var WAITLIST_ENDPOINT = "";
+  var waitlistForm = document.getElementById("waitlistForm");
+  var waitlistDone = document.getElementById("waitlistDone");
+
+  if (waitlistForm && waitlistDone) {
+    waitlistForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var email = document.getElementById("waitlistEmail");
+      if (!email.value || email.validity.typeMismatch || email.value.indexOf("@") < 1) {
+        email.focus();
+        return;
+      }
+      var finish = function () {
+        waitlistForm.hidden = true;
+        waitlistDone.hidden = false;
+      };
+      if (WAITLIST_ENDPOINT) {
+        fetch(WAITLIST_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ email: email.value })
+        }).then(finish, finish);
+      } else {
+        finish();
+      }
+    });
+  }
+
   var reveals = document.querySelectorAll(".reveal");
 
   if (reduceMotion || !("IntersectionObserver" in window)) {

@@ -17,7 +17,7 @@
   </a>
   <ul class="nav__links u">
     <li><a href="#">Shop</a></li>
-    <li><a href="#collection">Collection</a></li>
+    <li><a href="#waitlist">Collection</a></li>
     <li><a href="#statement">Statement</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
@@ -34,23 +34,16 @@
 
 <main>
 
-  <section id="collection">
-    <div class="lookbook" id="lookbook">
-      <figure class="look reveal">
-        <img class="look__img" src="assets/img/runner.jpg" alt="Textured monochrome runner mid-stride">
-      </figure>
-
-      <figure class="look reveal">
-        <img class="look__img" src="assets/img/sprinter.jpg" alt="Long-exposure motion-blur sprinter, monochrome">
-      </figure>
-
-      <figure class="look reveal">
-        <img class="look__img" src="assets/img/boxer.jpg" alt="Long-exposure motion-blur boxer, monochrome">
-      </figure>
-
-      <figure class="look reveal">
-        <img class="look__img" src="assets/img/kick.jpg" alt="Long-exposure motion-blur bicycle kick, monochrome">
-      </figure>
+  <section id="waitlist" class="waitlist">
+    <div class="waitlist__inner reveal">
+      <h2 class="waitlist__title u">Join Waiting List</h2>
+      <p class="waitlist__sub u">Be first in line for Collection 001</p>
+      <form class="waitlist__form" id="waitlistForm" novalidate>
+        <label class="visually-hidden" for="waitlistEmail">Email address</label>
+        <input class="waitlist__input" id="waitlistEmail" type="email" name="email" placeholder="EMAIL ADDRESS" autocomplete="email" required>
+        <button class="waitlist__submit u" type="submit">Join</button>
+      </form>
+      <p class="waitlist__done u" id="waitlistDone" hidden>You're on the list.</p>
     </div>
   </section>
 
@@ -72,7 +65,7 @@
         <h3 class="u">Index</h3>
         <ul>
           <li><a href="#">Shop</a></li>
-          <li><a href="#collection">Collection</a></li>
+          <li><a href="#waitlist">Waiting List</a></li>
           <li><a href="#statement">Statement</a></li>
         </ul>
       </div>
@@ -86,7 +79,10 @@
     </div>
   </div>
   <div class="footer__bottom">
-    <span>&copy; <span id="year">2026</span> P.STAR. All rights reserved.</span>
+    <div class="footer__bottom-left">
+      <img class="footer__logo" src="assets/img/footer-logo.png" alt="P.STAR monogram">
+      <span>&copy; <span id="year">2026</span> P.STAR. All rights reserved.</span>
+    </div>
     <a href="#top" class="u">Back to top</a>
   </div>
 </footer>
