@@ -17,9 +17,11 @@
     heroVideo.pause();
   }
 
-  // Cursor parallax on the hero: media drifts with the pointer, title
-  // drifts gently against it. Fine pointers only; skipped for
-  // prefers-reduced-motion.
+  // Hover-to-play hero: on devices with a mouse the footage holds a
+  // static frame until the cursor enters the hero, then plays and
+  // drifts with the pointer (title counter-drifts for depth). Freezes
+  // and recenters on leave. Touch devices keep the autoplay loop;
+  // prefers-reduced-motion keeps everything still.
   var hero = document.querySelector(".hero");
   var heroTitle = document.querySelector(".hero__title");
   var finePointer = window.matchMedia("(pointer: fine)").matches;
@@ -27,8 +29,16 @@
   if (hero && heroVideo && finePointer && !reduceMotion) {
     hero.classList.add("hero--parallax");
 
-    var MEDIA_SHIFT = 24;
-    var TITLE_SHIFT = -10;
+    heroVideo.removeAttribute("autoplay");
+    heroVideo.pause();
+    heroVideo.addEventListener("loadeddata", function () {
+      if (!hero.matches(":hover")) {
+        heroVideo.pause();
+      }
+    });
+
+    var MEDIA_SHIFT = 60;
+    var TITLE_SHIFT = -20;
     var targetX = 0;
     var targetY = 0;
     var curX = 0;
@@ -36,10 +46,10 @@
     var rafId = null;
 
     var tick = function () {
-      curX += (targetX - curX) * 0.06;
-      curY += (targetY - curY) * 0.06;
+      curX += (targetX - curX) * 0.1;
+      curY += (targetY - curY) * 0.1;
       heroVideo.style.transform =
-        "scale(1.08) translate(" + curX * MEDIA_SHIFT + "px, " + curY * MEDIA_SHIFT + "px)";
+        "scale(1.12) translate(" + curX * MEDIA_SHIFT + "px, " + curY * MEDIA_SHIFT + "px)";
       if (heroTitle) {
         heroTitle.style.transform =
           "translate(" + curX * TITLE_SHIFT + "px, " + curY * TITLE_SHIFT + "px)";
@@ -57,6 +67,10 @@
       }
     };
 
+    hero.addEventListener("mouseenter", function () {
+      heroVideo.play();
+    });
+
     hero.addEventListener("mousemove", function (e) {
       var rect = hero.getBoundingClientRect();
       targetX = (e.clientX - rect.left) / rect.width - 0.5;
@@ -65,6 +79,7 @@
     });
 
     hero.addEventListener("mouseleave", function () {
+      heroVideo.pause();
       targetX = 0;
       targetY = 0;
       queue();
