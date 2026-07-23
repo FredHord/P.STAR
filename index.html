@@ -12,7 +12,10 @@
 <body>
 
 <nav class="nav" id="nav">
-  <a href="#top" class="nav__mark u">P.STAR</a>
+  <a href="#top" class="nav__brand">
+    <span class="nav__mark u">P.STAR</span>
+    <img class="nav__logo" src="assets/img/logo-mark.png" alt="P.STAR mark">
+  </a>
   <ul class="nav__links u">
     <li><a href="#collection">Collection</a></li>
     <li><a href="#lookbook">Lookbook</a></li>
@@ -22,12 +25,12 @@
 </nav>
 
 <header class="hero" id="top">
-  <img class="hero__media" src="assets/img/hero.jpg" alt="Long-exposure motion-blur athlete mid-jump, monochrome">
+  <video class="hero__media" id="heroVideo" src="assets/img/hero.mp4" poster="assets/img/hero.jpg" autoplay muted loop playsinline></video>
   <div class="hero__scrim" aria-hidden="true"></div>
   <div class="hero__content">
     <span class="hero__index u">Collection&nbsp;001</span>
     <h1 class="hero__title u">P.STAR</h1>
-    <span class="hero__caption u">Motion, stripped to its essentials</span>
+    <span class="hero__caption u">Star Players: Collection 001</span>
   </div>
   <span class="hero__scrolldown u">Scroll</span>
 </header>

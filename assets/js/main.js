@@ -9,6 +9,14 @@
   window.addEventListener("scroll", onScroll, { passive: true });
 
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var heroVideo = document.getElementById("heroVideo");
+  if (heroVideo && reduceMotion) {
+    heroVideo.removeAttribute("autoplay");
+    heroVideo.removeAttribute("loop");
+    heroVideo.pause();
+  }
+
   var reveals = document.querySelectorAll(".reveal");
 
   if (reduceMotion || !("IntersectionObserver" in window)) {
