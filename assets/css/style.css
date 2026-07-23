@@ -151,6 +151,15 @@ a {
   filter: grayscale(1) contrast(1.12);
 }
 
+.hero--parallax .hero__media {
+  will-change: transform;
+  transform: scale(1.08);
+}
+
+.hero--parallax .hero__title {
+  will-change: transform;
+}
+
 .hero__scrim {
   position: absolute;
   inset: 0;
