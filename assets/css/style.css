@@ -1,13 +1,23 @@
 /* P.STAR — stark industrial minimalism, monochrome only */
 
+@font-face {
+  font-family: "Bookface";
+  src: url("../fonts/Bookface-Bold.woff2") format("woff2"),
+       url("../fonts/Bookface-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --bg: #101010;
+  --bg: #0a0a0a;
   --fg: #f1f3ef;
   --fg-dim: rgba(241, 243, 239, 0.55);
   --fg-faint: rgba(241, 243, 239, 0.28);
-  --line: rgba(241, 243, 239, 0.16);
+  --line: rgba(241, 243, 239, 0.1);
   --gap: clamp(1.25rem, 3vw, 2.5rem);
   --nav-h: 76px;
+  --font-display: "Bookface", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 * {
@@ -68,12 +78,26 @@ a {
 }
 
 .nav.is-scrolled {
-  background: rgba(16, 16, 16, 0.92);
+  background: rgba(10, 10, 10, 0.92);
   backdrop-filter: blur(6px);
   border-bottom: 1px solid var(--line);
 }
 
+.nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.nav__logo {
+  height: 26px;
+  width: auto;
+  display: block;
+  filter: grayscale(1) contrast(1.05);
+}
+
 .nav__mark {
+  font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -123,13 +147,14 @@ a {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  background: var(--bg);
   filter: grayscale(1) contrast(1.12);
 }
 
 .hero__scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(16,16,16,0.15) 0%, rgba(16,16,16,0) 35%, rgba(16,16,16,0.55) 100%);
+  background: linear-gradient(180deg, rgba(10,10,10,0.2) 0%, rgba(10,10,10,0) 35%, rgba(10,10,10,0.65) 100%);
   pointer-events: none;
 }
 
@@ -151,6 +176,7 @@ a {
 }
 
 .hero__title {
+  font-family: var(--font-display);
   margin: 0;
   font-size: clamp(2.75rem, 9vw, 7rem);
   line-height: 0.94;
@@ -210,7 +236,7 @@ section {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1px;
-  background: var(--line);
+  background: #050505;
   padding: 0 0 0;
 }
 
@@ -246,9 +272,10 @@ section {
   justify-content: space-between;
   align-items: baseline;
   padding: 1.1rem 1.25rem;
-  background: linear-gradient(0deg, rgba(16,16,16,0.72) 0%, rgba(16,16,16,0) 100%);
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
+  background: linear-gradient(0deg, rgba(10,10,10,0.75) 0%, rgba(10,10,10,0) 100%);
+  font-family: var(--font-display);
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
 }
 
 .look__caption .n {
@@ -317,6 +344,7 @@ section {
 }
 
 .footer__mark {
+  font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.12em;
