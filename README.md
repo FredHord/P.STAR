@@ -19,10 +19,13 @@ Real photography/video, uploaded via the repo and resized/compressed for the web
 | Slot | File | Subject |
 | --- | --- | --- |
 | Hero | `assets/img/hero.mp4` (poster: `assets/img/hero.jpg`) | Long-exposure motion-blur sprint/leap, looping video |
-| Lookbook 01 | `assets/img/sprinter.jpg` | Sprinter |
-| Lookbook 02 | `assets/img/boxer.jpg` | Boxer |
-| Lookbook 03 | `assets/img/highjump.jpg` | High jumper |
+| Lookbook 01 | `assets/img/runner.jpg` | Textured runner portrait |
+| Lookbook 02 | `assets/img/sprinter.jpg` | Sprinter |
+| Lookbook 03 | `assets/img/boxer.jpg` | Boxer |
 | Lookbook 04 | `assets/img/kick.jpg` | Bicycle kick |
+
+`assets/img/highjump.jpg` is currently unused (displaced when the grid was
+reordered) but kept in the repo in case it rotates back in.
 
 `assets/img/favicon.png` and `assets/img/logo-mark.png` are both derived from the
 brand's P.STAR mark — one sized for the browser tab, the other for the nav bar
