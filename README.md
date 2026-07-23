@@ -13,21 +13,17 @@ a-cold-wall.com. Monochrome only: background `#101010`, foreground `#f1f3ef`.
 
 ## Imagery
 
-`assets/img/placeholder-*.svg` are procedurally generated monochrome motion-blur
-placeholders standing in for the brand's real photography, which this build
-could not fetch: the source hosts (`dropbox.com`, `*.cloudfront.net`) were
-blocked by this session's outbound network policy.
+Real photography, uploaded via the repo and resized/compressed for the web:
 
-To swap in the real photos, replace the referenced files (or update the `src`
-attributes in `index.html`) with:
-
-| Slot | Placeholder file | Intended image |
+| Slot | File | Subject |
 | --- | --- | --- |
-| Hero | `assets/img/placeholder-hero.svg` | Long-exposure jumping athlete ("JUMPING") |
-| Lookbook 01 | `assets/img/placeholder-sprinter.svg` | Sprinter |
-| Lookbook 02 | `assets/img/placeholder-boxer.svg` | Boxer |
-| Lookbook 03 | `assets/img/placeholder-highjump.svg` | High jumper |
-| Lookbook 04 | `assets/img/placeholder-kick.svg` | Bicycle kick |
+| Hero | `assets/img/hero.jpg` | Arched long-exposure motion-blur figure |
+| Lookbook 01 | `assets/img/sprinter.jpg` | Sprinter |
+| Lookbook 02 | `assets/img/boxer.jpg` | Boxer |
+| Lookbook 03 | `assets/img/highjump.jpg` | High jumper |
+| Lookbook 04 | `assets/img/kick.jpg` | Bicycle kick |
+
+`assets/img/favicon.png` is a resized crop of the brand's P★ mark, used as the site favicon.
 
 ## Local preview
 
