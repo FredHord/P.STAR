@@ -342,8 +342,8 @@ section {
   max-width: 46rem;
 }
 
-.statement__eyebrow {
-  font-size: 0.7rem;
+.statement p.statement__eyebrow {
+  font-size: clamp(1.15rem, 2.55vw, 1.79rem);
   letter-spacing: 0.2em;
   color: var(--fg-dim);
   margin: 0 0 1.5rem;
@@ -371,12 +371,11 @@ section {
   padding: clamp(2.5rem, 6vw, 4rem) var(--gap) clamp(1.5rem, 3vw, 2rem);
 }
 
-.footer__top {
+.footer__brand {
   display: flex;
-  flex-wrap: wrap;
-  gap: 2.5rem;
-  justify-content: space-between;
-  padding-bottom: clamp(2rem, 5vw, 3rem);
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
 }
 
 .footer__mark {
@@ -386,63 +385,44 @@ section {
   letter-spacing: 0.12em;
 }
 
-.footer__cols {
-  display: flex;
-  gap: clamp(2.5rem, 6vw, 5rem);
+.footer__logo {
+  height: 45px;
+  width: auto;
+  opacity: 0.9;
 }
 
-.footer__col h3 {
-  font-size: 0.68rem;
-  letter-spacing: 0.18em;
-  color: var(--fg-dim);
-  margin: 0 0 0.9rem;
-  font-weight: 500;
-}
-
-.footer__col ul {
+.footer__menu {
   list-style: none;
-  margin: 0;
+  margin: 0 0 clamp(1.5rem, 3vw, 2.25rem);
   padding: 0;
   display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
+  flex-wrap: wrap;
+  gap: clamp(1.25rem, 3vw, 2.75rem);
 }
 
-.footer__col a {
-  font-size: 0.82rem;
-  letter-spacing: 0.02em;
+.footer__menu a {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
   color: var(--fg-dim);
   transition: color 0.2s ease;
+  white-space: nowrap;
 }
 
-.footer__col a:hover,
-.footer__col a:focus-visible {
+.footer__menu a:hover,
+.footer__menu a:focus-visible {
   color: var(--fg);
 }
 
 .footer__bottom {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   gap: 1rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--line);
   font-size: 0.68rem;
   letter-spacing: 0.1em;
   color: var(--fg-faint);
-}
-
-.footer__bottom-left {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1rem;
-}
-
-.footer__logo {
-  height: 56px;
-  width: auto;
-  opacity: 0.9;
 }
 
 /* ---------- Responsive ---------- */
@@ -459,9 +439,8 @@ section {
   .hero__caption {
     text-align: left;
   }
-  .footer__top {
-    flex-direction: column;
-    gap: 2rem;
+  .footer__menu {
+    gap: 1rem 1.5rem;
   }
 }
 
