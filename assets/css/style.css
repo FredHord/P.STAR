@@ -323,7 +323,7 @@ section {
 /* ---------- Section break ---------- */
 
 .section-break {
-  height: clamp(3rem, 8vw, 6rem);
+  height: clamp(1.25rem, 3vw, 2.5rem);
 }
 
 /* ---------- Product row ---------- */
@@ -476,12 +476,12 @@ section {
   position: relative;
   overflow: hidden;
   border-top: 1px solid var(--line);
-  margin-top: clamp(3rem, 8vw, 6rem);
-  padding: clamp(7rem, 18vw, 14rem) var(--gap);
+  margin-top: clamp(1.25rem, 3vw, 2.5rem);
+  padding: clamp(12rem, 30vw, 22rem) var(--gap) clamp(2.5rem, 5vw, 4rem);
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  text-align: right;
+  justify-content: center;
+  align-items: flex-end;
+  text-align: center;
 }
 
 .statement__bg {
@@ -497,7 +497,7 @@ section {
 .statement__scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(10,10,10,0.35) 0%, rgba(10,10,10,0.15) 45%, rgba(10,10,10,0.8) 100%);
+  background: linear-gradient(180deg, rgba(10,10,10,0.1) 0%, rgba(10,10,10,0.05) 45%, rgba(10,10,10,0.82) 100%);
   pointer-events: none;
 }
 
@@ -540,7 +540,7 @@ section {
 
 .footer {
   border-top: 1px solid var(--line);
-  padding: clamp(2.5rem, 6vw, 4rem) var(--gap) clamp(1.5rem, 3vw, 2rem);
+  padding: clamp(1.75rem, 4vw, 2.75rem) var(--gap) clamp(1.25rem, 2.5vw, 1.75rem);
 }
 
 .footer__brand {
