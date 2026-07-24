@@ -117,7 +117,7 @@
     });
   }
 
-  var reveals = document.querySelectorAll(".reveal");
+  var reveals = document.querySelectorAll(".reveal, .slide");
 
   if (reduceMotion || !("IntersectionObserver" in window)) {
     reveals.forEach(function (el) {

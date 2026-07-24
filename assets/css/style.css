@@ -354,25 +354,13 @@ section {
   transform: scale(1.05);
 }
 
-.product__name {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 3.1rem;
-  padding: 0.6rem 1rem 0.4rem;
-  font-family: var(--font-display);
-  font-size: 0.6rem;
-  letter-spacing: 0.14em;
-  color: var(--fg);
-  background: linear-gradient(0deg, rgba(10,10,10,0.82) 40%, rgba(10,10,10,0) 100%);
-  pointer-events: none;
+.product {
+  display: flex;
+  flex-direction: column;
 }
 
 .product__shop {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  display: block;
   padding: 0.85rem 1rem;
   text-align: center;
   font-family: var(--font-display);
@@ -488,9 +476,11 @@ section {
   position: relative;
   overflow: hidden;
   border-top: 1px solid var(--line);
-  padding: clamp(5rem, 14vw, 11rem) var(--gap);
+  margin-top: clamp(3rem, 8vw, 6rem);
+  padding: clamp(7rem, 18vw, 14rem) var(--gap);
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   text-align: right;
 }
 
@@ -500,6 +490,7 @@ section {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: 50% 12%;
   filter: grayscale(1) contrast(1.05);
 }
 
@@ -513,23 +504,35 @@ section {
 .statement__inner {
   position: relative;
   z-index: 2;
-  max-width: 40rem;
+  max-width: 34rem;
+}
+
+/* slide-in: statement copy glides in from the right, once, on scroll */
+.slide {
+  opacity: 0;
+  transform: translateX(80px);
+  transition: opacity 1.1s ease, transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide.is-visible {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .statement p {
-  font-size: clamp(1.49rem, 3.3vw, 2.31rem);
-  line-height: 1.35;
+  font-size: clamp(1.3rem, 2.85vw, 2rem);
+  line-height: 1.4;
   letter-spacing: -0.005em;
-  margin: 0 0 1.5rem;
+  margin: 0 0 1.75rem;
   font-weight: 400;
   text-shadow: 0 2px 20px rgba(0,0,0,0.7);
 }
 
 .statement p:last-child {
   margin-bottom: 0;
-  font-size: clamp(1.05rem, 1.54vw, 1.16rem);
-  color: rgba(241, 243, 239, 0.82);
-  line-height: 1.7;
+  font-size: clamp(0.95rem, 1.35vw, 1.05rem);
+  color: rgba(241, 243, 239, 0.85);
+  line-height: 1.75;
   text-shadow: 0 1px 14px rgba(0,0,0,0.7);
 }
 
@@ -625,12 +628,13 @@ section {
   html {
     scroll-behavior: auto;
   }
-  .reveal {
+  .reveal,
+  .slide {
     opacity: 1;
     transform: none;
     transition: none;
   }
-  .look__img {
+  .product__img {
     transition: none;
   }
   .nav {
