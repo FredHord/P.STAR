@@ -617,10 +617,11 @@ section {
 
 .statement p:last-child {
   margin: 0 auto;
-  max-width: 34rem;
-  font-size: clamp(0.95rem, 1.35vw, 1.05rem);
+  max-width: 42rem;
+  font-size: clamp(0.95rem, 1.45vw, 1.12rem);
+  letter-spacing: 0.09em;
   color: rgba(241, 243, 239, 0.85);
-  line-height: 1.75;
+  line-height: 1.8;
   text-shadow: 0 1px 14px rgba(0,0,0,0.7);
 }
 
@@ -635,7 +636,6 @@ section {
   display: flex;
   align-items: center;
   gap: 0.9rem;
-  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
 }
 
 .footer__mark {
@@ -654,6 +654,7 @@ section {
 .footer__cols {
   display: flex;
   justify-content: space-between;
+  align-items: flex-end;
   gap: 2.5rem;
   margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
 }
@@ -668,7 +669,7 @@ section {
 }
 
 .footer__menu--legal {
-  text-align: right;
+  text-align: left;
 }
 
 .footer__menu a {
@@ -740,6 +741,9 @@ section {
     white-space: normal;
     font-size: 1rem;
   }
+  .statement p:last-child {
+    letter-spacing: 0.03em;
+  }
   .diptych {
     grid-template-columns: 1fr;
   }
@@ -753,6 +757,7 @@ section {
   }
   .footer__cols {
     flex-direction: column;
+    align-items: flex-start;
     gap: 2rem;
   }
   .footer__menu--legal {
