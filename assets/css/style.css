@@ -540,7 +540,7 @@ section {
   font-family: var(--font-display);
   font-weight: 700;
   white-space: nowrap;
-  font-size: clamp(0.85rem, 1.72vw, 1.6rem);
+  font-size: clamp(0.77rem, 1.55vw, 1.44rem);
   letter-spacing: 0.03em;
   line-height: 1.2;
 }
