@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>P STAR — Launch Readiness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14161C;
+    --ink-2:#1A1D25;
+    --ink-3:#20242E;
+    --line:#2C313C;
+    --paper:#E9E7E1;
+    --muted:#8C93A1;
+    --star:#D8B25C;
+    --star-dim:#6B5A31;
+    --fsf:#9DBF8E;
+    --mgmt:#7FA8B8;
+    --digi:#B99AC9;
+    --r:3px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);color:var(--paper);
+    font-family:'Inter Tight',system-ui,sans-serif;font-size:15px;line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:32px 20px 96px;}
+
+  /* ---------- masthead ---------- */
+  .mast{border-bottom:1px solid var(--line);padding-bottom:22px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+  h1{
+    font-family:'Archivo',sans-serif;font-weight:700;font-size:clamp(38px,9vw,74px);
+    line-height:.92;letter-spacing:-.02em;text-transform:uppercase;margin:10px 0 0;
+    display:flex;align-items:center;gap:.12em;flex-wrap:wrap;
+  }
+  h1 .star{color:var(--star);font-size:.62em;transform:translateY(-.12em);}
+  .sub{margin-top:12px;color:var(--muted);max-width:52ch;font-size:14px;}
+
+  .meter{margin-top:26px;}
+  .meter-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;}
+  .meter-count{font-family:'Archivo',sans-serif;font-weight:700;font-size:26px;letter-spacing:-.01em;}
+  .meter-count span{color:var(--muted);font-weight:500;}
+  .meter-label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+  .ticks{display:flex;gap:3px;margin-top:12px;}
+  .tick{flex:1;height:14px;background:var(--ink-3);border-radius:1px;transition:background .28s ease;}
+  .tick.on{background:var(--star);}
+
+  /* ---------- owner split ---------- */
+  .split{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px;}
+  .owner-card{border:1px solid var(--line);border-left-width:3px;border-radius:var(--r);padding:12px 14px;background:var(--ink-2);}
+  .owner-card .who{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;}
+  .owner-card .n{font-family:'Archivo',sans-serif;font-weight:700;font-size:22px;margin-top:6px;}
+  .owner-card .n em{font-style:normal;color:var(--muted);font-weight:500;font-size:14px;}
+  .oc-FSF{border-left-color:var(--fsf);} .oc-FSF .who{color:var(--fsf);}
+  .oc-MGMT{border-left-color:var(--mgmt);} .oc-MGMT .who{color:var(--mgmt);}
+  .oc-DIGI{border-left-color:var(--digi);} .oc-DIGI .who{color:var(--digi);}
+
+  /* ---------- filters ---------- */
+  .filters{display:flex;gap:8px;margin-top:22px;flex-wrap:wrap;align-items:center;}
+  .filters .lab{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-right:4px;}
+  .chip{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    background:none;border:1px solid var(--line);color:var(--muted);padding:7px 12px;border-radius:var(--r);cursor:pointer;
+  }
+  .chip:hover{color:var(--paper);border-color:var(--muted);}
+  .chip[aria-pressed="true"]{background:var(--paper);color:var(--ink);border-color:var(--paper);}
+  .chip:focus-visible{outline:2px solid var(--star);outline-offset:2px;}
+
+  /* ---------- critical path ---------- */
+  .critical{
+    margin-top:30px;border:1px solid var(--star-dim);
+    background:linear-gradient(180deg,rgba(216,178,92,.06),rgba(216,178,92,0));
+    border-radius:var(--r);padding:20px;
+  }
+  .critical h2{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--star);margin:0 0 4px;font-weight:500;}
+  .critical p{margin:0 0 16px;color:var(--muted);font-size:13.5px;max-width:60ch;}
+  .crit-grid{display:grid;gap:12px;grid-template-columns:repeat(3,1fr);}
+  .crit{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;transition:border-color .2s ease;text-align:left;color:inherit;font:inherit;}
+  .crit:hover{border-color:var(--star-dim);}
+  .crit:focus-visible{outline:2px solid var(--star);outline-offset:2px;}
+  .crit .t{font-weight:600;font-size:14.5px;display:block;}
+  .crit .why{display:block;color:var(--muted);font-size:12.5px;margin-top:5px;}
+  .crit.done .t{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--star-dim);}
+
+  /* ---------- sections ---------- */
+  .cols{margin-top:32px;columns:2;column-gap:30px;}
+  section{break-inside:avoid;-webkit-column-break-inside:avoid;display:inline-block;width:100%;margin-bottom:28px;vertical-align:top;}
+  section.hidden{display:none;}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding-bottom:8px;}
+  .sec-head h3{font-family:'Archivo',sans-serif;font-weight:600;font-size:16px;letter-spacing:.04em;text-transform:uppercase;margin:0;}
+  .sec-count{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);white-space:nowrap;}
+  .sec-count.full{color:var(--star);}
+  .sec-owner{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;margin-top:7px;}
+  .rule{height:2px;background:var(--ink-3);margin-top:8px;}
+  .rule i{display:block;height:100%;background:var(--star);width:0;transition:width .35s cubic-bezier(.4,0,.2,1);}
+  ul{list-style:none;margin:8px 0 0;padding:0;}
+  li.hidden{display:none;}
+  .item{display:flex;gap:11px;align-items:flex-start;width:100%;text-align:left;background:none;border:0;color:inherit;font:inherit;padding:8px 6px 8px 2px;cursor:pointer;border-radius:var(--r);}
+  .item:hover{background:var(--ink-2);}
+  .item:focus-visible{outline:2px solid var(--star);outline-offset:2px;}
+  .box{flex:0 0 auto;width:18px;height:18px;margin-top:1px;border:1.5px solid var(--muted);border-radius:2px;display:grid;place-items:center;transition:background .18s ease,border-color .18s ease;}
+  .item:hover .box{border-color:var(--paper);}
+  .box svg{width:11px;height:11px;opacity:0;transform:scale(.4) rotate(-25deg);transition:opacity .18s ease,transform .22s cubic-bezier(.2,1.5,.4,1);}
+  .item.done .box,.crit.done .box{background:var(--star);border-color:var(--star);}
+  .item.done .box svg,.crit.done .box svg{opacity:1;transform:scale(1) rotate(0);}
+  .item.done .label{color:var(--muted);}
+  .item.done .headline{text-decoration:line-through;text-decoration-color:var(--star-dim);}
+  .note{display:block;color:var(--muted);font-size:12.5px;margin-top:4px;}
+  .note a{color:var(--muted);text-decoration:underline;text-underline-offset:2px;}
+  .note a:hover{color:var(--paper);}
+  .tag{
+    font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+    border:1px solid currentColor;border-radius:2px;padding:1px 5px;margin-left:7px;white-space:nowrap;vertical-align:2px;opacity:.85;
+    text-decoration:none;display:inline-block;
+  }
+  .t-FSF{color:var(--fsf);} .t-MGMT,.t-MGMTF{color:var(--mgmt);} .t-DIGI{color:var(--digi);} .t-MIX{color:var(--muted);}
+  .flag{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--star);border:1px solid var(--star-dim);border-radius:2px;padding:1px 5px;margin-left:7px;white-space:nowrap;vertical-align:2px;display:inline-block;text-decoration:none;}
+
+  footer{margin-top:8px;border-top:1px solid var(--line);padding-top:18px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .saved{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.06em;}
+  .reset{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;background:none;border:1px solid var(--line);color:var(--muted);padding:8px 14px;border-radius:var(--r);cursor:pointer;}
+  .reset:hover{border-color:var(--paper);color:var(--paper);}
+  .reset:focus-visible{outline:2px solid var(--star);outline-offset:2px;}
+
+  @media (max-width:860px){
+    .cols{columns:1;}
+    .crit-grid,.split{grid-template-columns:1fr;}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+  @media print{body{background:#fff;color:#000;}.reset,.filters{display:none;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="mast">
+    <div class="eyebrow">Collection 001 · Launch readiness · Ownership</div>
+    <h1>P<span class="star">★</span>STAR</h1>
+    <p class="sub">Every task between now and go-live, with an owner attached. Tap an item to mark it complete — progress saves in your browser.</p>
+
+    <div class="meter">
+      <div class="meter-head">
+        <div class="meter-count"><b id="doneCount">0</b><span id="totalCount"> / 0 complete</span></div>
+        <div class="meter-label" id="pct">0% ready</div>
+      </div>
+      <div class="ticks" id="ticks"></div>
+    </div>
+
+    <div class="split" id="split"></div>
+
+    <div class="filters" id="filters">
+      <span class="lab">Show</span>
+      <button class="chip" data-filter="ALL" aria-pressed="true">Everyone</button>
+      <button class="chip" data-filter="FSF" aria-pressed="false">FSF Studio</button>
+      <button class="chip" data-filter="MGMT" aria-pressed="false">Management</button>
+      <button class="chip" data-filter="DIGI" aria-pressed="false">Digital Marketing</button>
+    </div>
+  </header>
+
+  <div class="critical">
+    <h2>Critical path</h2>
+    <p>Three blockers gate the launch. Nothing else ships without them.</p>
+    <div class="crit-grid" id="critGrid"></div>
+  </div>
+
+  <div class="cols" id="cols"></div>
+
+  <footer>
+    <div class="saved" id="saved">Checking storage…</div>
+    <button class="reset" id="reset">Clear all</button>
+  </footer>
+</div>
+
+<script>
+const CHECK = '<svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M1.5 6.2 4.4 9.2 10.5 2.8" stroke="#14161C" stroke-width="2.2" stroke-linecap="square"/></svg>';
+
+const OWNERS = {
+  FSF:   {short:"FSF Studio", group:"FSF"},
+  MGMT:  {short:"Management", group:"MGMT"},
+  MGMTF: {short:"Mgmt + Fulfillment", group:"MGMT"},
+  DIGI:  {short:"Digital Marketing", group:"DIGI"},
+};
+
+const DATA = [
+  { name:"Product", owner:"FSF Studio", ownerTone:"FSF", items:[
+    {id:"prod-1", t:"Complete Collection 001 production", o:"FSF"},
+    {id:"prod-2", t:"Final quality control", o:"FSF"},
+    {id:"prod-3", t:"Packaging complete", o:"FSF"},
+    {id:"prod-4", t:"Inventory received and counted", o:"FSF"},
+  ]},
+  { name:"Website Design", owner:"FSF Studio", ownerTone:"FSF", items:[
+    {id:"des-1", t:"Site design complete", o:"FSF", done:true,
+     note:'Awaiting approval and final images — <a href="https://fredhord.github.io/P.STAR/" target="_blank" rel="noopener">view sample site</a>'},
+  ]},
+  { name:"Website & E-Commerce", owner:"Management + Fulfillment", ownerTone:"MGMTF", items:[
+    {id:"web-1", t:"Shopify store created", o:"MGMTF"},
+    {id:"web-2", t:"Primary domain access granted", o:"MGMTF", crit:true},
+    {id:"web-3", t:"Connect landing page and Shopify to primary domain", o:"MGMTF"},
+    {id:"web-4", t:"Product catalog uploaded", o:"MGMTF"},
+    {id:"web-5", t:"Shipping rates configured", o:"MGMTF"},
+    {id:"web-6", t:"Payment gateway configured", o:"MGMTF"},
+    {id:"web-7", t:"Checkout tested", o:"MGMTF"},
+  ]},
+  { name:"Marketing", owner:"Collective effort", ownerTone:"MIX", items:[
+    {id:"mkt-1", t:"Launch email signup page (next week)", o:"FSF", crit:true},
+    {id:"mkt-3", t:"Campaign photography", o:"FSF"},
+    {id:"mkt-4", t:"Campaign film", o:"FSF"},
+    {id:"mkt-5", t:"Product photography", o:"FSF"},
+    {id:"mkt-2", t:"Build email list", o:"MGMT"},
+    {id:"mkt-6", t:"Social media content", o:"MGMT"},
+    {id:"mkt-7", t:"Launch calendar", o:"MGMT"},
+    {id:"mkt-8", t:"Press & influencer outreach", o:"MGMT"},
+  ]},
+  { name:"Meta Integration", owner:"Management", ownerTone:"MGMT", items:[
+    {id:"meta-1", t:"Facebook Shop setup", o:"MGMT"},
+    {id:"meta-2", t:"Instagram Shop setup", o:"MGMT"},
+    {id:"meta-3", t:"Connect shop to Gunna's Instagram", o:"MGMT"},
+    {id:"meta-4", t:"Meta Pixel installed", o:"MGMT"},
+    {id:"meta-5", t:"Domain verified with Meta", o:"MGMT"},
+    {id:"meta-6", t:"Product catalog synced", o:"MGMT"},
+  ]},
+  { name:"Email & CRM", owner:"Digital Marketing", ownerTone:"DIGI", items:[
+    {id:"crm-1", t:"Klaviyo setup", o:"DIGI"},
+    {id:"crm-2", t:"Welcome email automation", o:"DIGI"},
+    {id:"crm-3", t:"Launch announcement", o:"DIGI"},
+    {id:"crm-4", t:"Abandoned cart flow", o:"DIGI"},
+    {id:"crm-5", t:"Order notifications", o:"DIGI"},
+  ]},
+  { name:"Fulfillment", owner:"Management \u00b7 model undecided", ownerTone:"MGMT", items:[
+    {id:"ful-0", t:"Decide: in-house or outsourced", o:"MGMT", crit:true, note:"Open question \u2014 gates every item below it"},
+    {id:"ful-1", t:"Secure fulfillment partner agreement", o:"MGMT", note:"Only if outsourced \u2014 FSF can make the introduction"},
+    {id:"ful-2", t:"Finalize pick-and-pack pricing", o:"MGMT"},
+    {id:"ful-3", t:"Inventory receiving process established", o:"MGMT"},
+    {id:"ful-4", t:"Shipping workflow tested", o:"MGMT"},
+    {id:"ful-5", t:"Returns process established", o:"MGMT"},
+    {id:"ful-6", t:"Customer support workflow defined", o:"MGMT"},
+    {id:"ful-7", t:"SLA and shipping expectations confirmed", o:"MGMT"},
+  ]},
+  { name:"Launch Readiness", owner:"Split — confirm owners", ownerTone:"MIX", items:[
+    {id:"lr-1", t:"Website QA", o:"FSF"},
+    {id:"lr-2", t:"Mobile QA", o:"FSF"},
+    {id:"lr-3", t:"Analytics & tracking verified", o:"DIGI"},
+    {id:"lr-4", t:"Legal pages published", o:"MGMT"},
+    {id:"lr-5", t:"Final inventory verification", o:"MGMT"},
+    {id:"lr-6", t:"Go-live checklist completed", o:"MGMT"},
+  ]},
+];
+
+const CRITICAL = [
+  {id:"web-2", t:"Primary domain access", why:"So the experience lives on the official P STAR URL.", o:"MGMTF"},
+  {id:"ful-0", t:"Fulfillment model decided", why:"In-house or outsourced. Nothing ships until this is settled \u2014 and if outsourced, the agreement executed.", o:"MGMT"},
+  {id:"mkt-1", t:"Email capture live next week", why:"To build an owned audience before products are available.", o:"FSF"},
+];
+
+const KEY = "pstar-launch-readiness-v2";
+const ITEMS = DATA.flatMap(s => s.items);
+const ALL = ITEMS.map(i => i.id);
+let checked = {};
+let filter = "ALL";
+
+function tag(o){ return `<span class="tag t-${o}">${OWNERS[o].short}</span>`; }
+
+function build(){
+  document.getElementById("cols").innerHTML = DATA.map(sec => {
+    const ids = sec.items.map(i => i.id).join(",");
+    const groups = [...new Set(sec.items.map(i => OWNERS[i.o].group))].join(" ");
+    return `<section data-ids="${ids}" data-groups="${groups}">
+      <div class="sec-head">
+        <h3>${sec.name}</h3>
+        <div class="sec-count" data-count>0/${sec.items.length}</div>
+      </div>
+      <div class="sec-owner t-${sec.ownerTone}">${sec.owner}</div>
+      <div class="rule"><i></i></div>
+      <ul>${sec.items.map(i => `
+        <li data-group="${OWNERS[i.o].group}">
+          <button class="item" data-id="${i.id}" role="checkbox" aria-checked="false">
+            <span class="box">${CHECK}</span>
+            <span class="label"><span class="headline">${i.t}</span>${tag(i.o)}${i.crit?'<span class="flag">Critical</span>':''}${i.note?`<span class="note">${i.note}</span>`:''}</span>
+          </button>
+        </li>`).join("")}
+      </ul>
+    </section>`;
+  }).join("");
+
+  document.getElementById("critGrid").innerHTML = CRITICAL.map(c =>
+    `<button class="crit" data-id="${c.id}" role="checkbox" aria-checked="false">
+      <span class="box">${CHECK}</span>
+      <span><span class="t">${c.t}${tag(c.o)}</span><span class="why">${c.why}</span></span>
+    </button>`).join("");
+
+  document.getElementById("ticks").innerHTML = ALL.map(id => `<div class="tick" data-tick="${id}"></div>`).join("");
+  document.getElementById("totalCount").textContent = ` / ${ALL.length} complete`;
+
+  document.getElementById("split").innerHTML = [
+    ["FSF","FSF Studio"],["MGMT","Management"],["DIGI","Digital Marketing"]
+  ].map(([g,label]) =>
+    `<div class="owner-card oc-${g}" data-split="${g}">
+      <div class="who">${label}</div>
+      <div class="n"><b data-sn>0</b><em data-st> of 0 done</em></div>
+    </div>`).join("");
+}
+
+function paint(){
+  document.querySelectorAll("[data-id]").forEach(el => {
+    const on = !!checked[el.dataset.id];
+    el.classList.toggle("done", on);
+    el.setAttribute("aria-checked", on ? "true" : "false");
+  });
+  document.querySelectorAll("[data-tick]").forEach(el => el.classList.toggle("on", !!checked[el.dataset.tick]));
+
+  document.querySelectorAll("section").forEach(sec => {
+    const ids = sec.dataset.ids.split(",");
+    const n = ids.filter(id => checked[id]).length;
+    const c = sec.querySelector("[data-count]");
+    c.textContent = `${n}/${ids.length}`;
+    c.classList.toggle("full", n === ids.length);
+    sec.querySelector(".rule i").style.width = (n / ids.length * 100) + "%";
+    sec.classList.toggle("hidden", filter !== "ALL" && !sec.dataset.groups.split(" ").includes(filter));
+  });
+
+  document.querySelectorAll("li[data-group]").forEach(li => {
+    li.classList.toggle("hidden", filter !== "ALL" && li.dataset.group !== filter);
+  });
+
+  document.querySelectorAll("[data-split]").forEach(card => {
+    const g = card.dataset.split;
+    const mine = ITEMS.filter(i => OWNERS[i.o].group === g);
+    card.querySelector("[data-sn]").textContent = mine.filter(i => checked[i.id]).length;
+    card.querySelector("[data-st]").textContent = ` of ${mine.length} done`;
+  });
+
+  const done = ALL.filter(id => checked[id]).length;
+  document.getElementById("doneCount").textContent = done;
+  document.getElementById("pct").textContent = Math.round(done / ALL.length * 100) + "% ready";
+}
+
+function seed(){
+  const s = {};
+  ITEMS.forEach(i => { if(i.done) s[i.id] = true; });
+  return s;
+}
+
+/* Standalone persistence: browser localStorage, with an in-memory
+   fallback for environments where storage is blocked. */
+let canStore = true;
+try{
+  const probe = "__pstar_probe__";
+  window.localStorage.setItem(probe, "1");
+  window.localStorage.removeItem(probe);
+}catch(e){ canStore = false; }
+
+function load(){
+  const el = document.getElementById("saved");
+  if(canStore){
+    try{
+      const raw = window.localStorage.getItem(KEY);
+      const saved = raw ? JSON.parse(raw) : null;
+      checked = saved && saved.checked ? saved.checked : seed();
+    }catch(e){
+      checked = seed();
+    }
+    el.textContent = "Progress saves in this browser";
+  }else{
+    checked = seed();
+    el.textContent = "Storage unavailable — changes apply for this session only";
+  }
+  paint();
+}
+
+let timer;
+function save(){
+  const el = document.getElementById("saved");
+  if(!canStore) return;
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    try{
+      window.localStorage.setItem(KEY, JSON.stringify({checked}));
+      el.textContent = "Saved " + new Date().toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+    }catch(e){
+      el.textContent = "Couldn't save — changes apply for this session only";
+    }
+  }, 150);
+}
+
+document.addEventListener("click", e => {
+  const chip = e.target.closest(".chip");
+  if(chip){
+    filter = chip.dataset.filter;
+    document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", c === chip ? "true" : "false"));
+    paint();
+    return;
+  }
+  if(e.target.closest("a")) return;
+  const btn = e.target.closest("[data-id]");
+  if(!btn) return;
+  const id = btn.dataset.id;
+  if(checked[id]) delete checked[id]; else checked[id] = true;
+  paint();
+  save();
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  checked = {};
+  paint();
+  save();
+});
+
+build();
+load();
+</script>
+</body>
+</html>
