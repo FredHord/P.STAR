@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P.STAR — Contact</title>
+<meta name="description" content="Contact P.STAR.">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="subpage">
+
+<nav class="nav is-scrolled" id="nav">
+  <a href="index.html" class="nav__brand">
+    <img class="nav__logo" src="assets/img/logo-mark.png" alt="P.STAR">
+  </a>
+  <button class="nav__toggle" id="navToggle" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav__links u" id="navLinks">
+    <li><a href="index.html#collection">Shop</a></li>
+    <li><a href="index.html#collection">Collection</a></li>
+    <li><a href="index.html#statement">Statement</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<main class="page">
+  <div class="page__inner">
+    <h1 class="page__title u">Contact</h1>
+    <p class="page__note u">Please allow 24&ndash;48 hours for us to respond to your inquiries.</p>
+
+    <form class="contact-form" id="contactForm" novalidate>
+      <label class="visually-hidden" for="cName">Name</label>
+      <input class="waitlist__input" id="cName" type="text" name="name" placeholder="NAME" autocomplete="name" required>
+
+      <label class="visually-hidden" for="cEmail">Email</label>
+      <input class="waitlist__input" id="cEmail" type="email" name="email" placeholder="EMAIL ADDRESS" autocomplete="email" required>
+
+      <label class="visually-hidden" for="cSubject">Subject</label>
+      <input class="waitlist__input" id="cSubject" type="text" name="subject" placeholder="SUBJECT">
+
+      <label class="visually-hidden" for="cMessage">Message</label>
+      <textarea class="waitlist__input contact-form__message" id="cMessage" name="message" placeholder="MESSAGE" rows="6" required></textarea>
+
+      <button class="waitlist__submit u" type="submit">Send</button>
+    </form>
+    <p class="page__done u" id="contactDone" hidden>Thanks &mdash; we&rsquo;ll be in touch within 24&ndash;48 hours.</p>
+
+    <p class="page__contactline u">Or email us directly: <a href="mailto:studio@pstar.com">studio@pstar.com</a></p>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer__brand">
+    <img class="footer__logo" src="assets/img/footer-logo.png" alt="P.STAR monogram">
+    <span class="footer__mark u">P.STAR</span>
+  </div>
+  <ul class="footer__menu u">
+    <li><a href="index.html#collection">Shop</a></li>
+    <li><a href="index.html#waitlist">Early Access</a></li>
+    <li><a href="index.html#statement">Statement</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <ul class="footer__menu footer__menu--legal u">
+    <li><a href="faq.html">FAQ</a></li>
+    <li><a href="returns.html">Return Policy</a></li>
+    <li><a href="privacy.html">Privacy Policy</a></li>
+    <li><a href="terms.html">Terms &amp; Conditions</a></li>
+  </ul>
+  <div class="footer__bottom">
+    <span>&copy; 2026 P.STAR. All rights reserved.</span>
+    <a href="index.html" class="u">Home</a>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('navToggle').addEventListener('click', function () {
+    var nav = document.getElementById('nav');
+    var open = nav.classList.toggle('nav--open');
+    this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  document.getElementById('contactForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = document.getElementById('cEmail');
+    var msg = document.getElementById('cMessage');
+    if (!email.value || email.value.indexOf('@') < 1 || !msg.value.trim()) {
+      (!email.value ? email : msg).focus();
+      return;
+    }
+    // No backend yet — acknowledge in the UI. Wire CONTACT_ENDPOINT to a
+    // form service (Formspree, Basin, etc.) to actually deliver messages.
+    this.hidden = true;
+    document.getElementById('contactDone').hidden = false;
+  });
+</script>
+</body>
+</html>

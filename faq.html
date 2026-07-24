@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P.STAR — FAQ</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="subpage">
+
+<nav class="nav is-scrolled" id="nav">
+  <a href="index.html" class="nav__brand">
+    <img class="nav__logo" src="assets/img/logo-mark.png" alt="P.STAR">
+  </a>
+  <button class="nav__toggle" id="navToggle" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
+    <span></span><span></span><span></span>
+  </button>
+  <ul class="nav__links u" id="navLinks">
+    <li><a href="index.html#collection">Shop</a></li>
+    <li><a href="index.html#collection">Collection</a></li>
+    <li><a href="index.html#statement">Statement</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<main class="page">
+  <div class="page__inner page__inner--text">
+    <h1 class="page__title u">FAQ</h1>
+    <p class="page__meta u">Placeholder copy — replace with your finalized policy before launch. Last updated: 2026.</p>
+    <div class="prose">
+      <h2>When does Collection 001 launch?</h2>
+      <p>Collection 001 arrives Fall 2026. Join for early access to be first in line and get notified the moment it drops.</p>
+      <h2>How do I get early access?</h2>
+      <p>Enter your email (and optionally your mobile number for SMS) in the Join for Early Access form on the homepage.</p>
+      <h2>What sizes will be available?</h2>
+      <p>Sizing details will be published with each product at launch. Reach out via our contact page with fit questions.</p>
+      <h2>Where do you ship?</h2>
+      <p>Shipping regions and rates will be confirmed at launch. Sign up for early access to receive shipping details first.</p>
+      <h2>How can I contact you?</h2>
+      <p>Use our <a href="contact.html">contact form</a> or email <a href="mailto:studio@pstar.com">studio@pstar.com</a>. Please allow 24&ndash;48 hours for a response.</p>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer__brand">
+    <img class="footer__logo" src="assets/img/footer-logo.png" alt="P.STAR monogram">
+    <span class="footer__mark u">P.STAR</span>
+  </div>
+  <ul class="footer__menu u">
+    <li><a href="index.html#collection">Shop</a></li>
+    <li><a href="index.html#waitlist">Early Access</a></li>
+    <li><a href="index.html#statement">Statement</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <ul class="footer__menu footer__menu--legal u">
+    <li><a href="faq.html">FAQ</a></li>
+    <li><a href="returns.html">Return Policy</a></li>
+    <li><a href="privacy.html">Privacy Policy</a></li>
+    <li><a href="terms.html">Terms &amp; Conditions</a></li>
+  </ul>
+  <div class="footer__bottom">
+    <span>&copy; 2026 P.STAR. All rights reserved.</span>
+    <a href="index.html" class="u">Home</a>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('navToggle').addEventListener('click', function () {
+    var nav = document.getElementById('nav');
+    var open = nav.classList.toggle('nav--open');
+    this.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+</script>
+</body>
+</html>

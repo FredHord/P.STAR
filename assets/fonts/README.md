@@ -1,24 +1,12 @@
-# Bookface font files go here
+# Fonts
 
-The site's CSS (`assets/css/style.css`) already references Bookface for the
-P.STAR wordmark and lookbook captions:
+The site's display typeface is **Akira** (Akira Expanded), used for the
+wordmark, headings, nav, buttons, and labels via `--font-display` in
+`assets/css/style.css`.
 
-```css
-@font-face {
-  font-family: "Bookface";
-  src: url("../fonts/Bookface-Bold.woff2") format("woff2"),
-       url("../fonts/Bookface-Bold.otf") format("opentype");
-  font-weight: 700;
-  font-style: normal;
-}
-```
+- `Akira-Bold.woff2` — weight 700 (nav, labels, buttons, body headings)
+- `Akira-SuperBold.woff2` — weights 800–900 (large display / page titles)
 
-I couldn't license/download the actual Bookface font file myself, so drop the
-files in here with these exact names and it'll pick them up automatically —
-no further code changes needed:
-
-- `Bookface-Bold.woff2` (preferred — smallest/fastest)
-- `Bookface-Bold.otf` (fallback if you only have the desktop font)
-
-Until then, the site falls back to Helvetica Neue/Arial, so nothing breaks —
-it just won't show the real typeface yet.
+Long-form running copy (the statement description paragraph, form fields)
+stays in a system sans for readability, since Akira Expanded is a display
+face not suited to paragraphs.

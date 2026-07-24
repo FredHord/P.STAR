@@ -19,10 +19,10 @@
     <span></span><span></span><span></span>
   </button>
   <ul class="nav__links u" id="navLinks">
-    <li><a href="#">Shop</a></li>
-    <li><a href="#waitlist">Collection</a></li>
+    <li><a href="#collection">Shop</a></li>
+    <li><a href="#collection">Collection</a></li>
     <li><a href="#statement">Statement</a></li>
-    <li><a href="#contact">Contact</a></li>
+    <li><a href="contact.html">Contact</a></li>
   </ul>
 </nav>
 
@@ -32,11 +32,17 @@
 
   <div class="hero__signup" id="waitlist">
     <div class="waitlist__inner reveal">
-      <h2 class="waitlist__title u">Join for Access</h2>
+      <h2 class="waitlist__title u">Join for Early Access</h2>
       <p class="waitlist__sub u">Be first in line for Collection 001</p>
       <form class="waitlist__form" id="waitlistForm" novalidate>
         <label class="visually-hidden" for="waitlistEmail">Email address</label>
         <input class="waitlist__input" id="waitlistEmail" type="email" name="email" placeholder="EMAIL ADDRESS" autocomplete="email" required>
+        <label class="visually-hidden" for="waitlistPhone">Mobile number</label>
+        <input class="waitlist__input" id="waitlistPhone" type="tel" name="phone" placeholder="MOBILE NUMBER (OPTIONAL)" autocomplete="tel" inputmode="tel">
+        <label class="waitlist__sms">
+          <input type="checkbox" id="waitlistSms" name="sms">
+          <span class="u">Text me early-access drops &amp; updates</span>
+        </label>
         <button class="waitlist__submit u" type="submit">Join</button>
       </form>
       <p class="waitlist__done u" id="waitlistDone" hidden>You're on the list.</p>
@@ -70,21 +76,67 @@
   <div class="section-break" aria-hidden="true"></div>
 
   <section id="collection" class="products" aria-label="Collection 001 pieces">
-    <div class="product">
-      <img class="product__img" src="assets/img/product-bomber.jpg" alt="Bomber jacket" loading="lazy">
-      <a class="product__shop u" href="#waitlist">Shop</a>
-    </div>
-    <div class="product">
-      <img class="product__img" src="assets/img/product-zip.jpg" alt="Zip hoodie" loading="lazy">
-      <a class="product__shop u" href="#waitlist">Shop</a>
-    </div>
-    <div class="product">
-      <img class="product__img" src="assets/img/product-track.jpg" alt="Track jacket" loading="lazy">
-      <a class="product__shop u" href="#waitlist">Shop</a>
-    </div>
-    <div class="product">
-      <img class="product__img" src="assets/img/product-shorts.jpg" alt="Sweatshorts" loading="lazy">
-      <a class="product__shop u" href="#waitlist">Shop</a>
+    <div class="products__track">
+      <div class="product">
+        <a class="product__link" href="assets/img/product-bomber.jpg" target="_blank" rel="noopener">
+          <img class="product__img" src="assets/img/product-bomber.jpg" alt="Bomber jacket" loading="lazy">
+        </a>
+        <a class="product__shop u" href="assets/img/product-bomber.jpg" target="_blank" rel="noopener">Shop</a>
+      </div>
+      <div class="product">
+        <a class="product__link" href="assets/img/product-zip.jpg" target="_blank" rel="noopener">
+          <img class="product__img" src="assets/img/product-zip.jpg" alt="Zip hoodie" loading="lazy">
+        </a>
+        <a class="product__shop u" href="assets/img/product-zip.jpg" target="_blank" rel="noopener">Shop</a>
+      </div>
+      <div class="product">
+        <a class="product__link" href="assets/img/product-track.jpg" target="_blank" rel="noopener">
+          <img class="product__img" src="assets/img/product-track.jpg" alt="Track jacket" loading="lazy">
+        </a>
+        <a class="product__shop u" href="assets/img/product-track.jpg" target="_blank" rel="noopener">Shop</a>
+      </div>
+      <div class="product">
+        <a class="product__link" href="assets/img/product-pullover.jpg" target="_blank" rel="noopener">
+          <img class="product__img" src="assets/img/product-pullover.jpg" alt="Pullover hoodie" loading="lazy">
+        </a>
+        <a class="product__shop u" href="assets/img/product-pullover.jpg" target="_blank" rel="noopener">Shop</a>
+      </div>
+      <div class="product">
+        <a class="product__link" href="assets/img/product-tee.jpg" target="_blank" rel="noopener">
+          <img class="product__img" src="assets/img/product-tee.jpg" alt="Logo tee" loading="lazy">
+        </a>
+        <a class="product__shop u" href="assets/img/product-tee.jpg" target="_blank" rel="noopener">Shop</a>
+      </div>
+      <div class="product">
+        <a class="product__link" href="assets/img/product-longsleeve.jpg" target="_blank" rel="noopener">
+          <img class="product__img" src="assets/img/product-longsleeve.jpg" alt="Long sleeve" loading="lazy">
+        </a>
+        <a class="product__shop u" href="assets/img/product-longsleeve.jpg" target="_blank" rel="noopener">Shop</a>
+      </div>
+      <div class="product">
+        <a class="product__link" href="assets/img/product-tank.jpg" target="_blank" rel="noopener">
+          <img class="product__img" src="assets/img/product-tank.jpg" alt="Logo tank" loading="lazy">
+        </a>
+        <a class="product__shop u" href="assets/img/product-tank.jpg" target="_blank" rel="noopener">Shop</a>
+      </div>
+      <div class="product">
+        <a class="product__link" href="assets/img/product-sweatpants.jpg" target="_blank" rel="noopener">
+          <img class="product__img" src="assets/img/product-sweatpants.jpg" alt="Sweatpants" loading="lazy">
+        </a>
+        <a class="product__shop u" href="assets/img/product-sweatpants.jpg" target="_blank" rel="noopener">Shop</a>
+      </div>
+      <div class="product">
+        <a class="product__link" href="assets/img/product-trackpants.jpg" target="_blank" rel="noopener">
+          <img class="product__img" src="assets/img/product-trackpants.jpg" alt="Track pants" loading="lazy">
+        </a>
+        <a class="product__shop u" href="assets/img/product-trackpants.jpg" target="_blank" rel="noopener">Shop</a>
+      </div>
+      <div class="product">
+        <a class="product__link" href="assets/img/product-shorts.jpg" target="_blank" rel="noopener">
+          <img class="product__img" src="assets/img/product-shorts.jpg" alt="Sweatshorts" loading="lazy">
+        </a>
+        <a class="product__shop u" href="assets/img/product-shorts.jpg" target="_blank" rel="noopener">Shop</a>
+      </div>
     </div>
   </section>
 
@@ -105,11 +157,17 @@
     <span class="footer__mark u">P.STAR</span>
   </div>
   <ul class="footer__menu u">
-    <li><a href="#">Shop</a></li>
-    <li><a href="#waitlist">Waiting List</a></li>
+    <li><a href="#collection">Shop</a></li>
+    <li><a href="#waitlist">Early Access</a></li>
     <li><a href="#statement">Statement</a></li>
-    <li><a href="mailto:studio@pstar.com">Contact</a></li>
+    <li><a href="contact.html">Contact</a></li>
     <li><a href="#top">Instagram</a></li>
+  </ul>
+  <ul class="footer__menu footer__menu--legal u">
+    <li><a href="faq.html">FAQ</a></li>
+    <li><a href="returns.html">Return Policy</a></li>
+    <li><a href="privacy.html">Privacy Policy</a></li>
+    <li><a href="terms.html">Terms &amp; Conditions</a></li>
   </ul>
   <div class="footer__bottom">
     <span>&copy; <span id="year">2026</span> P.STAR. All rights reserved.</span>

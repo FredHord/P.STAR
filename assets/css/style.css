@@ -1,10 +1,17 @@
 /* P.STAR — stark industrial minimalism, monochrome only */
 
 @font-face {
-  font-family: "Bookface";
-  src: url("../fonts/Bookface-Bold.woff2") format("woff2"),
-       url("../fonts/Bookface-Bold.otf") format("opentype");
+  font-family: "Akira";
+  src: url("../fonts/Akira-Bold.woff2") format("woff2");
   font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Akira";
+  src: url("../fonts/Akira-SuperBold.woff2") format("woff2");
+  font-weight: 800 900;
   font-style: normal;
   font-display: swap;
 }
@@ -17,7 +24,7 @@
   --line: rgba(241, 243, 239, 0.1);
   --gap: clamp(1.25rem, 3vw, 2.5rem);
   --nav-h: 76px;
-  --font-display: "Bookface", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: "Akira", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 * {
@@ -130,9 +137,10 @@ a {
 }
 
 .nav__links a {
-  font-size: 0.72rem;
-  letter-spacing: 0.16em;
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
   color: var(--fg-dim);
   transition: color 0.25s ease;
   white-space: nowrap;
@@ -351,20 +359,49 @@ section {
   height: clamp(1.25rem, 3vw, 2.5rem);
 }
 
-/* ---------- Product row ---------- */
+/* ---------- Product row (horizontal scroll) ---------- */
 
 .products {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  padding: 0 0 0 var(--gap);
+}
+
+.products__track {
+  display: flex;
   gap: clamp(0.75rem, 1.5vw, 1.25rem);
-  padding: 0 var(--gap);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  padding-right: var(--gap);
+  padding-bottom: 0.75rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+
+.products__track::-webkit-scrollbar {
+  height: 6px;
+}
+.products__track::-webkit-scrollbar-track {
+  background: transparent;
+}
+.products__track::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 3px;
 }
 
 .product {
   position: relative;
-  display: block;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   background: #e9e9e7;
+  flex: 0 0 auto;
+  width: clamp(220px, 24vw, 320px);
+  scroll-snap-align: start;
+}
+
+.product__link {
+  display: block;
+  overflow: hidden;
 }
 
 .product__img {
@@ -377,11 +414,6 @@ section {
 
 .product:hover .product__img {
   transform: scale(1.05);
-}
-
-.product {
-  display: flex;
-  flex-direction: column;
 }
 
 .product__shop {
@@ -428,9 +460,8 @@ section {
 
 .waitlist__form {
   display: flex;
-  border: 1px solid rgba(241, 243, 239, 0.35);
-  background: rgba(10, 10, 10, 0.35);
-  backdrop-filter: blur(4px);
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
 .waitlist__form[hidden] {
@@ -438,10 +469,11 @@ section {
 }
 
 .waitlist__input {
-  flex: 1;
+  width: 100%;
   min-width: 0;
-  background: transparent;
-  border: 0;
+  background: rgba(10, 10, 10, 0.35);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(241, 243, 239, 0.35);
   outline: none;
   color: var(--fg);
   font-family: inherit;
@@ -455,15 +487,36 @@ section {
 }
 
 .waitlist__input:focus-visible {
-  box-shadow: inset 0 0 0 1px var(--fg-dim);
+  border-color: var(--fg-dim);
+}
+
+.waitlist__sms {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.2rem 0.1rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  color: var(--fg);
+  text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+  text-align: left;
+}
+
+.waitlist__sms input {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  accent-color: var(--fg);
 }
 
 .waitlist__submit {
+  margin-top: 0.3rem;
+  width: 100%;
   background: var(--fg);
   color: #0a0a0a;
   border: 0;
   font-family: var(--font-display);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.16em;
   padding: 1rem 1.6rem;
@@ -600,19 +653,30 @@ section {
 
 .footer__menu {
   list-style: none;
-  margin: 0 0 clamp(1.5rem, 3vw, 2.25rem);
+  margin: 0 0 1rem;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
   gap: clamp(1.25rem, 3vw, 2.75rem);
 }
 
+.footer__menu--legal {
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+  gap: clamp(1rem, 2.4vw, 2rem);
+}
+
 .footer__menu a {
-  font-size: 0.72rem;
-  letter-spacing: 0.16em;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
   color: var(--fg-dim);
   transition: color 0.2s ease;
   white-space: nowrap;
+}
+
+.footer__menu--legal a {
+  color: var(--fg-faint);
 }
 
 .footer__menu a:hover,
@@ -661,9 +725,6 @@ section {
     padding: 0.9rem var(--gap);
     font-size: 0.8rem;
   }
-  .products {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .statement p.statement__lead {
     white-space: normal;
     font-size: 1rem;
@@ -682,6 +743,103 @@ section {
   .footer__menu {
     gap: 1rem 1.5rem;
   }
+}
+
+/* ---------- Sub-pages (contact / legal) ---------- */
+
+.subpage {
+  padding-top: var(--nav-h);
+}
+
+.page {
+  min-height: calc(100vh - var(--nav-h));
+  padding: clamp(2.5rem, 7vw, 5rem) var(--gap) clamp(3rem, 8vw, 6rem);
+  display: flex;
+  justify-content: center;
+}
+
+.page__inner {
+  width: 100%;
+  max-width: 34rem;
+}
+
+.page__inner--text {
+  max-width: 44rem;
+}
+
+.page__title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.35rem, 4vw, 2.4rem);
+  letter-spacing: 0.02em;
+  margin: 0 0 1rem;
+}
+
+.page__note {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--fg-dim);
+  margin: 0 0 2rem;
+}
+
+.page__meta {
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  color: var(--fg-faint);
+  margin: 0 0 2.5rem;
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.contact-form__message {
+  resize: vertical;
+  min-height: 8rem;
+  line-height: 1.5;
+}
+
+.page__done {
+  margin: 1.5rem 0 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  color: var(--fg);
+}
+
+.page__contactline {
+  margin: 2rem 0 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--fg-dim);
+}
+
+.page__contactline a {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(0.82rem, 1.6vw, 1rem);
+  letter-spacing: 0.04em;
+  margin: 2rem 0 0.6rem;
+}
+
+.prose p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--fg-dim);
+  margin: 0 0 0.4rem;
+}
+
+.prose a {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* ---------- Motion preference ---------- */
