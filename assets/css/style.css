@@ -651,18 +651,24 @@ section {
   opacity: 0.9;
 }
 
+.footer__cols {
+  display: flex;
+  justify-content: space-between;
+  gap: 2.5rem;
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+}
+
 .footer__menu {
   list-style: none;
-  margin: 0 0 1rem;
+  margin: 0;
   padding: 0;
   display: flex;
-  flex-wrap: wrap;
-  gap: clamp(1.25rem, 3vw, 2.75rem);
+  flex-direction: column;
+  gap: 0.7rem;
 }
 
 .footer__menu--legal {
-  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
-  gap: clamp(1rem, 2.4vw, 2rem);
+  text-align: right;
 }
 
 .footer__menu a {
@@ -673,6 +679,11 @@ section {
   color: var(--fg-dim);
   transition: color 0.2s ease;
   white-space: nowrap;
+}
+
+.footer__menu a:hover,
+.footer__menu a:focus-visible {
+  color: var(--fg);
 }
 
 .footer__menu--legal a {
@@ -740,8 +751,18 @@ section {
   .hero__caption {
     text-align: left;
   }
-  .footer__menu {
-    gap: 1rem 1.5rem;
+  .footer__cols {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .footer__menu--legal {
+    text-align: left;
+  }
+  .footer__logo {
+    height: 22px;
+  }
+  .footer__mark {
+    font-size: 1.125rem;
   }
 }
 
