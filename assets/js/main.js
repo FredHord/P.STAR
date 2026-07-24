@@ -8,6 +8,20 @@
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
 
+  var navToggle = document.getElementById("navToggle");
+  if (navToggle) {
+    navToggle.addEventListener("click", function () {
+      var open = nav.classList.toggle("nav--open");
+      navToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    nav.querySelectorAll(".nav__links a").forEach(function (link) {
+      link.addEventListener("click", function () {
+        nav.classList.remove("nav--open");
+        navToggle.setAttribute("aria-expanded", "false");
+      });
+    });
+  }
+
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   var heroVideo = document.getElementById("heroVideo");
@@ -26,16 +40,8 @@
   var heroTitle = document.querySelector(".hero__title");
   var finePointer = window.matchMedia("(pointer: fine)").matches;
 
-  if (hero && heroVideo && finePointer && !reduceMotion) {
+  if (hero && heroVideo && !reduceMotion) {
     hero.classList.add("hero--parallax");
-
-    heroVideo.removeAttribute("autoplay");
-    heroVideo.pause();
-    heroVideo.addEventListener("loadeddata", function () {
-      if (!hero.matches(":hover")) {
-        heroVideo.pause();
-      }
-    });
 
     var MEDIA_SHIFT = 60;
     var TITLE_SHIFT = -20;
@@ -67,23 +73,63 @@
       }
     };
 
-    hero.addEventListener("mouseenter", function () {
-      heroVideo.play();
-    });
-
-    hero.addEventListener("mousemove", function (e) {
+    var setTarget = function (clientX, clientY) {
       var rect = hero.getBoundingClientRect();
-      targetX = (e.clientX - rect.left) / rect.width - 0.5;
-      targetY = (e.clientY - rect.top) / rect.height - 0.5;
+      targetX = (clientX - rect.left) / rect.width - 0.5;
+      targetY = (clientY - rect.top) / rect.height - 0.5;
       queue();
-    });
+    };
 
-    hero.addEventListener("mouseleave", function () {
-      heroVideo.pause();
+    var recenter = function () {
       targetX = 0;
       targetY = 0;
       queue();
-    });
+    };
+
+    if (finePointer) {
+      // Desktop: still frame until hover, then play + drift with cursor.
+      heroVideo.removeAttribute("autoplay");
+      heroVideo.pause();
+      heroVideo.addEventListener("loadeddata", function () {
+        if (!hero.matches(":hover")) {
+          heroVideo.pause();
+        }
+      });
+
+      hero.addEventListener("mouseenter", function () {
+        heroVideo.play();
+      });
+
+      hero.addEventListener("mousemove", function (e) {
+        setTarget(e.clientX, e.clientY);
+      });
+
+      hero.addEventListener("mouseleave", function () {
+        heroVideo.pause();
+        recenter();
+      });
+    } else {
+      // Touch: video keeps its autoplay loop; the finger drives the
+      // same drift while touching the hero, then it glides back.
+      hero.addEventListener(
+        "touchstart",
+        function (e) {
+          var t = e.touches[0];
+          if (t) setTarget(t.clientX, t.clientY);
+        },
+        { passive: true }
+      );
+      hero.addEventListener(
+        "touchmove",
+        function (e) {
+          var t = e.touches[0];
+          if (t) setTarget(t.clientX, t.clientY);
+        },
+        { passive: true }
+      );
+      hero.addEventListener("touchend", recenter, { passive: true });
+      hero.addEventListener("touchcancel", recenter, { passive: true });
+    }
   }
 
   // Waiting-list form. No backend is wired up yet: submissions are
