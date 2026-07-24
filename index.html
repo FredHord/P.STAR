@@ -26,6 +26,20 @@
 <header class="hero" id="top">
   <video class="hero__media" id="heroVideo" src="assets/img/hero.mp4" poster="assets/img/hero.jpg" autoplay muted loop playsinline></video>
   <div class="hero__scrim" aria-hidden="true"></div>
+
+  <div class="hero__signup" id="waitlist">
+    <div class="waitlist__inner reveal">
+      <h2 class="waitlist__title u">Join for Access</h2>
+      <p class="waitlist__sub u">Be first in line for Collection 001</p>
+      <form class="waitlist__form" id="waitlistForm" novalidate>
+        <label class="visually-hidden" for="waitlistEmail">Email address</label>
+        <input class="waitlist__input" id="waitlistEmail" type="email" name="email" placeholder="EMAIL ADDRESS" autocomplete="email" required>
+        <button class="waitlist__submit u" type="submit">Join</button>
+      </form>
+      <p class="waitlist__done u" id="waitlistDone" hidden>You're on the list.</p>
+    </div>
+  </div>
+
   <div class="hero__content">
     <h1 class="hero__title u">Star Players: Collection&nbsp;001</h1>
   </div>
@@ -50,42 +64,37 @@
     </figure>
   </section>
 
-  <section class="products" aria-label="Collection 001 pieces">
-    <a class="product" href="#waitlist">
+  <div class="section-break" aria-hidden="true"></div>
+
+  <section id="collection" class="products" aria-label="Collection 001 pieces">
+    <div class="product">
       <img class="product__img" src="assets/img/product-bomber.jpg" alt="Bomber jacket" loading="lazy">
       <span class="product__name u">Bomber Jacket</span>
-    </a>
-    <a class="product" href="#waitlist">
+      <a class="product__shop u" href="#waitlist">Shop</a>
+    </div>
+    <div class="product">
       <img class="product__img" src="assets/img/product-zip.jpg" alt="Zip hoodie" loading="lazy">
       <span class="product__name u">Zip Hoodie</span>
-    </a>
-    <a class="product" href="#waitlist">
+      <a class="product__shop u" href="#waitlist">Shop</a>
+    </div>
+    <div class="product">
       <img class="product__img" src="assets/img/product-track.jpg" alt="Track jacket" loading="lazy">
       <span class="product__name u">Track Jacket</span>
-    </a>
-    <a class="product" href="#waitlist">
+      <a class="product__shop u" href="#waitlist">Shop</a>
+    </div>
+    <div class="product">
       <img class="product__img" src="assets/img/product-shorts.jpg" alt="Sweatshorts" loading="lazy">
       <span class="product__name u">Sweatshorts</span>
-    </a>
-  </section>
-
-  <section id="statement" class="statement">
-    <div class="statement__inner reveal">
-      <p>Every journey to P.erfection is marked by P.rogress.</p>
-      <p>P. STAR celebrates the milestones that define the P.ursuit of greatness. Built for every P.layer striving for P.erfect P.erformance, this brand honors the P.assion, P.erseverance, and P.urpose behind every achievement.</p>
+      <a class="product__shop u" href="#waitlist">Shop</a>
     </div>
   </section>
 
-  <section id="waitlist" class="waitlist">
-    <div class="waitlist__inner reveal">
-      <h2 class="waitlist__title u">Join Waiting List</h2>
-      <p class="waitlist__sub u">Be first in line for Collection 001</p>
-      <form class="waitlist__form" id="waitlistForm" novalidate>
-        <label class="visually-hidden" for="waitlistEmail">Email address</label>
-        <input class="waitlist__input" id="waitlistEmail" type="email" name="email" placeholder="EMAIL ADDRESS" autocomplete="email" required>
-        <button class="waitlist__submit u" type="submit">Join</button>
-      </form>
-      <p class="waitlist__done u" id="waitlistDone" hidden>You're on the list.</p>
+  <section id="statement" class="statement">
+    <img class="statement__bg" src="assets/img/statement-bg.jpg" alt="" aria-hidden="true" loading="lazy">
+    <div class="statement__scrim" aria-hidden="true"></div>
+    <div class="statement__inner reveal">
+      <p>Every journey to P.erfection is marked by P.rogress.</p>
+      <p>P. STAR celebrates the milestones that define the P.ursuit of greatness. Built for every P.layer striving for P.erfect P.erformance, this brand honors the P.assion, P.erseverance, and P.urpose behind every achievement.</p>
     </div>
   </section>
 
