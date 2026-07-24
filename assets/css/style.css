@@ -477,10 +477,10 @@ section {
   overflow: hidden;
   border-top: 1px solid var(--line);
   margin-top: clamp(1.25rem, 3vw, 2.5rem);
-  padding: clamp(12rem, 30vw, 22rem) var(--gap) clamp(2.5rem, 5vw, 4rem);
+  padding: clamp(7rem, 17.5vw, 13rem) var(--gap);
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
   text-align: center;
 }
 
@@ -497,7 +497,7 @@ section {
 .statement__scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10,10,10,0.1) 0%, rgba(10,10,10,0.05) 45%, rgba(10,10,10,0.82) 100%);
+  background: radial-gradient(ellipse at center, rgba(10,10,10,0.5) 0%, rgba(10,10,10,0.12) 60%, rgba(10,10,10,0) 100%);
   pointer-events: none;
 }
 
@@ -517,14 +517,6 @@ section {
 .slide.is-visible {
   opacity: 1;
   transform: translateX(0);
-}
-
-.statement__logo {
-  width: clamp(58px, 8vw, 96px);
-  height: auto;
-  margin: 0 auto 1.5rem;
-  display: block;
-  filter: drop-shadow(0 2px 14px rgba(0,0,0,0.55));
 }
 
 .statement p {
