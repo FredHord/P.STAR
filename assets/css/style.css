@@ -34,6 +34,8 @@
 html {
   background: var(--bg);
   scroll-behavior: smooth;
+  /* Keep anchor targets clear of the fixed nav */
+  scroll-padding-top: var(--nav-h);
   cursor: url("../img/cursor-pstar.png") 4 4, auto;
 }
 
