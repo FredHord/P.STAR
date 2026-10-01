@@ -62,8 +62,10 @@ Behaviour worth knowing:
   total and flagged, rather than counted as zero — same as the spreadsheet.
 - Pattern and grading fees are charged **once per style**, so two lines of the
   same style are not billed twice.
-- Embellishments (printing, embroidery, studding) are *not* in FSF's quote;
-  their rates start empty and are flagged until filled in.
+- Embellishments (printing, embroidery, studding) are **quoted per project** —
+  the rates move every run, so there are deliberately no defaults for them in
+  `STYLES` or anywhere else. Each build prices its own, and a line left at $0
+  is flagged so it can't be quoted by accident.
 - Packaging is FSF's flat $3.50/unit and **covers bagging and tagging**
   (confirmed with Fred). The separate "Finishing / other" toggle is a spare
   line for anything beyond that; it is off and unpriced by default.

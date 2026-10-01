@@ -397,7 +397,8 @@ const DEFAULTS = {
   finishing:0           /* not quoted by Fred */
 };
 
-/* Embellishments are NOT in Fred's sheet — every rate here is yours to fill in. */
+/* Embellishments are quoted per project — the rates move every run, so there are
+   no defaults to carry here. Each build prices its own. */
 const EMB_TYPES = ["Screen printing","DTG / digital print","Embroidery","Studding","Patch / applique","Puff print","Washed / vintage print","Other"];
 
 /* ============================================================
@@ -592,8 +593,8 @@ function cost(L){
       add(label, rate * per, { detail:per + " × " + money(rate) + " per unit" });
       setup += num(e.setup);
       if(rate === 0){
-        r.issues.push(L.style + ": " + e.type + " has no rate — embellishments are not in Fred's sheet, enter a price.");
-        r.flags.push({ cls:"warn", t:"Embellishment rate needed" });
+        r.issues.push(L.style + ": " + e.type + " is not priced — embellishments are quoted per project, so enter this run's rate.");
+        r.flags.push({ cls:"warn", t:"Embellishment not priced" });
       }
     });
   }
@@ -759,10 +760,10 @@ function renderLines(){
           <summary><span>Embellishments${L.emb.length ? " — " + L.emb.length : ""}</span><span class="chev">›</span></summary>
           <div class="panel__body">
             <p class="sec-note" style="margin:0 0 4px">
-              Printing, embroidery and studding are not in Fred's sheet — every rate below is yours to
-              enter. <strong>Per unit</strong> is the rate for one placement on one garment;
-              <strong>placements</strong> is how many go on each garment. Setup is charged once for the
-              whole order (screens, digitizing).
+              Embellishment pricing is quoted per project and moves every run, so nothing is
+              pre-loaded here — price this one on its own. <strong>Per unit</strong> is the rate for one
+              placement on one garment; <strong>placements</strong> is how many go on each garment.
+              Setup is charged once for the whole order (screens, digitizing).
             </p>
             ${L.emb.map((e,j) => `
               <div class="emb">
@@ -774,7 +775,7 @@ function renderLines(){
                     <input type="text" data-emb="${j}" data-k="note" value="${esc(e.note)}" placeholder="e.g. back hit"></label>
                   <label><span class="flabel">$ per unit</span>
                     <input type="number" step="0.25" min="0" data-emb="${j}" data-k="rate" value="${e.rate}"
-                           class="${num(e.rate) === 0 ? "missing" : ""}" placeholder="rate needed"></label>
+                           class="${num(e.rate) === 0 ? "missing" : ""}" placeholder="this run's rate"></label>
                   <label><span class="flabel">Placements</span>
                     <input type="number" step="1" min="0" data-emb="${j}" data-k="per" value="${e.per}"></label>
                   <div class="btnrow">
