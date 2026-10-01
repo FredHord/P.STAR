@@ -39,35 +39,36 @@ def build(s):
     s = sub(s, "\n</body>\n</html>\n", "\n")
 
     # --- a name, not a caption, for the gallery and tab -------------------
-    s = sub(s, "<title>P STAR — FSF Production Cost Sheet</title>", "<title>FSF Cost Sheet</title>")
+    s = sub(s, "<title>FSF Production Cost Sheet</title>", "<title>FSF Cost Sheet</title>")
 
     # --- single-theme dark, declared so controls and scrollbars follow ----
     s = sub(s, "    --gutter:20px;\n  }", "    --gutter:20px;\n    color-scheme:dark;\n  }")
 
-    # --- sibling pages are not published alongside this one ---------------
-    s = sub(s,
-            '\n    <a href="checklist.html">Launch readiness</a> &nbsp;·&nbsp; <a href="index.html">Home</a>\n',
-            "\n")
-
     # --- the frame refuses window.print() ---------------------------------
     s = sub(s, '      <button class="btn" id="btnPrint">Print / PDF</button>\n', "")
+    s = sub(s, '      <button class="btn" id="invPrint">Print / save PDF</button>\n', "")
+    s = sub(s, '$("#invPrint").addEventListener("click", () => window.print());\n', "")
+    # without printing, say where a PDF comes from instead
+    s = sub(s,
+            'This banner is on screen only — it does not print.</div>` : ""}',
+            'This banner is on screen only.</div>` : ""}')
     s = sub(s, '    <button class="btn" id="btnPrint2">Print / PDF</button>\n', "")
     s = sub(s, '<button class="btn" id="btnCsv">Export CSV</button>',
                '<button class="btn" id="btnCsv">Copy as CSV</button>')
 
     # --- downloads are inert in the frame; copy out instead ---------------
-    s = sub(s, """/* --- toolbar --- */
-const doPrint = () => window.print();
+    s = sub(s, """const doPrint = () => window.print();
 $("#btnPrint").addEventListener("click", doPrint);
 $("#btnPrint2").addEventListener("click", doPrint);
 
-$("#btnCsv").addEventListener("click", () => {
+""", "")
+
+    s = sub(s, """$("#btnCsv").addEventListener("click", () => {
   const stamp = new Date().toISOString().slice(0,10);
   download(`FSF-cost-sheet-${stamp}.csv`, csv(lastResults, lastFees), "text/csv;charset=utf-8");
-});
-
-$("#btnCopy").addEventListener("click", async () => {
-  const btn = $("#btnCopy"), text = summaryText(lastResults, lastFees);
+});""",
+            """$("#btnCsv").addEventListener("click", async () => {
+  const btn = $("#btnCsv"), text = csv(lastResults, lastFees);
   try{
     await navigator.clipboard.writeText(text);
     btn.textContent = "Copied";
@@ -75,35 +76,15 @@ $("#btnCopy").addEventListener("click", async () => {
     const ta = document.createElement("textarea");
     ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
     document.body.appendChild(ta); ta.select();
-    btn.textContent = document.execCommand("copy") ? "Copied" : "Copy failed";
+    btn.textContent = document.execCommand("copy") ? "Copied" : "Press \u2318C to copy";
     ta.remove();
   }
-  setTimeout(() => { btn.textContent = "Copy summary"; }, 1600);
-});""",
-            """/* --- toolbar --- */
-async function copyOut(btn, text, label){
-  let ok = true;
-  try{
-    await navigator.clipboard.writeText(text);
-  }catch(err){
-    const ta = document.createElement("textarea");
-    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
-    document.body.appendChild(ta); ta.select();
-    try{ ok = document.execCommand("copy"); }catch(e){ ok = false; }
-    ta.remove();
-  }
-  btn.textContent = ok ? "Copied" : "Press ⌘C to copy";
-  setTimeout(() => { btn.textContent = label; }, 1800);
-}
-
-$("#btnCsv").addEventListener("click", e =>
-  copyOut(e.target, csv(lastResults, lastFees), "Copy as CSV"));
-$("#btnCopy").addEventListener("click", e =>
-  copyOut(e.target, summaryText(lastResults, lastFees), "Copy summary"));""")
+  setTimeout(() => { btn.textContent = "Copy as CSV"; }, 1800);
+});""")
 
     # the download helper has no caller left
     s = re.sub(r"\nfunction download\(name, text, mime\)\{.*?\n\}\n", "\n", s, flags=re.S)
-    assert "function download(" not in s
+    assert "function download(" not in s, "download() still present"
 
     # --- the frame's confirm() returns false without asking ---------------
     s = sub(s, "const esc = s =>", """/* The artifact frame refuses the browser's confirm dialog: it returns false
@@ -141,11 +122,13 @@ const esc = s =>""")
 
     s = sub(s, """  if(!window.confirm("Clear every line and put all rates back to Fred's quoted prices?")) return;
   S = freshState(); S.demo = false;
-  renderRates(); renderLines(); refresh();
+  hideInvoice();
+  renderRates(); renderInvForm(); renderLines(); refresh();
 });""",
             """  armConfirm(e.target, "Tap again to clear everything", () => {
     S = freshState(); S.demo = false;
-    renderRates(); renderLines(); refresh();
+    hideInvoice();
+    renderRates(); renderInvForm(); renderLines(); refresh();
   });
 });""")
 

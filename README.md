@@ -77,6 +77,31 @@ by URL, since it exposes cost prices.
 It opens on two worked example builds so the sheet is legible at a glance;
 "Clear examples" empties it. The order is then remembered per browser.
 
+### Invoicing
+
+Section 4 turns the order into a clean invoice — line items, one-time
+charges, optional shipping, tax and deposit, with a totals block and payment
+notes. It shows only what the payer is owed; the cost breakdown behind it
+never appears on the document. Two directions:
+
+- **FSF billing you** (the default) charges each unit at cost including
+  FSF's markup, and bills pattern, grading and embellishment setup once per
+  style.
+- **You billing a customer** charges the selling price instead; one-time
+  fees are then optional.
+
+The invoice renders on a light paper surface in either theme, because it is
+a document and it is what gets printed. If any price is still open on the
+cost sheet, a banner says so on screen — it does not print.
+
+### Running it off a desktop, without the repo
+
+`costing.html` is one self-contained file with no build step and no server.
+Download it anywhere and double-click it; everything works offline except
+the webfonts, which fall back cleanly. Use this copy rather than the
+published Artifact when you need a real PDF: a browser opening a local file
+can Print → Save as PDF, which the Artifact frame does not allow.
+
 ### The published Artifact copy
 
 `tools/build-artifact.py` generates the Claude Artifact version:
