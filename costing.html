@@ -307,6 +307,13 @@
         <label><span class="flabel">Selling price multiple (×)</span><input type="number" step="0.1" min="0" id="multiple"></label>
       </div>
 
+      <p class="subhead">Transportation &amp; ancillary</p>
+      <p class="sec-note" style="margin:0 0 10px">One charge covering freight, ancillary development and whatever the run throws up. Applied to the whole order on the cost sheet below, after FSF's markup and one-time fees. It is a cost of yours, not something the invoice passes on.</p>
+      <div class="grid cols-2">
+        <label><span class="flabel">Transportation &amp; ancillary (%)</span>
+          <input type="number" step="0.5" min="0" id="defAncillary"></label>
+      </div>
+
       <p class="subhead">One-time fees per style ($, charged once — not per garment)</p>
       <div class="grid cols-2">
         <label><span class="flabel">Pattern fee</span><input type="number" step="1" min="0" id="feePattern"></label>
@@ -405,11 +412,16 @@
       </div>
 
       <p class="subhead">Totals</p>
-      <div class="grid cols-3">
-        <label><span class="flabel">Tax / VAT (%)</span>
-          <input type="number" step="0.5" min="0" id="invTax"></label>
-        <label><span class="flabel">Transportation &amp; ancillary (%)</span>
-          <input type="number" step="0.5" min="0" id="invAncillary"></label>
+      <div class="grid cols-4">
+        <label><span class="flabel">CA state tax (%)</span>
+          <input type="number" step="0.25" min="0" id="invTax"></label>
+        <label><span class="flabel">Paid by</span>
+          <select id="invPay">
+            <option value="bank">Bank transfer / ACH — no fee</option>
+            <option value="card">Credit card</option>
+          </select></label>
+        <label><span class="flabel">Card processing fee (%)</span>
+          <input type="number" step="0.1" min="0" id="invCcFee"></label>
         <div>
           <span class="flabel">One-time fees</span>
           <label class="check" style="padding-top:2px"><input type="checkbox" id="invFees">
@@ -534,7 +546,8 @@ const DEFAULTS = {
   feePattern:200,
   feeGrading:250,
   packaging:3.50,
-  finishing:0           /* not quoted by Fred */
+  finishing:0,          /* not quoted by Fred */
+  ancillary:10          /* transportation, ancillary dev and the unexpected */
 };
 
 /* Embellishments are quoted per project — the rates move every run, so there are
@@ -556,13 +569,15 @@ function todayISO(){
 
 function freshInvoice(){
   return {
-    v:3,                      /* bump to re-apply the defaults below */
+    v:4,                      /* bump to re-apply the defaults below */
     mode:"fsf", number:"", issued:todayISO(),
     terms:0,                  /* due on issue — no net terms */
     deposit:50,               /* half on order, half before completion */
-    ancillary:10,             /* transportation, ancillary costs and the unexpected */
+    tax:7.25,                 /* CA statewide base — district rates sit on top */
+    pay:"bank",               /* "bank" | "card" — the card fee applies only to card */
+    ccFee:3,
     fromName:"", fromDetails:"", toName:"", toDetails:"",
-    tax:0, fees:true, notes:""
+    fees:true, notes:""
   };
 }
 
@@ -833,7 +848,7 @@ const INV_FIELDS = {
   invMode:"mode", invNumber:"number", invIssued:"issued", invTerms:"terms",
   invDeposit:"deposit", invFromName:"fromName", invFromDetails:"fromDetails",
   invToName:"toName", invToDetails:"toDetails", invTax:"tax",
-  invAncillary:"ancillary", invNotes:"notes"
+  invPay:"pay", invCcFee:"ccFee", invNotes:"notes"
 };
 
 function renderInvForm(){
@@ -881,6 +896,7 @@ function renderRates(){
   $("#feeGrading").value   = S.g.feeGrading;
   $("#defPackaging").value = S.g.packaging;
   $("#defFinishing").value = S.g.finishing;
+  $("#defAncillary").value = S.g.ancillary;
 }
 
 /* ============================================================
@@ -1124,7 +1140,10 @@ function renderSheet(results, fees){
   const fsf      = results.reduce((a,r) => a + r.lineFsf, 0);
   const sell     = results.reduce((a,r) => a + r.lineSell, 0);
   const markupAmt= fsf - prod;
-  const grand    = fsf + fees.grand;
+  const payable  = fsf + fees.grand;
+  const ancPct   = num(S.g.ancillary);
+  const ancillary= payable * ancPct / 100;
+  const grand    = payable + ancillary;
   const margin   = sell > 0 ? (sell - grand) / sell * 100 : 0;
   const avg      = units > 0 ? grand / units : 0;
 
@@ -1139,7 +1158,7 @@ function renderSheet(results, fees){
       <div class="totgrid">
         <div class="kpi"><div class="l">Units</div><div class="n">${qtyFmt(units)}</div></div>
         <div class="kpi"><div class="l">Styles</div><div class="n">${new Set(S.lines.map(l => l.style)).size} <small>/ ${results.length} build${results.length===1?"":"s"}</small></div></div>
-        <div class="kpi kpi--star"><div class="l">Total payable to FSF</div><div class="n">${money(grand,0)}</div></div>
+        <div class="kpi kpi--star"><div class="l">Total order cost</div><div class="n">${money(grand,0)}</div></div>
         <div class="kpi"><div class="l">All-in cost per unit</div><div class="n">${money(avg)}</div></div>
       </div>
       <div class="totrows">
@@ -1152,7 +1171,9 @@ function renderSheet(results, fees){
             ${feeRows}
             ${fees.setup ? `<tr><td class="dim">Embellishment setup (screens, digitizing)</td><td class="v dim">${money(fees.setup)}</td></tr>` : ""}
             ${fees.grand ? `<tr class="sum"><td>Total one-time fees</td><td class="v">${money(fees.grand)}</td></tr>` : ""}
-            <tr class="big"><td>Total payable to FSF</td><td class="v">${money(grand)}</td></tr>
+            <tr class="sum"><td>Payable to FSF</td><td class="v">${money(payable)}</td></tr>
+            ${ancPct ? `<tr><td class="dim">Transportation &amp; ancillary (${ancPct}%)</td><td class="v dim">${money(ancillary)}</td></tr>` : ""}
+            <tr class="big"><td>Total order cost</td><td class="v">${money(grand)}</td></tr>
             <tr><td class="dim">Retail value at ${num(S.g.multiple)}×</td><td class="v dim">${money(sell)}</td></tr>
             <tr><td class="dim">Gross margin if everything sells at full price</td><td class="v dim">${margin.toFixed(1)}%</td></tr>
           </tbody>
@@ -1162,7 +1183,7 @@ function renderSheet(results, fees){
 
   /* sticky bar */
   $("#sticky").hidden = false;
-  $("#stickyS").innerHTML = `<b>${qtyFmt(units)}</b> units · <b>${money(grand,0)}</b> to FSF · <b>${money(avg)}</b> all-in per unit`;
+  $("#stickyS").innerHTML = `<b>${qtyFmt(units)}</b> units · <b>${money(grand,0)}</b> order cost · <b>${money(avg)}</b> all-in per unit`;
   return { units, prod, fsf, sell, grand, avg, margin };
 }
 
@@ -1214,7 +1235,12 @@ function csv(results, fees){
   out.push(["Units", units]);
   out.push(["Garments incl. FSF markup", fsf.toFixed(2)]);
   out.push(["One-time fees", fees.grand.toFixed(2)]);
-  out.push(["TOTAL PAYABLE TO FSF", (fsf + fees.grand).toFixed(2)]);
+  const payable = fsf + fees.grand;
+  const ancPct  = num(S.g.ancillary);
+  const anc     = payable * ancPct / 100;
+  out.push(["Payable to FSF", payable.toFixed(2)]);
+  out.push(["Transportation & ancillary (" + ancPct + "%)", anc.toFixed(2)]);
+  out.push(["TOTAL ORDER COST", (payable + anc).toFixed(2)]);
   out.push(["Retail value", sell.toFixed(2)]);
   const issues = results.flatMap(r => r.issues);
   if(issues.length){
@@ -1239,7 +1265,8 @@ function summaryText(results, fees){
     ...lines,
     "",
     `One-time fees: ${money(fees.grand)}`,
-    `TOTAL PAYABLE TO FSF: ${money(fsf + fees.grand)} for ${qtyFmt(units)} units`,
+    `Transportation & ancillary (${num(S.g.ancillary)}%): ${money((fsf + fees.grand) * num(S.g.ancillary) / 100)}`,
+    `TOTAL ORDER COST: ${money((fsf + fees.grand) * (1 + num(S.g.ancillary) / 100))} for ${qtyFmt(units)} units`,
     ...(issues.length ? ["", "Open items:", ...issues.map(t => "- " + t)] : [])
   ].join("\n");
 }
@@ -1294,15 +1321,19 @@ function invoiceModel(){
   const goods    = items.reduce((a,i) => a + i.amount, 0);
   const feeTotal = feeItems.reduce((a,i) => a + i.amount, 0);
 
-  /* One uplift covering transportation, ancillary development and whatever
-     the run throws up, charged on the order before tax. */
-  const ancPct   = num(I.ancillary);
-  const ancillary = (goods + feeTotal) * ancPct / 100;
+  const subtotal = goods + feeTotal;
 
-  const subtotal = goods + feeTotal + ancillary;
+  /* CA sales tax on the goods, then the processor's cut on what is actually
+     charged to the card — tax included, which is what they bill on. */
   const taxPct   = num(I.tax);
   const tax      = subtotal * taxPct / 100;
-  const total    = subtotal + tax;
+  const taxed    = subtotal + tax;
+
+  const card     = I.pay === "card";
+  const ccPct    = card ? num(I.ccFee) : 0;
+  const ccFee    = taxed * ccPct / 100;
+
+  const total    = taxed + ccFee;
   const depPct   = Math.min(100, Math.max(0, num(I.deposit)));
   const deposit  = total * depPct / 100;
 
@@ -1310,8 +1341,8 @@ function invoiceModel(){
   const number = (I.number || "").trim() || (client ? "INV-" : "FSF-") + stamp + "-01";
 
   return {
-    client, number, items, feeItems, goods, feeTotal, ancPct, ancillary, subtotal,
-    taxPct, tax, total, depPct, deposit, balance:total - deposit,
+    client, number, items, feeItems, goods, feeTotal, subtotal,
+    taxPct, tax, card, ccPct, ccFee, total, depPct, deposit, balance:total - deposit,
     issued:I.issued || todayISO(),
     due:addDays(I.issued || todayISO(), I.terms),
     terms:num(I.terms),
@@ -1343,7 +1374,8 @@ function renderInvoice(){
       <div class="inv-meta">
         Issued <b>${fmtDate(v.issued)}</b><br>
         Due <b>${fmtDate(v.due)}</b>${v.terms ? ` · net ${v.terms}` : " · on receipt"}<br>
-        ${qtyFmt(v.units)} unit${v.units === 1 ? "" : "s"}
+        ${qtyFmt(v.units)} unit${v.units === 1 ? "" : "s"}<br>
+        ${v.card ? "By credit card" : "By bank transfer / ACH"}
       </div>
     </div>
 
@@ -1375,9 +1407,9 @@ function renderInvoice(){
       <tbody>
         <tr><td class="dim">Goods</td><td class="r">${money(v.goods)}</td></tr>
         ${v.feeTotal ? `<tr><td class="dim">One-time charges</td><td class="r">${money(v.feeTotal)}</td></tr>` : ""}
-        ${v.ancPct ? `<tr><td class="dim">Transportation &amp; ancillary (${v.ancPct}%)</td><td class="r">${money(v.ancillary)}</td></tr>` : ""}
         <tr><td class="dim">Subtotal</td><td class="r">${money(v.subtotal)}</td></tr>
-        ${v.taxPct ? `<tr><td class="dim">Tax (${v.taxPct}%)</td><td class="r">${money(v.tax)}</td></tr>` : ""}
+        ${v.taxPct ? `<tr><td class="dim">CA state tax (${v.taxPct}%)</td><td class="r">${money(v.tax)}</td></tr>` : ""}
+        ${v.ccPct ? `<tr><td class="dim">Card processing fee (${v.ccPct}%)</td><td class="r">${money(v.ccFee)}</td></tr>` : ""}
         <tr class="tot"><td>Total</td><td class="r">${money(v.total)}</td></tr>
         ${v.depPct ? `
           <tr><td class="dim">Deposit due on order (${v.depPct}%)</td><td class="r">${money(v.deposit)}</td></tr>
@@ -1399,6 +1431,7 @@ function invoiceText(){
     "INVOICE  " + v.number,
     "Issued " + fmtDate(v.issued) + "   Due " + fmtDate(v.due) + (v.terms ? "  (net " + v.terms + ")" : "  (on receipt)"),
     "",
+    (v.card ? "Payment: credit card" : "Payment: bank transfer / ACH"),
     "From: " + v.fromName + (v.fromDetails ? " — " + v.fromDetails : ""),
     "Bill to: " + v.toName + (v.toDetails ? " — " + v.toDetails : ""),
     ""
@@ -1414,9 +1447,9 @@ function invoiceText(){
   out.push("");
   out.push(pad("Goods", money(v.goods)));
   if(v.feeTotal) out.push(pad("One-time charges", money(v.feeTotal)));
-  if(v.ancPct) out.push(pad("Transportation & ancillary (" + v.ancPct + "%)", money(v.ancillary)));
   out.push(pad("Subtotal", money(v.subtotal)));
-  if(v.taxPct) out.push(pad("Tax (" + v.taxPct + "%)", money(v.tax)));
+  if(v.taxPct) out.push(pad("CA state tax (" + v.taxPct + "%)", money(v.tax)));
+  if(v.ccPct)  out.push(pad("Card processing fee (" + v.ccPct + "%)", money(v.ccFee)));
   out.push(pad("TOTAL", money(v.total)));
   if(v.depPct){
     out.push(pad("Deposit on order (" + v.depPct + "%)", money(v.deposit)));
@@ -1490,8 +1523,13 @@ function load(){
       S.inv = Object.assign(freshInvoice(), p.inv);
       const was = num(p.inv.v);
       if(was < 2){ S.inv.terms = 0; S.inv.deposit = 50; }
-      if(was < 3){ S.inv.ancillary = 10; }
-      S.inv.v = 3;
+      if(was < 4){                /* uplift left the invoice; CA tax and card fee arrived */
+        S.inv.tax = 7.25;
+        S.inv.pay = "bank";
+        S.inv.ccFee = 3;
+      }
+      delete S.inv.ancillary;
+      S.inv.v = 4;
     }
     S.demo = !!p.demo;
     if(Array.isArray(p.lines)){
@@ -1563,7 +1601,8 @@ $("#panelRates").addEventListener("input", e => {
     }
   } else if(t.id){
     const map = { markup:"markup", multiple:"multiple", feePattern:"feePattern",
-                  feeGrading:"feeGrading", defPackaging:"packaging", defFinishing:"finishing" };
+                  feeGrading:"feeGrading", defPackaging:"packaging", defFinishing:"finishing",
+                  defAncillary:"ancillary" };
     const k = map[t.id];
     if(k){
       S.g[k] = num(t.value);
@@ -1703,7 +1742,7 @@ $("#lines").addEventListener("click", e => {
 $("#panelInv").addEventListener("input", e => {
   const k = INV_FIELDS[e.target.id];
   if(!k) return;
-  const numeric = ["terms","deposit","tax","ancillary"];
+  const numeric = ["terms","deposit","tax","ccFee"];
   S.inv[k] = numeric.includes(k) ? num(e.target.value) : e.target.value;
   if(!$("#invoiceView").hidden) renderInvoice();
   save();
