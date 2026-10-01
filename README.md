@@ -74,6 +74,25 @@ Behaviour worth knowing:
 Nothing links to it from the public site — like `checklist.html` it is reached
 by URL, since it exposes cost prices.
 
+It opens on two worked example builds so the sheet is legible at a glance;
+"Clear examples" empties it. The order is then remembered per browser.
+
+### The published Artifact copy
+
+`tools/build-artifact.py` generates the Claude Artifact version:
+
+    python3 tools/build-artifact.py > build/artifact.html
+
+A published Artifact runs in a locked-down frame where this page's document
+skeleton is supplied by the host, `print()` and `confirm()` do nothing, and
+script-driven downloads are inert. The script applies exactly those
+adaptations — dropping the Print buttons, turning the CSV export into a
+clipboard copy, and replacing the two confirm dialogs with a tap-again arm on
+the button — so the repo page keeps working as a normal web page and the two
+copies never drift by hand. Every substitution asserts it matched exactly
+once, so editing `costing.html` in a way that invalidates one fails the build
+loudly instead of shipping a broken page. `build/` is not committed.
+
 ## Local preview
 
 Serve the directory with any static file server, e.g. `python3 -m http.server`.
