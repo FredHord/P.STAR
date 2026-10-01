@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>P STAR — FSF Production Cost Sheet</title>
+<meta name="description" content="Build an FSF production cost sheet: pick styles, washes, quantities and embellishments; every price stays editable." />
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14161C;
+    --ink-2:#1A1D25;
+    --ink-3:#20242E;
+    --line:#2C313C;
+    --paper:#E9E7E1;
+    --muted:#8C93A1;
+    --star:#D8B25C;
+    --star-dim:#6B5A31;
+    --good:#9DBF8E;
+    --warn:#D8875C;
+    --bad:#C96A6A;
+    --r:3px;
+    --gutter:20px;
+  }
+  *{box-sizing:border-box;}
+  [hidden]{display:none !important;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);color:var(--paper);
+    font-family:'Inter Tight',system-ui,sans-serif;font-size:15px;line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:32px var(--gutter) 96px;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .num{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;}
+
+  /* ---------- masthead ---------- */
+  .mast{border-bottom:1px solid var(--line);padding-bottom:22px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+  h1{
+    font-family:'Archivo',sans-serif;font-weight:700;font-size:clamp(32px,7vw,58px);
+    line-height:.95;letter-spacing:-.02em;text-transform:uppercase;margin:10px 0 0;
+  }
+  h1 .star{color:var(--star);}
+  .sub{margin-top:12px;color:var(--muted);max-width:66ch;font-size:14px;}
+  .sub a{color:var(--muted);text-decoration:underline;text-underline-offset:2px;}
+  .sub a:hover{color:var(--paper);}
+
+  h2{font-family:'Archivo',sans-serif;font-weight:600;font-size:17px;letter-spacing:.04em;text-transform:uppercase;margin:0;}
+  .sec{margin-top:36px;}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:14px;border-bottom:1px solid var(--line);padding-bottom:8px;flex-wrap:wrap;}
+  .sec-note{color:var(--muted);font-size:13.5px;margin:12px 0 0;max-width:72ch;}
+
+  /* ---------- buttons ---------- */
+  button{font:inherit;}
+  .btn{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    background:none;border:1px solid var(--line);color:var(--muted);padding:8px 13px;border-radius:var(--r);cursor:pointer;
+  }
+  .btn:hover{color:var(--paper);border-color:var(--muted);}
+  .btn:focus-visible{outline:2px solid var(--star);outline-offset:2px;}
+  .btn--primary{background:var(--star);border-color:var(--star);color:var(--ink);font-weight:500;}
+  .btn--primary:hover{background:var(--paper);border-color:var(--paper);color:var(--ink);}
+  .btn--ghost{border-style:dashed;}
+  .btn--x{padding:5px 9px;font-size:10px;}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+
+  /* ---------- fields ---------- */
+  label{display:block;}
+  .flabel{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+  input[type=text],input[type=number],select{
+    width:100%;background:var(--ink);border:1px solid var(--line);color:var(--paper);
+    border-radius:var(--r);padding:8px 9px;font-family:'JetBrains Mono',monospace;font-size:13px;
+    font-variant-numeric:tabular-nums;
+  }
+  input[type=text]{font-family:'Inter Tight',sans-serif;font-size:14px;}
+  select{font-family:'Inter Tight',sans-serif;font-size:14px;cursor:pointer;}
+  input:focus-visible,select:focus-visible{outline:2px solid var(--star);outline-offset:1px;border-color:var(--star-dim);}
+  input:disabled{opacity:.38;cursor:not-allowed;}
+  input.edited{border-color:var(--star-dim);background:rgba(216,178,92,.05);}
+  input.missing{border-color:var(--bad);background:rgba(201,106,106,.07);}
+  .grid{display:grid;gap:12px;}
+  .cols-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .cols-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+  .cols-4{grid-template-columns:repeat(4,minmax(0,1fr));}
+  .cols-5{grid-template-columns:repeat(5,minmax(0,1fr));}
+
+  .check{display:flex;gap:9px;align-items:flex-start;cursor:pointer;padding:7px 0;}
+  .check input{width:17px;height:17px;flex:0 0 auto;margin:1px 0 0;accent-color:var(--star);cursor:pointer;}
+  .check span{font-size:13.5px;}
+  .check em{font-style:normal;display:block;color:var(--muted);font-size:12px;}
+
+  /* ---------- panel / cards ---------- */
+  .panel{border:1px solid var(--line);background:var(--ink-2);border-radius:var(--r);margin-top:14px;}
+  .panel > summary{
+    cursor:pointer;padding:13px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--muted);list-style:none;
+    display:flex;justify-content:space-between;gap:12px;align-items:center;
+  }
+  .panel > summary::-webkit-details-marker{display:none;}
+  .panel > summary:hover{color:var(--paper);}
+  .panel > summary .chev{transition:transform .2s ease;}
+  .panel[open] > summary{border-bottom:1px solid var(--line);color:var(--paper);}
+  .panel[open] > summary .chev{transform:rotate(90deg);}
+  .panel__body{padding:16px;}
+  .subhead{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--star);margin:22px 0 10px;}
+  .subhead:first-child{margin-top:0;}
+
+  .line{border:1px solid var(--line);border-left:3px solid var(--star-dim);background:var(--ink-2);border-radius:var(--r);margin-top:14px;}
+  .line__head{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;flex-wrap:wrap;}
+  .line__idx{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);padding-top:9px;min-width:22px;}
+  .line__main{flex:1 1 440px;min-width:260px;}
+  .line__tot{text-align:right;min-width:150px;padding-top:4px;}
+  .line__tot .t{font-family:'Archivo',sans-serif;font-weight:700;font-size:21px;letter-spacing:-.01em;}
+  .line__tot .l{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+  .line__opts{padding:0 16px 14px;}
+  .line__foot{padding:0 16px 14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;}
+  .emb{border:1px solid var(--line);border-radius:var(--r);padding:12px;margin-top:10px;background:var(--ink);}
+
+  .flag{
+    font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;
+    border:1px solid currentColor;border-radius:2px;padding:1px 5px;white-space:nowrap;display:inline-block;
+  }
+  .flag--ok{color:var(--good);}
+  .flag--warn{color:var(--warn);}
+  .flag--bad{color:var(--bad);}
+  .flag--star{color:var(--star);}
+  .flags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+
+  .empty{border:1px dashed var(--line);border-radius:var(--r);padding:34px 20px;text-align:center;color:var(--muted);margin-top:14px;font-size:14px;}
+
+  /* ---------- cost sheet ---------- */
+  .sheet{margin-top:16px;}
+  .build{border:1px solid var(--line);border-radius:var(--r);margin-top:14px;background:var(--ink-2);overflow:hidden;}
+  .build__head{padding:13px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline;}
+  .build__name{font-family:'Archivo',sans-serif;font-weight:600;font-size:15.5px;}
+  .build__meta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.06em;}
+  table{width:100%;border-collapse:collapse;}
+  .rows th,.rows td{text-align:left;padding:5px 16px;font-size:13px;border:0;}
+  .rows td.v,.rows th.v{text-align:right;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .rows tr.grp td{
+    font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);padding-top:14px;border-bottom:1px solid var(--line);padding-bottom:4px;
+  }
+  .rows tr.sum td{border-top:1px solid var(--line);padding-top:9px;padding-bottom:9px;font-weight:600;}
+  .rows tr.sum.big td{font-family:'Archivo',sans-serif;font-weight:700;font-size:15px;}
+  .rows tr.sum.big td.v{font-size:17px;color:var(--star);}
+  .rows td.dim{color:var(--muted);}
+  .rows tr.off td{color:var(--muted);opacity:.6;}
+
+  .tot{border:1px solid var(--star-dim);background:linear-gradient(180deg,rgba(216,178,92,.07),rgba(216,178,92,0));border-radius:var(--r);padding:20px;margin-top:22px;}
+  .tot h3{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--star);margin:0 0 16px;font-weight:500;}
+  .totgrid{display:grid;gap:14px;grid-template-columns:repeat(4,minmax(0,1fr));}
+  .kpi{border:1px solid var(--line);background:var(--ink-2);border-radius:var(--r);padding:13px 14px;}
+  .kpi .l{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+  .kpi .n{font-family:'Archivo',sans-serif;font-weight:700;font-size:23px;margin-top:6px;letter-spacing:-.01em;}
+  .kpi .n small{font-weight:500;font-size:13px;color:var(--muted);}
+  .kpi--star{border-color:var(--star-dim);}
+  .kpi--star .n{color:var(--star);}
+  .totrows{margin-top:16px;border-top:1px solid var(--line);}
+  .totrows table td{padding:7px 0;font-size:13.5px;}
+  .totrows table td.v{text-align:right;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;}
+  .totrows tr.big td{font-family:'Archivo',sans-serif;font-weight:700;font-size:16px;border-top:1px solid var(--line);padding-top:12px;}
+  .totrows tr.big td.v{color:var(--star);font-size:19px;}
+
+  .notice{border:1px solid var(--bad);background:rgba(201,106,106,.07);border-radius:var(--r);padding:13px 15px;margin-top:16px;font-size:13.5px;}
+  .notice h4{margin:0 0 7px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--bad);font-weight:500;}
+  .notice ul{margin:0;padding-left:18px;color:var(--muted);}
+  .notice li{margin:3px 0;}
+
+  footer{margin-top:60px;border-top:1px solid var(--line);padding-top:18px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  footer .mono{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+  footer a{color:var(--muted);text-decoration:none;}
+  footer a:hover{color:var(--paper);text-decoration:underline;}
+
+  .sticky{position:sticky;bottom:0;z-index:5;background:rgba(20,22,28,.94);backdrop-filter:blur(8px);border-top:1px solid var(--line);margin:30px calc(var(--gutter) * -1) 0;padding:12px var(--gutter);display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;}
+  .sticky .s{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.08em;}
+  .sticky .s b{color:var(--paper);font-weight:500;}
+
+  @media (max-width:900px){
+    .cols-4,.cols-5{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .totgrid{grid-template-columns:repeat(2,minmax(0,1fr));}
+  }
+  @media (max-width:560px){
+    :root{--gutter:16px;}
+    .wrap{padding-top:24px;padding-bottom:80px;}
+    .cols-2,.cols-3,.cols-4,.cols-5{grid-template-columns:1fr;}
+    .totgrid{grid-template-columns:1fr;}
+    .rows th,.rows td{padding-left:12px;padding-right:12px;font-size:12.5px;}
+    .line__tot{text-align:left;}
+  }
+
+  @media print{
+    :root{--ink:#fff;--ink-2:#fff;--ink-3:#fff;--paper:#000;--muted:#555;--line:#bbb;--star:#8a6d1f;--star-dim:#c9b47a;}
+    body{background:#fff;color:#000;font-size:11pt;}
+    .no-print{display:none !important;}
+    .wrap{max-width:none;padding:0;}
+    .build,.panel,.tot,.kpi{break-inside:avoid;page-break-inside:avoid;}
+    .tot{background:none;}
+    .sticky{display:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">P<span class="star">★</span>STAR &nbsp;/&nbsp; Production</p>
+  <h1>FSF Cost <span class="star">Sheet</span></h1>
+  <p class="sub">
+    Pick the styles you want quoted, set the wash, grinding, embellishments and quantity for each,
+    and the sheet below builds itself — unit cost, FSF markup, selling price, one-time fees and the
+    full order total. Every number is pre-loaded from Fred's pricing but stays editable, so a changed
+    fabric price or a rate he hasn't quoted yet can be typed straight in.
+    <a href="checklist.html">Launch readiness</a> &nbsp;·&nbsp; <a href="index.html">Home</a>
+  </p>
+</header>
+
+<!-- ============ GLOBAL INPUTS ============ -->
+<section class="sec no-print">
+  <div class="sec-head">
+    <h2>1 — Rates</h2>
+    <span class="mono" style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Source: Fred, 9/30 – 10/1/2026</span>
+  </div>
+  <p class="sec-note">
+    These feed every line. Change one here and the whole sheet recalculates. Anything Fred hasn't
+    priced is left blank and flagged — a blank fabric price is excluded from the total rather than
+    counted as zero, exactly like the spreadsheet does for Nylon.
+  </p>
+
+  <details class="panel" id="panelRates">
+    <summary><span>Fabrics, trims, wash, markup &amp; one-time fees</span><span class="chev">›</span></summary>
+    <div class="panel__body">
+      <p class="subhead">Fabric prices ($ per yard)</p>
+      <div id="fabricRows" class="grid"></div>
+      <div class="btnrow" style="margin-top:12px">
+        <button class="btn btn--ghost" id="addFabric">+ Add fabric</button>
+      </div>
+
+      <p class="subhead">Trims priced by the yard ($ per yard)</p>
+      <div class="grid cols-2" id="trimRows"></div>
+
+      <p class="subhead">Wash / finish — cost per unit by product group ($)</p>
+      <div id="washRows"></div>
+
+      <p class="subhead">Markup &amp; selling price</p>
+      <div class="grid cols-2">
+        <label><span class="flabel">FSF markup (%)</span><input type="number" step="0.5" min="0" id="markup"></label>
+        <label><span class="flabel">Selling price multiple (×)</span><input type="number" step="0.1" min="0" id="multiple"></label>
+      </div>
+
+      <p class="subhead">One-time fees per style ($, charged once — not per garment)</p>
+      <div class="grid cols-2">
+        <label><span class="flabel">Pattern fee</span><input type="number" step="1" min="0" id="feePattern"></label>
+        <label><span class="flabel">Pattern digitized &amp; graded for cutting</span><input type="number" step="1" min="0" id="feeGrading"></label>
+      </div>
+
+      <p class="subhead">Per-unit defaults for steps Fred quotes flat</p>
+      <div class="grid cols-2">
+        <label><span class="flabel">Packaging ($ per unit)</span><input type="number" step="0.05" min="0" id="defPackaging"></label>
+        <label><span class="flabel">Finishing / other ($ per unit) — not quoted</span><input type="number" step="0.05" min="0" id="defFinishing"></label>
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- ============ BUILD ============ -->
+<section class="sec no-print">
+  <div class="sec-head">
+    <h2>2 — Build the order</h2>
+    <div class="btnrow">
+      <select id="stylePick" style="width:auto;min-width:210px" aria-label="Style to add"></select>
+      <button class="btn btn--primary" id="addLine">+ Add style</button>
+    </div>
+  </div>
+  <div id="lines"></div>
+  <div class="empty" id="linesEmpty">
+    Nothing selected yet. Pick a style above and hit <strong>Add style</strong> — e.g. Long Sleeve
+    Jersey Tee, basic wash, no pattern, no grading, 50 units.
+  </div>
+</section>
+
+<!-- ============ SHEET ============ -->
+<section class="sec sheet" id="sheetSec" hidden>
+  <div class="sec-head">
+    <h2>3 — Production cost sheet</h2>
+    <div class="btnrow no-print">
+      <button class="btn" id="btnPrint">Print / PDF</button>
+      <button class="btn" id="btnCsv">Export CSV</button>
+      <button class="btn" id="btnCopy">Copy summary</button>
+    </div>
+  </div>
+  <div id="issues"></div>
+  <div id="builds"></div>
+  <div id="rollup"></div>
+</section>
+
+<footer>
+  <span class="mono">P★STAR — FSF production costing</span>
+  <span class="mono" id="saveState">&nbsp;</span>
+  <span class="mono no-print"><a href="#" id="reset">Reset everything</a></span>
+</footer>
+
+<div class="sticky no-print" id="sticky" hidden>
+  <span class="s" id="stickyS">&nbsp;</span>
+  <div class="btnrow">
+    <button class="btn" id="btnPrint2">Print / PDF</button>
+    <button class="btn btn--primary" id="btnJump">View cost sheet ↓</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   DEFAULTS — transcribed from FSF_Production_Pricing.xlsx
+   (Inputs tab, Fred 9/30/2026 & 10/1/2026)
+   ============================================================ */
+
+const DEFAULT_FABRICS = [
+  { name:"20oz Gabardine French Terry", price:8.57 },
+  { name:"Rib Knit",                    price:6.95 },
+  { name:"Jersey",                      price:3.95 },
+  { name:"Collar Rib (Tees)",           price:3.95 },
+  { name:"Thermal",                     price:4.95 },
+  { name:"Nylon",                       price:null, note:"Price needed — track jacket & track pants fabric" }
+];
+
+const DEFAULT_TRIMS = { drawstring:0.55, elastic:1.00 };
+
+const WASH_GROUPS = ["Hoodies","Bottoms","Tees"];
+
+const DEFAULT_WASHES = [
+  { name:"PP Spray (Potassium)", Hoodies:23,   Bottoms:18,   Tees:12   },
+  { name:"Stone Wash",           Hoodies:12,   Bottoms:11,   Tees:6    },
+  { name:"Basic Wash / Dye",     Hoodies:4.75, Bottoms:3.75, Tees:2.75 }
+];
+
+/* body/rib yields in yards per unit; labor in $ per unit.
+   grind:null  = Fred has not quoted grinding for this style
+   trims       = zipper / hardware already quoted in the sheet */
+const STYLES = [
+  { name:"Zip Hoodie", group:"Hoodies", fabric:"20oz Gabardine French Terry", yield:2.16,
+    rib:"Rib Knit", ribYield:0.75, draw:0, elastic:0,
+    sew:20, cut:1, grind:2.5, trims:3.00, trimsNote:"Zipper $3.00" },
+  { name:"Pullover Hoodie", group:"Hoodies", fabric:"20oz Gabardine French Terry", yield:2.06,
+    rib:"Rib Knit", ribYield:0.75, draw:0, elastic:0,
+    sew:15, cut:1, grind:2.5, trims:0 },
+  { name:"Specialized Zip Hoodie", group:"Hoodies", fabric:"20oz Gabardine French Terry", yield:2.16,
+    rib:"Rib Knit", ribYield:0.75, draw:0, elastic:0,
+    sew:30, cut:1, grind:2.5, trims:3.00, trimsNote:"Zipper $3.00" },
+  { name:"Specialized Pullover Hoodie", group:"Hoodies", fabric:"20oz Gabardine French Terry", yield:2.06,
+    rib:"Rib Knit", ribYield:0.75, draw:0, elastic:0,
+    sew:25, cut:1, grind:2.5, trims:0 },
+  { name:"Sweatpants", group:"Bottoms", fabric:"20oz Gabardine French Terry", yield:2.08,
+    rib:"", ribYield:0, draw:2.25, elastic:1.5,
+    sew:18, cut:1, grind:2.5, trims:0 },
+  { name:"Sweat Shorts (Jorts Baggy Cut)", group:"Bottoms", fabric:"20oz Gabardine French Terry", yield:1.45,
+    rib:"", ribYield:0, draw:2.25, elastic:1.5,
+    sew:16, cut:1, grind:2.5, trims:0 },
+  { name:"Short Sleeve Jersey Tee", group:"Tees", fabric:"Jersey", yield:1.08,
+    rib:"Collar Rib (Tees)", ribYield:0.25, draw:0, elastic:0,
+    sew:10, cut:0.63, grind:null, trims:0 },
+  { name:"Long Sleeve Jersey Tee", group:"Tees", fabric:"Jersey", yield:1.60,
+    rib:"Collar Rib (Tees)", ribYield:0.25, draw:0, elastic:0,
+    sew:12, cut:1, grind:null, trims:0 },
+  { name:"Thermal Long Sleeve", group:"Tees", fabric:"Thermal", yield:1.60,
+    rib:"Collar Rib (Tees)", ribYield:0.25, draw:0, elastic:0,
+    sew:12, cut:1, grind:null, trims:0,
+    note:"Sewing and cutting assumed same as long sleeve tee — confirm with Fred" },
+  { name:"Tank Top", group:"Tees", fabric:"Rib Knit", yield:0.75,
+    rib:"", ribYield:0, draw:0, elastic:0,
+    sew:8, cut:0.95, grind:null, trims:0,
+    note:"Body fabric may change — Rib Knit assumed" },
+  { name:"Track Jacket", group:"", fabric:"Nylon", yield:1.63,
+    rib:"", ribYield:0, draw:0, elastic:0,
+    sew:60, cut:3.65, grind:null, trims:3.90, trimsNote:"Zipper $3.90",
+    note:"Cutting = jacket + lining $3.50 + fuse $0.15. No wash group set" },
+  { name:"Track Pants", group:"", fabric:"Nylon", yield:1.40,
+    rib:"", ribYield:0, draw:0, elastic:1.5,
+    sew:20, cut:2, grind:null, trims:0,
+    note:"Elastic 1.5 yd assumed same as sweatpants — confirm. No wash group set" }
+];
+
+const DEFAULTS = {
+  markup:20,            /* % */
+  multiple:2.5,         /* × */
+  feePattern:200,
+  feeGrading:250,
+  packaging:3.50,
+  finishing:0           /* not quoted by Fred */
+};
+
+/* Embellishments are NOT in Fred's sheet — every rate here is yours to fill in. */
+const EMB_TYPES = ["Screen printing","DTG / digital print","Embroidery","Studding","Patch / applique","Puff print","Washed / vintage print","Other"];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+
+const KEY = "pstar.fsf.costsheet.v1";
+let S = null;
+let uid = 1;
+
+function freshState(){
+  return {
+    fabrics: DEFAULT_FABRICS.map(f => ({...f})),
+    trims:   {...DEFAULT_TRIMS},
+    washes:  DEFAULT_WASHES.map(w => ({...w})),
+    g:       {...DEFAULTS},
+    lines:   []
+  };
+}
+
+function makeLine(styleName){
+  const st = STYLES.find(s => s.name === styleName) || STYLES[0];
+  return {
+    id: "L" + (uid++),
+    style: st.name,
+    qty: 50,
+    group: st.group,                 /* wash group — editable, blank for track pieces */
+    wash: "",                        /* "" = no wash */
+    pattern: true,
+    grading: true,
+    fabric: st.fabric,
+    yield: st.yield,
+    rib: st.rib,
+    ribYield: st.ribYield,
+    draw: st.draw,
+    elastic: st.elastic,
+    sew: st.sew,
+    cut: st.cut,
+    grindOn: st.grind !== null,      /* on by default only where Fred quoted it */
+    grind: st.grind === null ? 0 : st.grind,
+    trims: st.trims,
+    washOn: true,
+    pkgOn: true,
+    pkg: DEFAULTS.packaging,
+    finOn: false,
+    fin: DEFAULTS.finishing,
+    emb: []
+  };
+}
+
+function makeEmb(){
+  return { type:"Screen printing", note:"", rate:0, per:1, setup:0 };
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+const $  = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function money(n, dp){
+  if(n === null || n === undefined || !Number.isFinite(n)) return "—";
+  const d = dp === undefined ? 2 : dp;
+  return "$" + n.toLocaleString("en-US", { minimumFractionDigits:d, maximumFractionDigits:d });
+}
+function qtyFmt(n){ return Number(n).toLocaleString("en-US"); }
+function yd(n){ return Number(n).toLocaleString("en-US", { minimumFractionDigits:2, maximumFractionDigits:3 }) + " yd"; }
+
+function fabricPrice(name){
+  if(!name) return 0;
+  const f = S.fabrics.find(x => x.name === name);
+  if(!f) return null;
+  return (f.price === null || f.price === "" || f.price === undefined) ? null : num(f.price);
+}
+function washCost(washName, group){
+  if(!washName || !group) return null;
+  const w = S.washes.find(x => x.name === washName);
+  if(!w) return null;
+  const v = w[group];
+  return (v === null || v === "" || v === undefined) ? null : num(v);
+}
+
+/* ============================================================
+   COSTING — mirrors the spreadsheet's row order exactly
+   ============================================================ */
+
+function cost(L){
+  const st = STYLES.find(s => s.name === L.style) || {};
+  const r = { style:L.style, qty:Math.max(0, Math.round(num(L.qty))), rows:[], flags:[], issues:[], styleNote:st.note || "" };
+
+  let total = 0;
+  const add = (label, amount, opts) => {
+    const o = opts || {};
+    r.rows.push({ label, amount, detail:o.detail || "", group:o.group, off:!!o.off, missing:!!o.missing });
+    if(!o.off && !o.missing && Number.isFinite(amount)) total += amount;
+  };
+
+  /* --- body fabric --- */
+  const bp = fabricPrice(L.fabric);
+  const bYd = num(L.yield);
+  r.rows.push({ group:"Body fabric" });
+  r.rows.push({ label:"Fabric", text:L.fabric || "—" });
+  r.rows.push({ label:"Yield", text:yd(bYd) });
+  r.rows.push({ label:"Price per yard", text:bp === null ? "price needed" : money(bp) });
+  if(bp === null){
+    add("Body fabric cost", null, { missing:true, detail:"excluded — no price for " + (L.fabric || "fabric") });
+    r.issues.push((L.style) + ": no price for " + (L.fabric || "body fabric") + " — fabric is excluded from the total.");
+    r.flags.push({ cls:"bad", t:"Missing fabric price" });
+  } else {
+    add("Body fabric cost", bYd * bp);
+  }
+
+  /* --- rib --- */
+  if(L.rib){
+    const rp = fabricPrice(L.rib);
+    const rYd = num(L.ribYield);
+    r.rows.push({ group:"Rib" });
+    r.rows.push({ label:"Rib fabric", text:L.rib });
+    r.rows.push({ label:"Rib yield", text:yd(rYd) });
+    r.rows.push({ label:"Rib price per yard", text:rp === null ? "price needed" : money(rp) });
+    if(rp === null){
+      add("Rib cost", null, { missing:true, detail:"excluded — no price for " + L.rib });
+      r.issues.push(L.style + ": no price for " + L.rib + " — rib is excluded from the total.");
+      r.flags.push({ cls:"bad", t:"Missing rib price" });
+    } else {
+      add("Rib cost", rYd * rp);
+    }
+  }
+
+  /* --- drawstring & elastic --- */
+  const dYd = num(L.draw), eYd = num(L.elastic);
+  if(dYd > 0 || eYd > 0){
+    r.rows.push({ group:"Drawstring & elastic" });
+    if(dYd > 0) add("Drawstring", dYd * num(S.trims.drawstring), { detail:yd(dYd) + " @ " + money(num(S.trims.drawstring)) + "/yd" });
+    if(eYd > 0) add("Elastic",    eYd * num(S.trims.elastic),    { detail:yd(eYd) + " @ " + money(num(S.trims.elastic)) + "/yd" });
+  }
+
+  /* --- wash, labor, trims, packaging --- */
+  r.rows.push({ group:"Wash, labor, trims & packaging" });
+
+  if(L.washOn && L.wash){
+    const wc = washCost(L.wash, L.group);
+    if(wc === null){
+      add("Wash — " + L.wash, null, { missing:true, detail:L.group ? "no price for this group" : "no wash group set for this style" });
+      r.issues.push(L.style + ": wash \"" + L.wash + "\" has no price" + (L.group ? " for the " + L.group + " group." : " because no wash group is set — pick one on the line."));
+      r.flags.push({ cls:"bad", t:"Missing wash price" });
+    } else {
+      add("Wash — " + L.wash, wc, { detail:L.group + " group" });
+    }
+  } else {
+    add("Wash", 0, { off:true, detail:L.wash ? "switched off" : "no wash selected" });
+  }
+
+  if(L.grindOn){
+    const g = num(L.grind);
+    add("Distress grinding", g);
+    if(g === 0){
+      r.issues.push(L.style + ": grinding is switched on but the rate is $0 — Fred has not quoted grinding for this style, enter a price.");
+      r.flags.push({ cls:"warn", t:"Grinding rate needed" });
+    }
+  } else {
+    add("Distress grinding", 0, { off:true, detail:"not needed" });
+  }
+
+  add("Cutting", num(L.cut));
+  add("Sewing", num(L.sew));
+  if(num(L.trims) > 0) add("Trims / other", num(L.trims), { detail:st.trimsNote || "" });
+
+  if(L.pkgOn) add("Packaging", num(L.pkg));
+  else        add("Packaging", 0, { off:true, detail:"not needed" });
+
+  if(L.finOn){
+    const f = num(L.fin);
+    add("Finishing / other", f);
+    if(f === 0){
+      r.issues.push(L.style + ": finishing is switched on but the rate is $0 — not quoted by Fred, enter a price.");
+      r.flags.push({ cls:"warn", t:"Finishing rate needed" });
+    }
+  }
+
+  /* --- embellishments --- */
+  let setup = 0;
+  if(L.emb.length){
+    r.rows.push({ group:"Embellishments" });
+    L.emb.forEach(e => {
+      const per  = Math.max(0, num(e.per));
+      const rate = num(e.rate);
+      const label = e.type + (e.note ? " — " + e.note : "");
+      add(label, rate * per, { detail:per + " × " + money(rate) + " per unit" });
+      setup += num(e.setup);
+      if(rate === 0){
+        r.issues.push(L.style + ": " + e.type + " has no rate — embellishments are not in Fred's sheet, enter a price.");
+        r.flags.push({ cls:"warn", t:"Embellishment rate needed" });
+      }
+    });
+  }
+
+  /* --- totals --- */
+  r.unit      = total;
+  r.markupPct = num(S.g.markup) / 100;
+  r.markup    = r.unit * r.markupPct;
+  r.unitFsf   = r.unit + r.markup;
+  r.multiple  = num(S.g.multiple);
+  r.sell      = r.unitFsf * r.multiple;
+
+  r.lineCost  = r.unit    * r.qty;
+  r.lineFsf   = r.unitFsf * r.qty;
+  r.lineSell  = r.sell    * r.qty;
+  r.embSetup  = setup;
+
+  if(!r.flags.length) r.flags.push({ cls:"ok", t:"Complete" });
+  if(r.qty === 0) r.issues.push(r.style + ": quantity is 0.");
+  return r;
+}
+
+/* One-time fees: pattern and grading are per STYLE, so two lines of the
+   same style are charged once — matching the spreadsheet's note. */
+function oneTimeFees(){
+  const byStyle = new Map();
+  S.lines.forEach(L => {
+    const e = byStyle.get(L.style) || { style:L.style, pattern:false, grading:false, lines:0 };
+    e.pattern = e.pattern || !!L.pattern;
+    e.grading = e.grading || !!L.grading;
+    e.lines++;
+    byStyle.set(L.style, e);
+  });
+  const rows = [];
+  let total = 0;
+  byStyle.forEach(e => {
+    const p = e.pattern ? num(S.g.feePattern) : 0;
+    const g = e.grading ? num(S.g.feeGrading) : 0;
+    if(p || g || e.pattern || e.grading){
+      rows.push({ style:e.style, pattern:p, grading:g, sub:p + g, shared:e.lines > 1 });
+      total += p + g;
+    }
+  });
+  let setup = 0;
+  S.lines.forEach(L => L.emb.forEach(e => { setup += num(e.setup); }));
+  return { rows, total, setup, grand:total + setup };
+}
+
+/* ============================================================
+   RENDER — rates panel
+   ============================================================ */
+
+function renderRates(){
+  /* fabrics */
+  $("#fabricRows").innerHTML = S.fabrics.map((f,i) => `
+    <div class="grid cols-3" style="align-items:end;gap:10px">
+      <label><span class="flabel">Fabric</span>
+        <input type="text" data-fab="${i}" data-k="name" value="${esc(f.name)}"></label>
+      <label><span class="flabel">$ per yard</span>
+        <input type="number" step="0.01" min="0" data-fab="${i}" data-k="price"
+               value="${f.price === null ? "" : f.price}" placeholder="price needed"
+               class="${f.price === null ? "missing" : ""}"></label>
+      <div class="btnrow">
+        ${f.note ? `<span class="flag flag--bad">${esc(f.note)}</span>` : ""}
+        <button class="btn btn--x" data-delfab="${i}" aria-label="Remove ${esc(f.name)}">Remove</button>
+      </div>
+    </div>`).join("");
+
+  /* trims */
+  $("#trimRows").innerHTML = `
+    <label><span class="flabel">Drawstring</span>
+      <input type="number" step="0.01" min="0" data-trim="drawstring" value="${S.trims.drawstring}"></label>
+    <label><span class="flabel">Elastic</span>
+      <input type="number" step="0.01" min="0" data-trim="elastic" value="${S.trims.elastic}"></label>`;
+
+  /* wash matrix */
+  $("#washRows").innerHTML = S.washes.map((w,i) => `
+    <div class="grid cols-4" style="gap:10px;margin-bottom:10px">
+      <label><span class="flabel">Wash</span>
+        <input type="text" data-wash="${i}" data-k="name" value="${esc(w.name)}"></label>
+      ${WASH_GROUPS.map(g => `
+        <label><span class="flabel">${g}</span>
+          <input type="number" step="0.05" min="0" data-wash="${i}" data-k="${g}"
+                 value="${w[g] === null ? "" : w[g]}" placeholder="price needed"></label>`).join("")}
+    </div>`).join("");
+
+  $("#markup").value       = S.g.markup;
+  $("#multiple").value     = S.g.multiple;
+  $("#feePattern").value   = S.g.feePattern;
+  $("#feeGrading").value   = S.g.feeGrading;
+  $("#defPackaging").value = S.g.packaging;
+  $("#defFinishing").value = S.g.finishing;
+}
+
+/* ============================================================
+   RENDER — line builder
+   ============================================================ */
+
+function fabricOptions(sel, allowNone){
+  const none = allowNone ? `<option value=""${!sel ? " selected" : ""}>None</option>` : "";
+  return none + S.fabrics.map(f =>
+    `<option value="${esc(f.name)}"${f.name === sel ? " selected" : ""}>${esc(f.name)}${f.price === null ? " (price needed)" : ""}</option>`
+  ).join("");
+}
+
+function renderLines(){
+  const host = $("#lines");
+  $("#linesEmpty").hidden = S.lines.length > 0;
+
+  host.innerHTML = S.lines.map((L,i) => {
+    const st = STYLES.find(s => s.name === L.style) || {};
+    const washOpts = `<option value=""${!L.wash ? " selected" : ""}>No wash</option>` +
+      S.washes.map(w => {
+        const p = L.group ? w[L.group] : null;
+        const lbl = esc(w.name) + (p === null || p === "" || p === undefined ? " (no price)" : " — " + money(num(p)));
+        return `<option value="${esc(w.name)}"${w.name === L.wash ? " selected" : ""}>${lbl}</option>`;
+      }).join("");
+
+    const groupOpts = `<option value=""${!L.group ? " selected" : ""}>Not set — no wash available</option>` +
+      WASH_GROUPS.map(g => `<option value="${g}"${g === L.group ? " selected" : ""}>${g}</option>`).join("");
+
+    return `
+    <article class="line" data-line="${L.id}">
+      <div class="line__head">
+        <span class="line__idx">${String(i+1).padStart(2,"0")}</span>
+        <div class="line__main">
+          <div class="grid cols-3">
+            <label><span class="flabel">Style</span>
+              <select data-f="style">${STYLES.map(s =>
+                `<option value="${esc(s.name)}"${s.name === L.style ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label>
+            <label><span class="flabel">Wash / finish</span>
+              <select data-f="wash" ${L.washOn ? "" : "disabled"}>${washOpts}</select></label>
+            <label><span class="flabel">Quantity (units)</span>
+              <input type="number" step="1" min="0" data-f="qty" value="${L.qty}"></label>
+          </div>
+          <div class="flags" data-flags></div>
+          ${st.note ? `<p class="sec-note" style="margin-top:9px;font-size:12.5px">${esc(st.note)}</p>` : ""}
+        </div>
+        <div class="line__tot">
+          <div class="t num" data-unit>—</div>
+          <div class="l">Cost per unit</div>
+          <div class="l" style="margin-top:7px" data-ext>&nbsp;</div>
+        </div>
+      </div>
+
+      <div class="line__opts">
+        <div class="grid cols-4" style="gap:4px 16px">
+          <label class="check"><input type="checkbox" data-f="washOn" ${L.washOn ? "checked" : ""}>
+            <span>Wash / dye<em>Fred's wash step</em></span></label>
+          <label class="check"><input type="checkbox" data-f="grindOn" ${L.grindOn ? "checked" : ""}>
+            <span>Distress grinding<em>${st.grind === null ? "not quoted for this style" : money(st.grind) + " per unit"}</em></span></label>
+          <label class="check"><input type="checkbox" data-f="pattern" ${L.pattern ? "checked" : ""}>
+            <span>Pattern needed<em>${money(num(S.g.feePattern),0)} once per style</em></span></label>
+          <label class="check"><input type="checkbox" data-f="grading" ${L.grading ? "checked" : ""}>
+            <span>Grading needed<em>${money(num(S.g.feeGrading),0)} once per style</em></span></label>
+          <label class="check"><input type="checkbox" data-f="pkgOn" ${L.pkgOn ? "checked" : ""}>
+            <span>Packaging<em>${money(num(S.g.packaging))} per unit</em></span></label>
+          <label class="check"><input type="checkbox" data-f="finOn" ${L.finOn ? "checked" : ""}>
+            <span>Finishing / other<em>not quoted — set a rate</em></span></label>
+        </div>
+
+        <details class="panel" style="background:var(--ink)">
+          <summary><span>Embellishments${L.emb.length ? " — " + L.emb.length : ""}</span><span class="chev">›</span></summary>
+          <div class="panel__body">
+            <p class="sec-note" style="margin:0 0 4px">
+              Printing, embroidery and studding are not in Fred's sheet — every rate below is yours to
+              enter. <strong>Per unit</strong> is the rate for one placement on one garment;
+              <strong>placements</strong> is how many go on each garment. Setup is charged once for the
+              whole order (screens, digitizing).
+            </p>
+            ${L.emb.map((e,j) => `
+              <div class="emb">
+                <div class="grid cols-5" style="align-items:end;gap:10px">
+                  <label><span class="flabel">Type</span>
+                    <select data-emb="${j}" data-k="type">${EMB_TYPES.map(t =>
+                      `<option value="${esc(t)}"${t === e.type ? " selected" : ""}>${esc(t)}</option>`).join("")}</select></label>
+                  <label><span class="flabel">Placement / note</span>
+                    <input type="text" data-emb="${j}" data-k="note" value="${esc(e.note)}" placeholder="e.g. back hit"></label>
+                  <label><span class="flabel">$ per unit</span>
+                    <input type="number" step="0.25" min="0" data-emb="${j}" data-k="rate" value="${e.rate}"
+                           class="${num(e.rate) === 0 ? "missing" : ""}" placeholder="rate needed"></label>
+                  <label><span class="flabel">Placements</span>
+                    <input type="number" step="1" min="0" data-emb="${j}" data-k="per" value="${e.per}"></label>
+                  <div class="btnrow">
+                    <label style="flex:1"><span class="flabel">Setup (once)</span>
+                      <input type="number" step="5" min="0" data-emb="${j}" data-k="setup" value="${e.setup}"></label>
+                    <button class="btn btn--x" data-delemb="${j}" aria-label="Remove embellishment">Remove</button>
+                  </div>
+                </div>
+              </div>`).join("")}
+            <div class="btnrow" style="margin-top:12px">
+              <button class="btn btn--ghost" data-addemb>+ Add embellishment</button>
+            </div>
+          </div>
+        </details>
+
+        <details class="panel" style="background:var(--ink)">
+          <summary><span>Override yields, labor &amp; rates for this build</span><span class="chev">›</span></summary>
+          <div class="panel__body">
+            <p class="sec-note" style="margin:0 0 4px">
+              Pre-loaded from Fred's quote for <strong>${esc(L.style)}</strong>. Edit anything that has
+              changed for this build — fabric prices themselves live in the Rates panel at the top.
+            </p>
+            <p class="subhead">Fabric &amp; trims</p>
+            <div class="grid cols-4">
+              <label><span class="flabel">Body fabric</span>
+                <select data-f="fabric">${fabricOptions(L.fabric, false)}</select></label>
+              <label><span class="flabel">Body yield (yd/unit)</span>
+                <input type="number" step="0.01" min="0" data-f="yield" value="${L.yield}"></label>
+              <label><span class="flabel">Rib fabric</span>
+                <select data-f="rib">${fabricOptions(L.rib, true)}</select></label>
+              <label><span class="flabel">Rib yield (yd/unit)</span>
+                <input type="number" step="0.01" min="0" data-f="ribYield" value="${L.ribYield}" ${L.rib ? "" : "disabled"}></label>
+              <label><span class="flabel">Drawstring (yd/unit)</span>
+                <input type="number" step="0.05" min="0" data-f="draw" value="${L.draw}"></label>
+              <label><span class="flabel">Elastic (yd/unit)</span>
+                <input type="number" step="0.05" min="0" data-f="elastic" value="${L.elastic}"></label>
+              <label><span class="flabel">Trims / other ($/unit)</span>
+                <input type="number" step="0.05" min="0" data-f="trims" value="${L.trims}"></label>
+              <label><span class="flabel">Wash price group</span>
+                <select data-f="group">${groupOpts}</select></label>
+            </div>
+            <p class="subhead">Labor &amp; per-unit steps</p>
+            <div class="grid cols-4">
+              <label><span class="flabel">Sewing ($/unit)</span>
+                <input type="number" step="0.5" min="0" data-f="sew" value="${L.sew}"></label>
+              <label><span class="flabel">Cutting ($/unit)</span>
+                <input type="number" step="0.01" min="0" data-f="cut" value="${L.cut}"></label>
+              <label><span class="flabel">Grinding ($/unit)</span>
+                <input type="number" step="0.25" min="0" data-f="grind" value="${L.grind}" ${L.grindOn ? "" : "disabled"}
+                       class="${L.grindOn && num(L.grind) === 0 ? "missing" : ""}"></label>
+              <label><span class="flabel">Packaging ($/unit)</span>
+                <input type="number" step="0.05" min="0" data-f="pkg" value="${L.pkg}" ${L.pkgOn ? "" : "disabled"}></label>
+              <label><span class="flabel">Finishing / other ($/unit)</span>
+                <input type="number" step="0.05" min="0" data-f="fin" value="${L.fin}" ${L.finOn ? "" : "disabled"}
+                       class="${L.finOn && num(L.fin) === 0 ? "missing" : ""}"></label>
+            </div>
+            <div class="btnrow" style="margin-top:14px">
+              <button class="btn" data-resetline>Reset this line to Fred's quote</button>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="line__foot">
+        <span class="mono" style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)" data-sell></span>
+        <div class="btnrow">
+          <button class="btn" data-dupline>Duplicate</button>
+          <button class="btn" data-delline>Remove</button>
+        </div>
+      </div>
+    </article>`;
+  }).join("");
+}
+
+/* live badges inside each line card — no DOM rebuild, so typing never loses focus */
+function paintLineBadges(results){
+  results.forEach(r => {
+    const el = document.querySelector(`[data-line="${r.id}"]`);
+    if(!el) return;
+    el.querySelector("[data-unit]").textContent = money(r.unit);
+    el.querySelector("[data-ext]").textContent  = qtyFmt(r.qty) + " × = " + money(r.lineCost);
+    el.querySelector("[data-sell]").textContent =
+      "Incl. markup " + money(r.unitFsf) + " / unit · selling " + money(r.sell) + " · line " + money(r.lineFsf);
+    el.querySelector("[data-flags]").innerHTML = r.flags.map(f =>
+      `<span class="flag flag--${f.cls}">${esc(f.t)}</span>`).join("");
+    el.style.borderLeftColor = r.flags.some(f => f.cls === "bad") ? "var(--bad)"
+                             : r.flags.some(f => f.cls === "warn") ? "var(--warn)"
+                             : "var(--star-dim)";
+  });
+}
+
+/* ============================================================
+   RENDER — the cost sheet
+   ============================================================ */
+
+function renderSheet(results, fees){
+  $("#sheetSec").hidden = results.length === 0;
+  if(!results.length){ $("#builds").innerHTML = ""; $("#rollup").innerHTML = ""; $("#issues").innerHTML = ""; return; }
+
+  /* issues */
+  const issues = results.flatMap(r => r.issues);
+  $("#issues").innerHTML = issues.length ? `
+    <div class="notice">
+      <h4>${issues.length} thing${issues.length === 1 ? "" : "s"} to settle before this quote is firm</h4>
+      <ul>${issues.map(t => `<li>${esc(t)}</li>`).join("")}</ul>
+    </div>` : "";
+
+  /* per-build breakdowns */
+  $("#builds").innerHTML = results.map((r,i) => {
+    const L = S.lines.find(x => x.id === r.id);
+    const body = r.rows.map(row => {
+      if(row.group) return `<tr class="grp"><td colspan="2">${esc(row.group)}</td></tr>`;
+      if(row.text !== undefined) return `<tr><td class="dim">${esc(row.label)}</td><td class="v dim">${esc(row.text)}</td></tr>`;
+      const amt = row.missing ? "not in total" : money(row.amount);
+      return `<tr class="${row.off || row.missing ? "off" : ""}">
+        <td>${esc(row.label)}${row.detail ? ` <span class="dim">— ${esc(row.detail)}</span>` : ""}</td>
+        <td class="v">${amt}</td></tr>`;
+    }).join("");
+
+    return `
+    <div class="build">
+      <div class="build__head">
+        <span class="build__name">${String(i+1).padStart(2,"0")} · ${esc(r.style)}</span>
+        <span class="build__meta">
+          ${L && L.washOn && L.wash ? esc(L.wash) : "No wash"}
+          · ${L && L.grindOn ? "grinding" : "no grinding"}
+          · ${qtyFmt(r.qty)} unit${r.qty === 1 ? "" : "s"}
+        </span>
+      </div>
+      <table class="rows">
+        <tbody>
+          ${body}
+          <tr class="sum big"><td>Total cost per unit</td><td class="v">${money(r.unit)}</td></tr>
+          <tr class="grp"><td colspan="2">Pricing</td></tr>
+          <tr><td class="dim">FSF markup (${(r.markupPct*100).toFixed(1).replace(/\.0$/,"")}%)</td><td class="v dim">${money(r.markup)}</td></tr>
+          <tr class="sum"><td>Total cost incl. FSF markup</td><td class="v">${money(r.unitFsf)}</td></tr>
+          <tr><td class="dim">Selling price multiple</td><td class="v dim">${r.multiple}×</td></tr>
+          <tr class="sum"><td>Selling price per unit</td><td class="v">${money(r.sell)}</td></tr>
+          <tr class="grp"><td colspan="2">Line totals — ${qtyFmt(r.qty)} units</td></tr>
+          <tr><td class="dim">Production cost</td><td class="v dim">${money(r.lineCost)}</td></tr>
+          <tr class="sum big"><td>Payable to FSF (incl. markup)</td><td class="v">${money(r.lineFsf)}</td></tr>
+          <tr><td class="dim">Retail value at ${r.multiple}×</td><td class="v dim">${money(r.lineSell)}</td></tr>
+        </tbody>
+      </table>
+    </div>`;
+  }).join("");
+
+  /* rollup */
+  const units    = results.reduce((a,r) => a + r.qty, 0);
+  const prod     = results.reduce((a,r) => a + r.lineCost, 0);
+  const fsf      = results.reduce((a,r) => a + r.lineFsf, 0);
+  const sell     = results.reduce((a,r) => a + r.lineSell, 0);
+  const markupAmt= fsf - prod;
+  const grand    = fsf + fees.grand;
+  const margin   = sell > 0 ? (sell - grand) / sell * 100 : 0;
+  const avg      = units > 0 ? grand / units : 0;
+
+  const feeRows = fees.rows.map(f => `
+    <tr><td class="dim">${esc(f.style)}${f.shared ? ` <span class="flag flag--star">charged once</span>` : ""}
+      ${f.pattern ? "" : ` <span class="dim">· no pattern</span>`}${f.grading ? "" : ` <span class="dim">· no grading</span>`}</td>
+      <td class="v dim">${money(f.sub)}</td></tr>`).join("");
+
+  $("#rollup").innerHTML = `
+    <div class="tot">
+      <h3>Order total</h3>
+      <div class="totgrid">
+        <div class="kpi"><div class="l">Units</div><div class="n">${qtyFmt(units)}</div></div>
+        <div class="kpi"><div class="l">Styles</div><div class="n">${new Set(S.lines.map(l => l.style)).size} <small>/ ${results.length} build${results.length===1?"":"s"}</small></div></div>
+        <div class="kpi kpi--star"><div class="l">Total payable to FSF</div><div class="n">${money(grand,0)}</div></div>
+        <div class="kpi"><div class="l">All-in cost per unit</div><div class="n">${money(avg)}</div></div>
+      </div>
+      <div class="totrows">
+        <table>
+          <tbody>
+            <tr><td class="dim">Production cost — ${qtyFmt(units)} units</td><td class="v dim">${money(prod)}</td></tr>
+            <tr><td class="dim">FSF markup @ ${(num(S.g.markup)).toString()}%</td><td class="v dim">${money(markupAmt)}</td></tr>
+            <tr class="sum"><td>Garments, incl. FSF markup</td><td class="v">${money(fsf)}</td></tr>
+            ${fees.rows.length ? `<tr class="grp"><td colspan="2" style="padding-top:14px"><span class="flabel" style="margin:0">One-time fees — once per style, not per garment</span></td></tr>` : ""}
+            ${feeRows}
+            ${fees.setup ? `<tr><td class="dim">Embellishment setup (screens, digitizing)</td><td class="v dim">${money(fees.setup)}</td></tr>` : ""}
+            ${fees.grand ? `<tr class="sum"><td>Total one-time fees</td><td class="v">${money(fees.grand)}</td></tr>` : ""}
+            <tr class="big"><td>Total payable to FSF</td><td class="v">${money(grand)}</td></tr>
+            <tr><td class="dim">Retail value at ${num(S.g.multiple)}×</td><td class="v dim">${money(sell)}</td></tr>
+            <tr><td class="dim">Gross margin if everything sells at full price</td><td class="v dim">${margin.toFixed(1)}%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+
+  /* sticky bar */
+  $("#sticky").hidden = false;
+  $("#stickyS").innerHTML = `<b>${qtyFmt(units)}</b> units · <b>${money(grand,0)}</b> to FSF · <b>${money(avg)}</b> all-in per unit`;
+  return { units, prod, fsf, sell, grand, avg, margin };
+}
+
+/* ============================================================
+   EXPORT
+   ============================================================ */
+
+function csv(results, fees){
+  const q = v => {
+    const s = String(v ?? "");
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  };
+  const out = [];
+  out.push(["FSF PRODUCTION COST SHEET"]);
+  out.push(["Generated", new Date().toLocaleString()]);
+  out.push([]);
+  out.push(["#","Style","Wash","Grinding","Qty","Cost/unit","Markup/unit","Cost incl. markup/unit",
+            "Selling price/unit","Line production cost","Line payable to FSF","Line retail value","Status"]);
+  results.forEach((r,i) => {
+    const L = S.lines.find(x => x.id === r.id);
+    out.push([i+1, r.style, (L && L.washOn && L.wash) || "No wash", L && L.grindOn ? "Yes" : "No", r.qty,
+              r.unit.toFixed(4), r.markup.toFixed(4), r.unitFsf.toFixed(4), r.sell.toFixed(4),
+              r.lineCost.toFixed(2), r.lineFsf.toFixed(2), r.lineSell.toFixed(2),
+              r.flags.map(f => f.t).join("; ")]);
+  });
+  out.push([]);
+  out.push(["COST BREAKDOWN PER UNIT"]);
+  out.push(["#","Style","Component","Detail","$ per unit"]);
+  results.forEach((r,i) => {
+    r.rows.forEach(row => {
+      if(row.group) return;
+      if(row.text !== undefined){ out.push([i+1, r.style, row.label, row.text, ""]); return; }
+      out.push([i+1, r.style, row.label, row.detail || (row.off ? "not needed" : row.missing ? "excluded — price needed" : ""),
+                row.missing ? "" : row.amount.toFixed(4)]);
+    });
+    out.push([i+1, r.style, "TOTAL COST PER UNIT", "", r.unit.toFixed(4)]);
+  });
+  out.push([]);
+  out.push(["ONE-TIME FEES (once per style)"]);
+  out.push(["Style","Pattern","Grading","Subtotal"]);
+  fees.rows.forEach(f => out.push([f.style, f.pattern.toFixed(2), f.grading.toFixed(2), f.sub.toFixed(2)]));
+  if(fees.setup) out.push(["Embellishment setup","","", fees.setup.toFixed(2)]);
+  out.push(["TOTAL ONE-TIME FEES","","", fees.grand.toFixed(2)]);
+  out.push([]);
+  const units = results.reduce((a,r) => a + r.qty, 0);
+  const fsf   = results.reduce((a,r) => a + r.lineFsf, 0);
+  const sell  = results.reduce((a,r) => a + r.lineSell, 0);
+  out.push(["ORDER TOTAL"]);
+  out.push(["Units", units]);
+  out.push(["Garments incl. FSF markup", fsf.toFixed(2)]);
+  out.push(["One-time fees", fees.grand.toFixed(2)]);
+  out.push(["TOTAL PAYABLE TO FSF", (fsf + fees.grand).toFixed(2)]);
+  out.push(["Retail value", sell.toFixed(2)]);
+  const issues = results.flatMap(r => r.issues);
+  if(issues.length){
+    out.push([]);
+    out.push(["OPEN ITEMS"]);
+    issues.forEach(t => out.push([t]));
+  }
+  return out.map(row => row.map(q).join(",")).join("\r\n");
+}
+
+function summaryText(results, fees){
+  const units = results.reduce((a,r) => a + r.qty, 0);
+  const fsf   = results.reduce((a,r) => a + r.lineFsf, 0);
+  const lines = results.map((r,i) => {
+    const L = S.lines.find(x => x.id === r.id);
+    return `${i+1}. ${r.style} — ${(L && L.washOn && L.wash) || "no wash"}${L && L.grindOn ? " + grinding" : ""}` +
+           ` — ${qtyFmt(r.qty)} units @ ${money(r.unitFsf)} = ${money(r.lineFsf)}`;
+  });
+  const issues = results.flatMap(r => r.issues);
+  return [
+    "FSF PRODUCTION COST SHEET",
+    ...lines,
+    "",
+    `One-time fees: ${money(fees.grand)}`,
+    `TOTAL PAYABLE TO FSF: ${money(fsf + fees.grand)} for ${qtyFmt(units)} units`,
+    ...(issues.length ? ["", "Open items:", ...issues.map(t => "- " + t)] : [])
+  ].join("\n");
+}
+
+function download(name, text, mime){
+  const blob = new Blob([text], { type:mime });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/* ============================================================
+   REFRESH / PERSIST
+   ============================================================ */
+
+let lastResults = [], lastFees = null;
+
+function refresh(){
+  const results = S.lines.map(L => Object.assign(cost(L), { id:L.id }));
+  const fees = oneTimeFees();
+  lastResults = results; lastFees = fees;
+  paintLineBadges(results);
+  renderSheet(results, fees);
+  if(!S.lines.length) $("#sticky").hidden = true;
+  save();
+}
+
+let canStore = true, timer = null;
+try{ window.localStorage.setItem(KEY + ".t","1"); window.localStorage.removeItem(KEY + ".t"); }
+catch(e){ canStore = false; }
+
+function save(){
+  const el = $("#saveState");
+  if(!canStore){ el.textContent = "Not saved — this browser blocks storage"; return; }
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    try{
+      window.localStorage.setItem(KEY, JSON.stringify(S));
+      el.textContent = "Saved " + new Date().toLocaleTimeString([], { hour:"numeric", minute:"2-digit" });
+    }catch(e){
+      el.textContent = "Couldn't save — changes apply for this session only";
+    }
+  }, 200);
+}
+
+function load(){
+  S = freshState();
+  if(!canStore) return;
+  try{
+    const raw = window.localStorage.getItem(KEY);
+    if(!raw) return;
+    const p = JSON.parse(raw);
+    if(!p || typeof p !== "object") return;
+    if(Array.isArray(p.fabrics) && p.fabrics.length) S.fabrics = p.fabrics;
+    if(p.trims) S.trims = Object.assign(S.trims, p.trims);
+    if(Array.isArray(p.washes) && p.washes.length) S.washes = p.washes;
+    if(p.g) S.g = Object.assign(S.g, p.g);
+    if(Array.isArray(p.lines)){
+      S.lines = p.lines.map(L => {
+        const base = makeLine(L.style || STYLES[0].name);
+        const merged = Object.assign(base, L);
+        merged.emb = Array.isArray(L.emb) ? L.emb.map(e => Object.assign(makeEmb(), e)) : [];
+        merged.id = "L" + (uid++);
+        return merged;
+      });
+    }
+  }catch(e){ S = freshState(); }
+}
+
+/* ============================================================
+   EVENTS
+   ============================================================ */
+
+function lineOf(el){
+  const host = el.closest("[data-line]");
+  return host ? S.lines.find(L => L.id === host.dataset.line) : null;
+}
+
+/* style select populate */
+$("#stylePick").innerHTML = STYLES.map(s =>
+  `<option value="${esc(s.name)}">${esc(s.name)}</option>`).join("");
+
+$("#addLine").addEventListener("click", () => {
+  S.lines.push(makeLine($("#stylePick").value));
+  renderLines(); refresh();
+  const el = $("#lines").lastElementChild;
+  if(el) el.scrollIntoView({ behavior:"smooth", block:"center" });
+});
+
+/* --- rates panel --- */
+$("#panelRates").addEventListener("input", e => {
+  const t = e.target;
+  if(t.dataset.fab !== undefined){
+    const f = S.fabrics[+t.dataset.fab];
+    if(!f) return;
+    if(t.dataset.k === "name"){
+      const old = f.name;
+      f.name = t.value;
+      S.lines.forEach(L => {
+        if(L.fabric === old) L.fabric = f.name;
+        if(L.rib === old) L.rib = f.name;
+      });
+    } else {
+      f.price = t.value === "" ? null : num(t.value);
+      t.classList.toggle("missing", f.price === null);
+    }
+  } else if(t.dataset.trim){
+    S.trims[t.dataset.trim] = num(t.value);
+  } else if(t.dataset.wash !== undefined){
+    const w = S.washes[+t.dataset.wash];
+    if(!w) return;
+    if(t.dataset.k === "name"){
+      const old = w.name;
+      w.name = t.value;
+      S.lines.forEach(L => { if(L.wash === old) L.wash = w.name; });
+    } else {
+      w[t.dataset.k] = t.value === "" ? null : num(t.value);
+    }
+  } else if(t.id){
+    const map = { markup:"markup", multiple:"multiple", feePattern:"feePattern",
+                  feeGrading:"feeGrading", defPackaging:"packaging", defFinishing:"finishing" };
+    const k = map[t.id];
+    if(k){
+      S.g[k] = num(t.value);
+      /* changing a default retunes lines still sitting on the old default */
+      if(k === "packaging") S.lines.forEach(L => { if(!L._pkgEdited) L.pkg = S.g.packaging; });
+      if(k === "finishing") S.lines.forEach(L => { if(!L._finEdited) L.fin = S.g.finishing; });
+    }
+  }
+  refresh();
+});
+
+$("#panelRates").addEventListener("click", e => {
+  if(e.target.id === "addFabric"){
+    S.fabrics.push({ name:"New fabric", price:null });
+    renderRates(); renderLines(); refresh();
+    return;
+  }
+  const del = e.target.closest("[data-delfab]");
+  if(del){
+    const f = S.fabrics[+del.dataset.delfab];
+    const used = S.lines.some(L => L.fabric === f.name || L.rib === f.name);
+    if(used && !window.confirm(`"${f.name}" is used by a line in this order. Remove it anyway? Those lines will lose their fabric price.`)) return;
+    S.fabrics.splice(+del.dataset.delfab, 1);
+    renderRates(); renderLines(); refresh();
+  }
+});
+
+/* --- lines: text/number/select input --- */
+$("#lines").addEventListener("input", e => {
+  const t = e.target, L = lineOf(t);
+  if(!L) return;
+
+  if(t.dataset.emb !== undefined){
+    const em = L.emb[+t.dataset.emb];
+    if(!em) return;
+    const k = t.dataset.k;
+    em[k] = (k === "type" || k === "note") ? t.value : num(t.value);
+    if(k === "rate") t.classList.toggle("missing", num(t.value) === 0);
+    refresh();
+    return;
+  }
+
+  const f = t.dataset.f;
+  if(!f) return;
+
+  if(f === "style"){
+    const keepQty = L.qty, keepEmb = L.emb, keepId = L.id;
+    const next = makeLine(t.value);
+    next.id = keepId; next.qty = keepQty; next.emb = keepEmb;
+    S.lines[S.lines.indexOf(L)] = next;
+    renderLines(); refresh();
+    return;
+  }
+
+  if(f === "rib"){
+    L.rib = t.value;
+    if(!L.rib) L.ribYield = 0;
+    else if(num(L.ribYield) === 0){
+      const st = STYLES.find(s => s.name === L.style);
+      L.ribYield = st && st.ribYield ? st.ribYield : 0.25;
+    }
+    renderLines(); refresh();
+    return;
+  }
+
+  if(f === "group"){
+    L.group = t.value;
+    renderLines(); refresh();   /* wash dropdown prices depend on the group */
+    return;
+  }
+
+  if(f === "fabric" || f === "wash"){ L[f] = t.value; refresh(); return; }
+
+  /* numbers */
+  L[f] = num(t.value);
+  if(f === "pkg") L._pkgEdited = true;
+  if(f === "fin") L._finEdited = true;
+  if(f === "grind" || f === "fin") t.classList.toggle("missing", num(t.value) === 0);
+  t.classList.add("edited");
+  refresh();
+});
+
+/* --- lines: checkboxes --- */
+$("#lines").addEventListener("change", e => {
+  const t = e.target, L = lineOf(t);
+  if(!L || t.type !== "checkbox") return;
+  const f = t.dataset.f;
+  if(!f) return;
+  L[f] = t.checked;
+  if(f === "grindOn" && t.checked && num(L.grind) === 0){
+    const st = STYLES.find(s => s.name === L.style);
+    if(st && st.grind !== null) L.grind = st.grind;
+  }
+  renderLines(); refresh();
+});
+
+/* --- lines: buttons --- */
+$("#lines").addEventListener("click", e => {
+  const L = lineOf(e.target);
+  if(!L) return;
+
+  if(e.target.closest("[data-addemb]")){
+    L.emb.push(makeEmb());
+    renderLines(); refresh();
+    const d = document.querySelector(`[data-line="${L.id}"] details`);
+    if(d) d.open = true;
+    return;
+  }
+  const dj = e.target.closest("[data-delemb]");
+  if(dj){
+    L.emb.splice(+dj.dataset.delemb, 1);
+    renderLines(); refresh();
+    const d = document.querySelector(`[data-line="${L.id}"] details`);
+    if(d) d.open = true;
+    return;
+  }
+  if(e.target.closest("[data-resetline]")){
+    const keep = { id:L.id, qty:L.qty, wash:L.wash, pattern:L.pattern, grading:L.grading, emb:L.emb };
+    S.lines[S.lines.indexOf(L)] = Object.assign(makeLine(L.style), keep);
+    renderLines(); refresh();
+    return;
+  }
+  if(e.target.closest("[data-dupline]")){
+    const copy = JSON.parse(JSON.stringify(L));
+    copy.id = "L" + (uid++);
+    S.lines.splice(S.lines.indexOf(L) + 1, 0, copy);
+    renderLines(); refresh();
+    return;
+  }
+  if(e.target.closest("[data-delline]")){
+    S.lines.splice(S.lines.indexOf(L), 1);
+    renderLines(); refresh();
+  }
+});
+
+/* --- toolbar --- */
+const doPrint = () => window.print();
+$("#btnPrint").addEventListener("click", doPrint);
+$("#btnPrint2").addEventListener("click", doPrint);
+
+$("#btnCsv").addEventListener("click", () => {
+  const stamp = new Date().toISOString().slice(0,10);
+  download(`FSF-cost-sheet-${stamp}.csv`, csv(lastResults, lastFees), "text/csv;charset=utf-8");
+});
+
+$("#btnCopy").addEventListener("click", async () => {
+  const btn = $("#btnCopy"), text = summaryText(lastResults, lastFees);
+  try{
+    await navigator.clipboard.writeText(text);
+    btn.textContent = "Copied";
+  }catch(err){
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    btn.textContent = document.execCommand("copy") ? "Copied" : "Copy failed";
+    ta.remove();
+  }
+  setTimeout(() => { btn.textContent = "Copy summary"; }, 1600);
+});
+
+$("#btnJump").addEventListener("click", () => {
+  $("#sheetSec").scrollIntoView({ behavior:"smooth", block:"start" });
+});
+
+$("#reset").addEventListener("click", e => {
+  e.preventDefault();
+  if(!window.confirm("Clear every line and put all rates back to Fred's quoted prices?")) return;
+  S = freshState();
+  renderRates(); renderLines(); refresh();
+});
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+
+load();
+renderRates();
+renderLines();
+refresh();
+</script>
+</body>
+</html>
