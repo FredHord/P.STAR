@@ -386,9 +386,9 @@
       <div class="grid cols-3">
         <label><span class="flabel">Issue date</span>
           <input type="date" id="invIssued"></label>
-        <label><span class="flabel">Payment terms (days)</span>
+        <label><span class="flabel">Days until due — 0 = due on issue</span>
           <input type="number" step="1" min="0" id="invTerms"></label>
-        <label><span class="flabel">Deposit on order (%)</span>
+        <label><span class="flabel">Deposit on order (%) — balance before completion</span>
           <input type="number" step="5" min="0" max="100" id="invDeposit"></label>
       </div>
 
@@ -556,7 +556,10 @@ function todayISO(){
 
 function freshInvoice(){
   return {
-    mode:"fsf", number:"", issued:todayISO(), terms:30, deposit:0,
+    v:2,                      /* bump to re-apply the payment terms below */
+    mode:"fsf", number:"", issued:todayISO(),
+    terms:0,                  /* due on issue — no net terms */
+    deposit:50,               /* half on order, half before completion */
     fromName:"", fromDetails:"", toName:"", toDetails:"",
     tax:0, shipping:0, fees:true, notes:""
   };
@@ -1333,7 +1336,7 @@ function renderInvoice(){
       </div>
       <div class="inv-meta">
         Issued <b>${fmtDate(v.issued)}</b><br>
-        Due <b>${fmtDate(v.due)}</b>${v.terms ? ` · net ${v.terms}` : ""}<br>
+        Due <b>${fmtDate(v.due)}</b>${v.terms ? ` · net ${v.terms}` : " · on receipt"}<br>
         ${qtyFmt(v.units)} unit${v.units === 1 ? "" : "s"}
       </div>
     </div>
@@ -1372,7 +1375,7 @@ function renderInvoice(){
         <tr class="tot"><td>Total</td><td class="r">${money(v.total)}</td></tr>
         ${v.depPct ? `
           <tr><td class="dim">Deposit due on order (${v.depPct}%)</td><td class="r">${money(v.deposit)}</td></tr>
-          <tr class="due"><td>Balance on completion</td><td class="r">${money(v.balance)}</td></tr>` : ""}
+          <tr class="due"><td>Balance before production completion</td><td class="r">${money(v.balance)}</td></tr>` : ""}
       </tbody>
     </table>
 
@@ -1388,7 +1391,7 @@ function invoiceText(){
   const pad = (l, r) => l + " ".repeat(Math.max(2, 58 - l.length)) + r;
   const out = [
     "INVOICE  " + v.number,
-    "Issued " + fmtDate(v.issued) + "   Due " + fmtDate(v.due),
+    "Issued " + fmtDate(v.issued) + "   Due " + fmtDate(v.due) + (v.terms ? "  (net " + v.terms + ")" : "  (on receipt)"),
     "",
     "From: " + v.fromName + (v.fromDetails ? " — " + v.fromDetails : ""),
     "Bill to: " + v.toName + (v.toDetails ? " — " + v.toDetails : ""),
@@ -1411,7 +1414,7 @@ function invoiceText(){
   out.push(pad("TOTAL", money(v.total)));
   if(v.depPct){
     out.push(pad("Deposit on order (" + v.depPct + "%)", money(v.deposit)));
-    out.push(pad("Balance on completion", money(v.balance)));
+    out.push(pad("Balance before production completion", money(v.balance)));
   }
   if(v.notes) out.push("", v.notes);
   return out.join("\n");
@@ -1477,7 +1480,14 @@ function load(){
     if(p.trims) S.trims = Object.assign(S.trims, p.trims);
     if(Array.isArray(p.washes) && p.washes.length) S.washes = p.washes;
     if(p.g) S.g = Object.assign(S.g, p.g);
-    if(p.inv) S.inv = Object.assign(freshInvoice(), p.inv);
+    if(p.inv){
+      S.inv = Object.assign(freshInvoice(), p.inv);
+      if(p.inv.v !== 2){           /* saved before the terms changed */
+        S.inv.terms = 0;
+        S.inv.deposit = 50;
+        S.inv.v = 2;
+      }
+    }
     S.demo = !!p.demo;
     if(Array.isArray(p.lines)){
       S.lines = p.lines.map(L => {

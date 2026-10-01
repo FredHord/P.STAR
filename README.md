@@ -90,6 +90,11 @@ never appears on the document. Two directions:
 - **You billing a customer** charges the selling price instead; one-time
   fees are then optional.
 
+Payment terms default to **50% deposit on order, balance before production
+completion**, with the due date equal to the issue date (due on receipt, no
+net terms). Both are editable per invoice; a saved invoice from before this
+default is migrated on load, keeping its order intact.
+
 The invoice renders on a light paper surface in either theme, because it is
 a document and it is what gets printed. If any price is still open on the
 cost sheet, a banner says so on screen — it does not print.
