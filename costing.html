@@ -408,8 +408,8 @@
       <div class="grid cols-3">
         <label><span class="flabel">Tax / VAT (%)</span>
           <input type="number" step="0.5" min="0" id="invTax"></label>
-        <label><span class="flabel">Shipping / freight ($)</span>
-          <input type="number" step="1" min="0" id="invShipping"></label>
+        <label><span class="flabel">Transportation &amp; ancillary (%)</span>
+          <input type="number" step="0.5" min="0" id="invAncillary"></label>
         <div>
           <span class="flabel">One-time fees</span>
           <label class="check" style="padding-top:2px"><input type="checkbox" id="invFees">
@@ -556,12 +556,13 @@ function todayISO(){
 
 function freshInvoice(){
   return {
-    v:2,                      /* bump to re-apply the payment terms below */
+    v:3,                      /* bump to re-apply the defaults below */
     mode:"fsf", number:"", issued:todayISO(),
     terms:0,                  /* due on issue — no net terms */
     deposit:50,               /* half on order, half before completion */
+    ancillary:10,             /* transportation, ancillary costs and the unexpected */
     fromName:"", fromDetails:"", toName:"", toDetails:"",
-    tax:0, shipping:0, fees:true, notes:""
+    tax:0, fees:true, notes:""
   };
 }
 
@@ -832,7 +833,7 @@ const INV_FIELDS = {
   invMode:"mode", invNumber:"number", invIssued:"issued", invTerms:"terms",
   invDeposit:"deposit", invFromName:"fromName", invFromDetails:"fromDetails",
   invToName:"toName", invToDetails:"toDetails", invTax:"tax",
-  invShipping:"shipping", invNotes:"notes"
+  invAncillary:"ancillary", invNotes:"notes"
 };
 
 function renderInvForm(){
@@ -1292,8 +1293,13 @@ function invoiceModel(){
 
   const goods    = items.reduce((a,i) => a + i.amount, 0);
   const feeTotal = feeItems.reduce((a,i) => a + i.amount, 0);
-  const shipping = num(I.shipping);
-  const subtotal = goods + feeTotal + shipping;
+
+  /* One uplift covering transportation, ancillary development and whatever
+     the run throws up, charged on the order before tax. */
+  const ancPct   = num(I.ancillary);
+  const ancillary = (goods + feeTotal) * ancPct / 100;
+
+  const subtotal = goods + feeTotal + ancillary;
   const taxPct   = num(I.tax);
   const tax      = subtotal * taxPct / 100;
   const total    = subtotal + tax;
@@ -1304,7 +1310,7 @@ function invoiceModel(){
   const number = (I.number || "").trim() || (client ? "INV-" : "FSF-") + stamp + "-01";
 
   return {
-    client, number, items, feeItems, goods, feeTotal, shipping, subtotal,
+    client, number, items, feeItems, goods, feeTotal, ancPct, ancillary, subtotal,
     taxPct, tax, total, depPct, deposit, balance:total - deposit,
     issued:I.issued || todayISO(),
     due:addDays(I.issued || todayISO(), I.terms),
@@ -1369,7 +1375,7 @@ function renderInvoice(){
       <tbody>
         <tr><td class="dim">Goods</td><td class="r">${money(v.goods)}</td></tr>
         ${v.feeTotal ? `<tr><td class="dim">One-time charges</td><td class="r">${money(v.feeTotal)}</td></tr>` : ""}
-        ${v.shipping ? `<tr><td class="dim">Shipping</td><td class="r">${money(v.shipping)}</td></tr>` : ""}
+        ${v.ancPct ? `<tr><td class="dim">Transportation &amp; ancillary (${v.ancPct}%)</td><td class="r">${money(v.ancillary)}</td></tr>` : ""}
         <tr><td class="dim">Subtotal</td><td class="r">${money(v.subtotal)}</td></tr>
         ${v.taxPct ? `<tr><td class="dim">Tax (${v.taxPct}%)</td><td class="r">${money(v.tax)}</td></tr>` : ""}
         <tr class="tot"><td>Total</td><td class="r">${money(v.total)}</td></tr>
@@ -1408,7 +1414,7 @@ function invoiceText(){
   out.push("");
   out.push(pad("Goods", money(v.goods)));
   if(v.feeTotal) out.push(pad("One-time charges", money(v.feeTotal)));
-  if(v.shipping) out.push(pad("Shipping", money(v.shipping)));
+  if(v.ancPct) out.push(pad("Transportation & ancillary (" + v.ancPct + "%)", money(v.ancillary)));
   out.push(pad("Subtotal", money(v.subtotal)));
   if(v.taxPct) out.push(pad("Tax (" + v.taxPct + "%)", money(v.tax)));
   out.push(pad("TOTAL", money(v.total)));
@@ -1482,11 +1488,10 @@ function load(){
     if(p.g) S.g = Object.assign(S.g, p.g);
     if(p.inv){
       S.inv = Object.assign(freshInvoice(), p.inv);
-      if(p.inv.v !== 2){           /* saved before the terms changed */
-        S.inv.terms = 0;
-        S.inv.deposit = 50;
-        S.inv.v = 2;
-      }
+      const was = num(p.inv.v);
+      if(was < 2){ S.inv.terms = 0; S.inv.deposit = 50; }
+      if(was < 3){ S.inv.ancillary = 10; }
+      S.inv.v = 3;
     }
     S.demo = !!p.demo;
     if(Array.isArray(p.lines)){
@@ -1698,7 +1703,7 @@ $("#lines").addEventListener("click", e => {
 $("#panelInv").addEventListener("input", e => {
   const k = INV_FIELDS[e.target.id];
   if(!k) return;
-  const numeric = ["terms","deposit","tax","shipping"];
+  const numeric = ["terms","deposit","tax","ancillary"];
   S.inv[k] = numeric.includes(k) ? num(e.target.value) : e.target.value;
   if(!$("#invoiceView").hidden) renderInvoice();
   save();

@@ -90,6 +90,10 @@ never appears on the document. Two directions:
 - **You billing a customer** charges the selling price instead; one-time
   fees are then optional.
 
+A single **10% transportation & ancillary** charge is applied to goods plus
+one-time charges, before tax — one line covering freight, ancillary
+development and whatever the run throws up. Set it to 0 to drop the line.
+
 Payment terms default to **50% deposit on order, balance before production
 completion**, with the due date equal to the issue date (due on receipt, no
 net terms). Both are editable per invoice; a saved invoice from before this
