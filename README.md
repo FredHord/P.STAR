@@ -64,6 +64,9 @@ Behaviour worth knowing:
   same style are not billed twice.
 - Embellishments (printing, embroidery, studding) are *not* in FSF's quote;
   their rates start empty and are flagged until filled in.
+- Packaging is FSF's flat $3.50/unit and **covers bagging and tagging**
+  (confirmed with Fred). The separate "Finishing / other" toggle is a spare
+  line for anything beyond that; it is off and unpriced by default.
 - The order is saved to `localStorage`, and exports as print/PDF or CSV.
 
 Nothing links to it from the public site — like `checklist.html` it is reached
