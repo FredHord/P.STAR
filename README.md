@@ -135,6 +135,11 @@ fee** (3%, editable) on the subtotal; set it to 0 to drop the line. The
 invoice charges no sales tax — add it as a line item if an order ever needs
 it.
 
+The issue date **follows today's date** by default, so an invoice generated
+next month is dated next month rather than the day the sheet was first
+saved. Unticking "Always today" pins the field so a specific date can be
+set; the invoice number and the due date both follow whichever applies.
+
 Payment terms default to **50% deposit on order, balance before production
 completion**, with the due date equal to the issue date (due on receipt, no
 net terms). Both are editable per invoice; a saved invoice from before this

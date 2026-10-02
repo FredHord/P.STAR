@@ -430,8 +430,12 @@
 
       <p class="subhead">Dates &amp; terms</p>
       <div class="grid cols-3">
-        <label><span class="flabel">Issue date</span>
-          <input type="date" id="invIssued"></label>
+        <div>
+          <span class="flabel">Issue date</span>
+          <input type="date" id="invIssued">
+          <label class="check" style="padding:6px 0 0"><input type="checkbox" id="invAutoDate">
+            <span>Always today<em>off pins the date above</em></span></label>
+        </div>
         <label><span class="flabel">Days until due — 0 = due on issue</span>
           <input type="number" step="1" min="0" id="invTerms"></label>
         <label><span class="flabel">Deposit on order (%) — balance before completion</span>
@@ -641,8 +645,10 @@ function todayISO(){
 
 function freshInvoice(){
   return {
-    v:5,                      /* bump to re-apply the defaults below */
-    mode:"fsf", number:"", issued:todayISO(),
+    v:6,                      /* bump to re-apply the defaults below */
+    mode:"fsf", number:"",
+    autoDate:true,            /* follow today's date; off pins `issued` */
+    issued:todayISO(),
     terms:0,                  /* due on issue — no net terms */
     deposit:50,               /* half on order, half before completion */
     pay:"bank",               /* "bank" | "card" — the card fee applies only to card */
@@ -928,6 +934,10 @@ const INV_FIELDS = {
 function renderInvForm(){
   Object.entries(INV_FIELDS).forEach(([id,k]) => { $("#" + id).value = S.inv[k]; });
   $("#invFees").checked = !!S.inv.fees;
+  $("#invAutoDate").checked = !!S.inv.autoDate;
+  /* while it follows today, the field shows today and is not editable */
+  $("#invIssued").value = S.inv.autoDate ? todayISO() : S.inv.issued;
+  $("#invIssued").disabled = !!S.inv.autoDate;
 }
 
 function renderRates(){
@@ -1458,14 +1468,17 @@ function invoiceModel(){
   const depPct   = Math.min(100, Math.max(0, num(I.deposit)));
   const deposit  = total * depPct / 100;
 
-  const stamp = (I.issued || todayISO()).replace(/-/g, "");
+  /* An invoice built today should say today unless the date was pinned. */
+  const issued = I.autoDate ? todayISO() : (I.issued || todayISO());
+  const stamp  = issued.replace(/-/g, "");
   const number = (I.number || "").trim() || (client ? "INV-" : "FSF-") + stamp + "-01";
 
   return {
     client, number, items, feeItems, goods, feeTotal, subtotal,
     card, ccPct, ccFee, total, depPct, deposit, balance:total - deposit,
-    issued:I.issued || todayISO(),
-    due:addDays(I.issued || todayISO(), I.terms),
+    issued,
+    due:addDays(issued, I.terms),
+    autoDate:!!I.autoDate,
     terms:num(I.terms),
     fromName:(I.fromName || "").trim() || (client ? "Your company" : "FSF"),
     fromDetails:I.fromDetails || "",
@@ -1841,9 +1854,10 @@ function load(){
         S.inv.pay = "bank";
         S.inv.ccFee = 3;
       }
+      if(was < 6) S.inv.autoDate = true;   /* the date used to freeze once saved */
       delete S.inv.ancillary;     /* moved to the worksheet */
       delete S.inv.tax;           /* state tax removed */
-      S.inv.v = 5;
+      S.inv.v = 6;
     }
     S.demo = !!p.demo;
     if(Array.isArray(p.lines)){
@@ -2101,6 +2115,14 @@ $("#panelInv").addEventListener("input", e => {
 $("#panelInv").addEventListener("change", e => {
   if(e.target.id === "invFees"){
     S.inv.fees = e.target.checked;
+    if(!$("#invoiceView").hidden) renderInvoice();
+    save();
+  }
+  if(e.target.id === "invAutoDate"){
+    S.inv.autoDate = e.target.checked;
+    /* pinning starts from today, so the field never reads as a stale date */
+    if(!S.inv.autoDate) S.inv.issued = todayISO();
+    renderInvForm();
     if(!$("#invoiceView").hidden) renderInvoice();
     save();
   }
