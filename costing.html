@@ -192,15 +192,17 @@
   .rep-kpi .n{font-family:'Archivo',sans-serif;font-weight:700;font-size:21px;margin-top:5px;letter-spacing:-.01em;}
   .rep-kpi--win{border-color:var(--d-accent);}
   .rep-kpi--win .n{color:var(--d-accent);}
-  table.rep td.ph{width:62px;padding-right:0;}
-  table.rep .shot{width:54px;height:66px;border-radius:2px;overflow:hidden;background:#E7E3DA;display:grid;place-items:center;}
-  table.rep .shot img{width:100%;height:100%;object-fit:cover;display:block;}
-  table.rep .shot span{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--d-muted);}
+  table.inv td.ph{width:62px;padding-right:0;}
+  table.inv .shot{width:54px;height:66px;border-radius:2px;overflow:hidden;background:#E7E3DA;display:grid;place-items:center;}
+  table.inv .shot img{width:100%;height:100%;object-fit:cover;display:block;}
+  table.inv .shot span{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--d-muted);}
   .rep-margin{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--d-muted);}
   /* eight columns do not fit a phone: the table scrolls inside its own box
      rather than widening the page */
   .rep-scroll{overflow-x:auto;margin-top:30px;}
   .rep-scroll table.rep{margin-top:0;min-width:620px;}
+  .inv-scroll{overflow-x:auto;margin-top:30px;}
+  .inv-scroll table.inv{margin-top:0;min-width:460px;}
   .rep-note{margin-top:30px;padding-top:18px;border-top:1px solid var(--d-rule);font-size:12.5px;color:var(--d-muted);}
   body.reporting .no-invoice{display:none !important;}
 
@@ -289,8 +291,8 @@
     .build,.panel,.tot,.kpi{break-inside:avoid;page-break-inside:avoid;}
     .tot{background:none;}
     .paper{box-shadow:none;padding:0;max-width:none;background:#fff;}
-    .rep-scroll{overflow:visible;}
-    .rep-scroll table.rep{min-width:0;}
+    .rep-scroll,.inv-scroll{overflow:visible;}
+    .rep-scroll table.rep,.inv-scroll table.inv{min-width:0;}
     .doc__bar{display:none;}
     .sticky{display:none;}
   }
@@ -467,6 +469,8 @@
           <span class="flabel">One-time fees</span>
           <label class="check" style="padding-top:2px"><input type="checkbox" id="invFees">
             <span>Bill pattern, grading &amp; setup<em>charged once per style</em></span></label>
+          <label class="check" style="padding-top:2px"><input type="checkbox" id="invPhotos">
+            <span>Show photos<em>only where a line has one</em></span></label>
         </div>
       </div>
 
@@ -652,6 +656,7 @@ function freshInvoice(){
     terms:0,                  /* due on issue — no net terms */
     deposit:50,               /* half on order, half before completion */
     pay:"bank",               /* "bank" | "card" — the card fee applies only to card */
+    photos:true,              /* show line photos on the document */
     ccFee:3,
     fromName:"", fromDetails:"", toName:"", toDetails:"",
     fees:true, notes:""
@@ -934,6 +939,7 @@ const INV_FIELDS = {
 function renderInvForm(){
   Object.entries(INV_FIELDS).forEach(([id,k]) => { $("#" + id).value = S.inv[k]; });
   $("#invFees").checked = !!S.inv.fees;
+  $("#invPhotos").checked = !!S.inv.photos;
   $("#invAutoDate").checked = !!S.inv.autoDate;
   /* while it follows today, the field shows today and is not editable */
   $("#invIssued").value = S.inv.autoDate ? todayISO() : S.inv.issued;
@@ -1440,7 +1446,8 @@ function invoiceModel(){
       bits.push(e.type.toLowerCase() + (e.note ? " (" + e.note + ")" : "") + (per > 1 ? " ×" + per : ""));
     });
     const unit = client ? r.sell : r.unitFsf;
-    return { desc:r.style, sub:bits.join(", "), qty:r.qty, unit, amount:unit * r.qty };
+    return { desc:r.style, sub:bits.join(", "), photo:L.photo || "",
+             qty:r.qty, unit, amount:unit * r.qty };
   });
 
   /* one-time fees are a production charge; a customer invoice bills them only
@@ -1475,6 +1482,7 @@ function invoiceModel(){
 
   return {
     client, number, items, feeItems, goods, feeTotal, subtotal,
+    photos: !!I.photos && items.some(i => i.photo),
     card, ccPct, ccFee, total, depPct, deposit, balance:total - deposit,
     issued,
     due:addDays(issued, I.terms),
@@ -1492,7 +1500,13 @@ function invoiceModel(){
 
 function renderInvoice(){
   const v = invoiceModel();
+  /* The photo column appears only when a line actually has one, so an
+     invoice without photos is exactly as it was. */
+  const cell = i => v.photos
+    ? `<td class="ph">${i.photo ? `<div class="shot"><img src="${i.photo}" alt="${esc(i.desc)}"></div>` : ""}</td>`
+    : "";
   const row = i => `<tr>
+      ${cell(i)}
       <td>${esc(i.desc)}${i.sub ? `<span class="sub">${esc(i.sub)}</span>` : ""}</td>
       <td class="r">${qtyFmt(i.qty)}</td>
       <td class="r">${money(i.unit)}</td>
@@ -1526,16 +1540,18 @@ function renderInvoice(){
       </div>
     </div>
 
+    <div class="inv-scroll">
     <table class="inv">
       <thead>
-        <tr><th>Description</th><th class="r">Qty</th><th class="r">Unit</th><th class="r">Amount</th></tr>
+        <tr>${v.photos ? "<th></th>" : ""}<th>Description</th><th class="r">Qty</th><th class="r">Unit</th><th class="r">Amount</th></tr>
       </thead>
       <tbody>
         ${v.items.map(row).join("")}
-        ${v.feeItems.length ? `<tr class="grp"><td colspan="4">One-time charges — once per style, not per garment</td></tr>` : ""}
+        ${v.feeItems.length ? `<tr class="grp"><td colspan="${v.photos ? 5 : 4}">One-time charges — once per style, not per garment</td></tr>` : ""}
         ${v.feeItems.map(row).join("")}
       </tbody>
     </table>
+    </div>
 
     <table class="inv-sum">
       <tbody>
@@ -2113,8 +2129,9 @@ $("#panelInv").addEventListener("input", e => {
 });
 
 $("#panelInv").addEventListener("change", e => {
-  if(e.target.id === "invFees"){
-    S.inv.fees = e.target.checked;
+  if(e.target.id === "invFees" || e.target.id === "invPhotos"){
+    if(e.target.id === "invFees") S.inv.fees = e.target.checked;
+    else S.inv.photos = e.target.checked;
     if(!$("#invoiceView").hidden) renderInvoice();
     save();
   }

@@ -96,8 +96,10 @@ therefore separates **Payable to FSF** from **Total order cost**.
 Each line takes one photo. It is downscaled in the browser to 640px on its
 longest edge and re-encoded as JPEG before being stored, because the whole
 sheet lives in `localStorage` and a photo straight off a phone would spend
-that budget on its own. Photos appear on the line card and in the retail
-report, not on the invoice.
+that budget on its own. Photos appear on the line card, the retail report and the
+invoice. On the invoice the column shows only when at least one line has a
+photo, so an invoice without them is laid out exactly as before; a
+"Show photos" tick in Invoice details turns it off entirely.
 
 ### Retail report
 
