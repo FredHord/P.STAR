@@ -48,6 +48,8 @@ def build(s):
     s = sub(s, '      <button class="btn" id="btnPrint">Print / PDF</button>\n', "")
     s = sub(s, '      <button class="btn" id="invPrint">Print / save PDF</button>\n', "")
     s = sub(s, '$("#invPrint").addEventListener("click", () => window.print());\n', "")
+    s = sub(s, '      <button class="btn" id="repPrint">Print / save PDF</button>\n', "")
+    s = sub(s, '$("#repPrint").addEventListener("click", () => window.print());\n', "")
     # without printing, say where a PDF comes from instead
     s = sub(s,
             'This banner is on screen only — it does not print.</div>` : ""}',
@@ -122,12 +124,12 @@ const esc = s =>""")
 
     s = sub(s, """  if(!window.confirm("Clear every line and put all rates back to Fred's quoted prices?")) return;
   S = freshState(); S.demo = false;
-  hideInvoice();
+  hideInvoice(); hideReport();
   renderRates(); renderInvForm(); renderLines(); refresh();
 });""",
             """  armConfirm(e.target, "Tap again to clear everything", () => {
     S = freshState(); S.demo = false;
-    hideInvoice();
+    hideInvoice(); hideReport();
     renderRates(); renderInvForm(); renderLines(); refresh();
   });
 });""")

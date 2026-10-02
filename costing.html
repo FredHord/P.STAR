@@ -174,6 +174,40 @@
   .notice ul{margin:0;padding-left:18px;color:var(--muted);}
   .notice li{margin:3px 0;}
 
+  /* ---------- photos ---------- */
+  .photo{
+    width:62px;height:74px;flex:0 0 auto;border:1px dashed var(--line);border-radius:var(--r);
+    display:grid;place-items:center;cursor:pointer;overflow:hidden;background:var(--ink);
+    margin-top:2px;position:relative;
+  }
+  .photo:hover{border-color:var(--muted);}
+  .photo img{width:100%;height:100%;object-fit:cover;display:block;}
+  .photo span{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;padding:0 4px;line-height:1.4;}
+  .photo:focus-within{outline:2px solid var(--star);outline-offset:2px;}
+
+  /* ---------- retail report ---------- */
+  .rep-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:30px;}
+  .rep-kpi{border:1px solid var(--d-rule);border-radius:var(--r);padding:13px 14px;}
+  .rep-kpi .l{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--d-muted);}
+  .rep-kpi .n{font-family:'Archivo',sans-serif;font-weight:700;font-size:21px;margin-top:5px;letter-spacing:-.01em;}
+  .rep-kpi--win{border-color:var(--d-accent);}
+  .rep-kpi--win .n{color:var(--d-accent);}
+  table.rep td.ph{width:62px;padding-right:0;}
+  table.rep .shot{width:54px;height:66px;border-radius:2px;overflow:hidden;background:#E7E3DA;display:grid;place-items:center;}
+  table.rep .shot img{width:100%;height:100%;object-fit:cover;display:block;}
+  table.rep .shot span{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--d-muted);}
+  .rep-margin{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--d-muted);}
+  /* eight columns do not fit a phone: the table scrolls inside its own box
+     rather than widening the page */
+  .rep-scroll{overflow-x:auto;margin-top:30px;}
+  .rep-scroll table.rep{margin-top:0;min-width:620px;}
+  .rep-note{margin-top:30px;padding-top:18px;border-top:1px solid var(--d-rule);font-size:12.5px;color:var(--d-muted);}
+  body.reporting .no-invoice{display:none !important;}
+
+  @media (max-width:720px){
+    .rep-kpis{grid-template-columns:repeat(2,minmax(0,1fr));}
+  }
+
   /* ---------- invoice ---------- */
   /* The invoice renders as paper in both themes: it is a document, it is what
      gets printed, and a dark invoice reads as a screenshot rather than a bill. */
@@ -255,6 +289,8 @@
     .build,.panel,.tot,.kpi{break-inside:avoid;page-break-inside:avoid;}
     .tot{background:none;}
     .paper{box-shadow:none;padding:0;max-width:none;background:#fff;}
+    .rep-scroll{overflow:visible;}
+    .rep-scroll table.rep{min-width:0;}
     .doc__bar{display:none;}
     .sticky{display:none;}
   }
@@ -312,6 +348,8 @@
       <div class="grid cols-2">
         <label><span class="flabel">Transportation &amp; ancillary (%)</span>
           <input type="number" step="0.5" min="0" id="defAncillary"></label>
+        <label><span class="flabel">Round suggested retail to nearest ($) — 0 = don't</span>
+          <input type="number" step="1" min="0" id="defRetailRound"></label>
       </div>
 
       <p class="subhead">One-time fees per style ($, charged once — not per garment)</p>
@@ -437,10 +475,40 @@
   </div>
 </section>
 
+<!-- ============ RETAIL REPORT ============ -->
+<section class="sec no-invoice" id="repSec" hidden>
+  <div class="sec-head">
+    <h2>5 — Retail report</h2>
+    <span class="mono" style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Cost, retail &amp; profit</span>
+  </div>
+  <p class="sec-note">
+    What each style lands at once FSF's markup, its share of the one-time fees and the
+    transportation charge are carried — against what it should sell for, and what is left.
+    Add a photo to a line and it appears here. Override a suggested retail price on any
+    line if you want a rounder number.
+  </p>
+  <div class="btnrow" style="margin-top:16px">
+    <button class="btn btn--primary" id="btnReport">Generate retail report</button>
+  </div>
+</section>
+
+<section id="reportView" class="doc" hidden>
+  <div class="doc__bar no-print">
+    <button class="btn" id="repBack">← Back to cost sheet</button>
+    <div class="btnrow">
+      <button class="btn" id="repToInv">Invoice →</button>
+      <button class="btn" id="repPrint">Print / save PDF</button>
+      <button class="btn" id="repCopy">Copy report</button>
+    </div>
+  </div>
+  <div class="paper" id="reportPaper"></div>
+</section>
+
 <section id="invoiceView" class="doc" hidden>
   <div class="doc__bar no-print">
     <button class="btn" id="invBack">← Back to cost sheet</button>
     <div class="btnrow">
+      <button class="btn" id="invToRep">Retail report →</button>
       <button class="btn" id="invPrint">Print / save PDF</button>
       <button class="btn" id="invCopy">Copy invoice</button>
     </div>
@@ -459,6 +527,7 @@
   <div class="btnrow">
     <button class="btn" id="btnPrint2">Print / PDF</button>
     <button class="btn" id="btnJump">Cost sheet ↓</button>
+    <button class="btn" id="btnReport2">Retail report</button>
     <button class="btn btn--primary" id="btnInvoice2">Generate invoice</button>
   </div>
 </div>
@@ -545,7 +614,8 @@ const DEFAULTS = {
   feeGrading:250,
   packaging:3.50,
   finishing:0,          /* not quoted by Fred */
-  ancillary:5           /* transportation, ancillary dev and the unexpected */
+  ancillary:5,          /* transportation, ancillary dev and the unexpected */
+  retailRound:5         /* round suggested retail to the nearest $; 0 = don't */
 };
 
 /* Embellishments are quoted per project — the rates move every run, so there are
@@ -616,6 +686,8 @@ function makeLine(styleName){
     pkg: DEFAULTS.packaging,
     finOn: false,
     fin: DEFAULTS.finishing,
+    retail: null,                    /* null = use the calculated selling price */
+    photo: "",                       /* downscaled data URI */
     emb: []
   };
 }
@@ -895,6 +967,7 @@ function renderRates(){
   $("#defPackaging").value = S.g.packaging;
   $("#defFinishing").value = S.g.finishing;
   $("#defAncillary").value = S.g.ancillary;
+  $("#defRetailRound").value = S.g.retailRound;
 }
 
 /* ============================================================
@@ -929,6 +1002,10 @@ function renderLines(){
     <article class="line" data-line="${L.id}">
       <div class="line__head">
         <span class="line__idx">${String(i+1).padStart(2,"0")}</span>
+        <label class="photo" title="${L.photo ? "Replace the photo" : "Add a photo"}">
+          <input type="file" accept="image/*" data-photo hidden>
+          ${L.photo ? `<img src="${L.photo}" alt="${esc(L.style)}">` : `<span>+ Photo</span>`}
+        </label>
         <div class="line__main">
           <div class="grid cols-3">
             <label><span class="flabel">Style</span>
@@ -1041,6 +1118,13 @@ function renderLines(){
                 <input type="number" step="0.05" min="0" data-f="fin" value="${L.fin}" ${L.finOn ? "" : "disabled"}
                        class="${L.finOn && num(L.fin) === 0 ? "missing" : ""}"></label>
             </div>
+            <p class="subhead">Retail</p>
+            <div class="grid cols-2">
+              <label><span class="flabel">Suggested retail ($/unit) — blank uses the calculated price</span>
+                <input type="number" step="1" min="0" data-f="retail" value="${L.retail === null || L.retail === undefined ? "" : L.retail}"
+                       placeholder="calculated"></label>
+            </div>
+
             <div class="btnrow" style="margin-top:14px">
               <button class="btn" data-resetline>Reset this line to Fred's quote</button>
             </div>
@@ -1051,6 +1135,7 @@ function renderLines(){
       <div class="line__foot">
         <span class="mono" style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)" data-sell></span>
         <div class="btnrow">
+          ${L.photo ? `<button class="btn btn--x" data-delphoto>Remove photo</button>` : ""}
           <button class="btn" data-dupline>Duplicate</button>
           <button class="btn" data-delline>Remove</button>
         </div>
@@ -1279,6 +1364,44 @@ function download(name, text, mime){
 }
 
 /* ============================================================
+   PHOTOS
+
+   Downscaled in the browser before they are stored: the whole sheet lives
+   in localStorage, and a phone photo straight off the camera would blow
+   that budget on its own.
+   ============================================================ */
+
+const PHOTO_MAX = 640;      /* longest edge, px */
+const PHOTO_Q   = 0.72;     /* JPEG quality */
+
+function readPhoto(file, done){
+  if(!file || !/^image\//.test(file.type)) return done(null, "That file is not an image.");
+  const reader = new FileReader();
+  reader.onerror = () => done(null, "Could not read that file.");
+  reader.onload = () => {
+    const img = new Image();
+    img.onerror = () => done(null, "Could not decode that image.");
+    img.onload = () => {
+      let w = img.naturalWidth, h = img.naturalHeight;
+      if(!w || !h) return done(null, "That image has no dimensions.");
+      const scale = Math.min(1, PHOTO_MAX / Math.max(w, h));
+      w = Math.max(1, Math.round(w * scale));
+      h = Math.max(1, Math.round(h * scale));
+      const c = document.createElement("canvas");
+      c.width = w; c.height = h;
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "#fff";           /* flatten transparency for JPEG */
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+      try{ done(c.toDataURL("image/jpeg", PHOTO_Q), null); }
+      catch(e){ done(null, "Could not process that image."); }
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ============================================================
    INVOICE
 
    One document, two directions. Billing FSF's production run charges the
@@ -1451,6 +1574,7 @@ function invoiceText(){
 }
 
 function showInvoice(){
+  hideReport();
   renderInvoice();
   document.body.classList.add("invoicing");
   $("#invoiceView").hidden = false;
@@ -1460,6 +1584,183 @@ function showInvoice(){
 function hideInvoice(){
   document.body.classList.remove("invoicing");
   $("#invoiceView").hidden = true;
+}
+
+/* ============================================================
+   RETAIL REPORT
+
+   What each style actually lands at once FSF's markup, its share of the
+   one-time fees and the ancillary charge are carried, what it should sell
+   for, and what is left over.
+   ============================================================ */
+
+function roundRetail(n){
+  const step = num(S.g.retailRound);
+  if(step <= 0) return n;
+  return Math.round(n / step) * step;
+}
+
+function retailModel(){
+  const results = lastResults.filter(r => r.qty > 0);
+  const fees   = lastFees || { rows:[], setup:0, grand:0 };
+  const ancPct = num(S.g.ancillary);
+
+  /* pattern and grading are per style, so a style split across two lines
+     carries them in proportion to the units on each */
+  const styleUnits = {};
+  results.forEach(r => { styleUnits[r.style] = (styleUnits[r.style] || 0) + r.qty; });
+  const styleFee = {};
+  fees.rows.forEach(f => { styleFee[f.style] = f.sub; });
+
+  const items = results.map(r => {
+    const L = S.lines.find(x => x.id === r.id) || {};
+    const share   = styleUnits[r.style] ? r.qty / styleUnits[r.style] : 1;
+    const oneTime = (styleFee[r.style] || 0) * share + num(r.embSetup);
+
+    const lineCost = (r.lineFsf + oneTime) * (1 + ancPct / 100);
+    const unitCost = r.qty ? lineCost / r.qty : 0;
+
+    const suggested = roundRetail(r.sell);
+    const custom    = L.retail !== null && L.retail !== undefined && L.retail !== "";
+    const retail    = custom ? num(L.retail) : suggested;
+
+    const profit    = retail - unitCost;
+    const lineRetail= retail * r.qty;
+    const lineProfit= profit * r.qty;
+
+    const bits = [];
+    if(L.washOn && L.wash) bits.push(L.wash);
+    if(L.grindOn) bits.push("distress grinding");
+    (L.emb || []).forEach(e => bits.push(e.type.toLowerCase() + (e.note ? " (" + e.note + ")" : "")));
+
+    return {
+      style:r.style, sub:bits.join(", "), photo:L.photo || "", qty:r.qty,
+      unitCost, retail, custom, suggested, profit,
+      margin: retail > 0 ? profit / retail * 100 : 0,
+      lineCost, lineRetail, lineProfit,
+      markup: unitCost > 0 ? retail / unitCost : 0
+    };
+  });
+
+  const units  = items.reduce((a,i) => a + i.qty, 0);
+  const cogs   = items.reduce((a,i) => a + i.lineCost, 0);
+  const revenue= items.reduce((a,i) => a + i.lineRetail, 0);
+  const profit = revenue - cogs;
+
+  return {
+    items, units, cogs, revenue, profit,
+    margin: revenue > 0 ? profit / revenue * 100 : 0,
+    avgCost: units ? cogs / units : 0,
+    ancPct,
+    breakEven: revenue > 0 ? Math.ceil(units * (cogs / revenue)) : 0,
+    open: results.flatMap(r => r.issues)
+  };
+}
+
+function renderReport(){
+  const v = retailModel();
+  const shot = i => i.photo
+    ? `<div class="shot"><img src="${i.photo}" alt="${esc(i.style)}"></div>`
+    : `<div class="shot"><span>No photo</span></div>`;
+
+  $("#reportPaper").innerHTML = `
+    <div class="inv-top">
+      <div>
+        <h2 class="inv-title">Retail report</h2>
+        <div class="inv-meta" style="text-align:left;margin-top:6px"><b>${qtyFmt(v.units)} units · ${v.items.length} build${v.items.length === 1 ? "" : "s"}</b></div>
+      </div>
+      <div class="inv-meta">${fmtDate(todayISO())}</div>
+    </div>
+
+    <div class="rep-kpis">
+      <div class="rep-kpi"><div class="l">Cost of goods</div><div class="n">${money(v.cogs,0)}</div></div>
+      <div class="rep-kpi"><div class="l">Retail value</div><div class="n">${money(v.revenue,0)}</div></div>
+      <div class="rep-kpi rep-kpi--win"><div class="l">Gross profit</div><div class="n">${money(v.profit,0)}</div></div>
+      <div class="rep-kpi"><div class="l">Gross margin</div><div class="n">${v.margin.toFixed(1)}%</div></div>
+    </div>
+
+    <div class="rep-scroll">
+    <table class="inv rep">
+      <thead>
+        <tr>
+          <th colspan="2">Style</th>
+          <th class="r">Qty</th>
+          <th class="r">Unit cost</th>
+          <th class="r">Retail</th>
+          <th class="r">Profit / unit</th>
+          <th class="r">Margin</th>
+          <th class="r">Line profit</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${v.items.map(i => `
+          <tr>
+            <td class="ph">${shot(i)}</td>
+            <td>${esc(i.style)}${i.sub ? `<span class="sub">${esc(i.sub)}</span>` : ""}
+              ${i.custom ? `<span class="sub">retail set by hand — calculated ${money(i.suggested)}</span>` : ""}</td>
+            <td class="r">${qtyFmt(i.qty)}</td>
+            <td class="r">${money(i.unitCost)}</td>
+            <td class="r">${money(i.retail)}</td>
+            <td class="r">${money(i.profit)}</td>
+            <td class="r"><span class="rep-margin">${i.margin.toFixed(1)}%</span></td>
+            <td class="r">${money(i.lineProfit)}</td>
+          </tr>`).join("")}
+      </tbody>
+    </table>
+    </div>
+
+    <table class="inv-sum">
+      <tbody>
+        <tr><td class="dim">Cost of goods — landed, ${qtyFmt(v.units)} units</td><td class="r">${money(v.cogs)}</td></tr>
+        <tr><td class="dim">Retail value at full price</td><td class="r">${money(v.revenue)}</td></tr>
+        <tr class="tot"><td>Gross profit</td><td class="r">${money(v.profit)}</td></tr>
+        <tr class="due"><td>Gross margin</td><td class="r">${v.margin.toFixed(1)}%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="rep-note">
+      Unit cost is landed: FSF's price including their markup, that style's share of the
+      pattern, grading and embellishment setup, and the ${v.ancPct}% transportation and ancillary
+      charge. Retail value and profit assume every unit sells at full price —
+      <strong>${qtyFmt(v.breakEven)} of ${qtyFmt(v.units)} units</strong> covers the cost of the run.
+    </div>
+    ${v.open.length ? `<div class="inv-open no-print">
+      <b>Not final:</b> ${v.open.length} price${v.open.length === 1 ? " is" : "s are"} still open on the
+      cost sheet, so these figures will move.</div>` : ""}
+  `;
+}
+
+function reportText(){
+  const v = retailModel();
+  const pad = (l, r) => l + " ".repeat(Math.max(2, 58 - l.length)) + r;
+  const out = ["RETAIL REPORT  " + fmtDate(todayISO()), ""];
+  v.items.forEach(i => {
+    out.push(pad(i.style + "  ×" + qtyFmt(i.qty), ""));
+    if(i.sub) out.push("    " + i.sub);
+    out.push(pad("    cost " + money(i.unitCost) + " · retail " + money(i.retail),
+                 money(i.profit) + "/unit · " + i.margin.toFixed(1) + "%"));
+  });
+  out.push("");
+  out.push(pad("Cost of goods (landed)", money(v.cogs)));
+  out.push(pad("Retail value at full price", money(v.revenue)));
+  out.push(pad("GROSS PROFIT", money(v.profit)));
+  out.push(pad("Gross margin", v.margin.toFixed(1) + "%"));
+  out.push("");
+  out.push(qtyFmt(v.breakEven) + " of " + qtyFmt(v.units) + " units covers the cost of the run.");
+  return out.join("\n");
+}
+
+function showReport(){
+  hideInvoice();
+  renderReport();
+  document.body.classList.add("reporting");
+  $("#reportView").hidden = false;
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+function hideReport(){
+  document.body.classList.remove("reporting");
+  $("#reportView").hidden = true;
 }
 
 /* ============================================================
@@ -1475,8 +1776,12 @@ function refresh(){
   paintLineBadges(results);
   renderSheet(results, fees);
   $("#invSec").hidden = results.length === 0;
-  if(!S.lines.length){ $("#sticky").hidden = true; hideInvoice(); }
-  else if(!$("#invoiceView").hidden) renderInvoice();
+  $("#repSec").hidden = results.length === 0;
+  if(!S.lines.length){ $("#sticky").hidden = true; hideInvoice(); hideReport(); }
+  else {
+    if(!$("#invoiceView").hidden) renderInvoice();
+    if(!$("#reportView").hidden) renderReport();
+  }
   save();
 }
 
@@ -1493,7 +1798,10 @@ function save(){
       window.localStorage.setItem(KEY, JSON.stringify(S));
       el.textContent = "Saved " + new Date().toLocaleTimeString([], { hour:"numeric", minute:"2-digit" });
     }catch(e){
-      el.textContent = "Couldn't save — changes apply for this session only";
+      const heavy = S.lines.some(L => L.photo);
+      el.textContent = heavy
+        ? "Couldn't save — photos filled this browser's storage. Remove one, or work without saving."
+        : "Couldn't save — changes apply for this session only";
     }
   }, 200);
 }
@@ -1595,7 +1903,7 @@ $("#panelRates").addEventListener("input", e => {
   } else if(t.id){
     const map = { markup:"markup", multiple:"multiple", feePattern:"feePattern",
                   feeGrading:"feeGrading", defPackaging:"packaging", defFinishing:"finishing",
-                  defAncillary:"ancillary" };
+                  defAncillary:"ancillary", defRetailRound:"retailRound" };
     const k = map[t.id];
     if(k){
       S.g[k] = num(t.value);
@@ -1669,6 +1977,13 @@ $("#lines").addEventListener("input", e => {
 
   if(f === "fabric" || f === "wash"){ L[f] = t.value; refresh(); return; }
 
+  if(f === "retail"){                 /* blank means "use the calculated price" */
+    L.retail = t.value === "" ? null : num(t.value);
+    t.classList.toggle("edited", t.value !== "");
+    refresh();
+    return;
+  }
+
   /* numbers */
   L[f] = num(t.value);
   if(f === "pkg") L._pkgEdited = true;
@@ -1676,6 +1991,30 @@ $("#lines").addEventListener("input", e => {
   if(f === "grind" || f === "fin") t.classList.toggle("missing", num(t.value) === 0);
   t.classList.add("edited");
   refresh();
+});
+
+/* --- lines: photo --- */
+$("#lines").addEventListener("change", e => {
+  const t = e.target;
+  if(t.dataset.photo === undefined) return;
+  const L = lineOf(t);
+  const file = t.files && t.files[0];
+  if(!L || !file) return;
+  const slot = t.closest(".photo");
+  const prev = slot.innerHTML;
+  slot.innerHTML = `<span>Reading…</span>`;
+  slot.appendChild(t);
+  readPhoto(file, (uri, err) => {
+    t.value = "";
+    if(!uri){
+      slot.innerHTML = prev;
+      slot.appendChild(t);
+      $("#saveState").textContent = err || "Could not add that photo";
+      return;
+    }
+    L.photo = uri;
+    renderLines(); refresh();
+  });
 });
 
 /* --- lines: checkboxes --- */
@@ -1725,6 +2064,11 @@ $("#lines").addEventListener("click", e => {
     renderLines(); refresh();
     return;
   }
+  if(e.target.closest("[data-delphoto]")){
+    L.photo = "";
+    renderLines(); refresh();
+    return;
+  }
   if(e.target.closest("[data-delline]")){
     S.lines.splice(S.lines.indexOf(L), 1);
     renderLines(); refresh();
@@ -1760,6 +2104,31 @@ $("#invBack").addEventListener("click", () => {
   $("#invSec").scrollIntoView({ behavior:"smooth", block:"center" });
 });
 $("#invPrint").addEventListener("click", () => window.print());
+
+const openReport = () => { if(lastResults.length) showReport(); };
+$("#btnReport").addEventListener("click", openReport);
+$("#btnReport2").addEventListener("click", openReport);
+$("#repBack").addEventListener("click", () => {
+  hideReport();
+  $("#repSec").scrollIntoView({ behavior:"smooth", block:"center" });
+});
+$("#repPrint").addEventListener("click", () => window.print());
+$("#repToInv").addEventListener("click", () => showInvoice());
+$("#invToRep").addEventListener("click", () => showReport());
+$("#repCopy").addEventListener("click", async () => {
+  const btn = $("#repCopy"), text = reportText();
+  try{
+    await navigator.clipboard.writeText(text);
+    btn.textContent = "Copied";
+  }catch(err){
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    btn.textContent = document.execCommand("copy") ? "Copied" : "Copy failed";
+    ta.remove();
+  }
+  setTimeout(() => { btn.textContent = "Copy report"; }, 1600);
+});
 
 /* --- toolbar --- */
 const doPrint = () => window.print();
@@ -1809,7 +2178,7 @@ $("#reset").addEventListener("click", e => {
   e.preventDefault();
   if(!window.confirm("Clear every line and put all rates back to Fred's quoted prices?")) return;
   S = freshState(); S.demo = false;
-  hideInvoice();
+  hideInvoice(); hideReport();
   renderRates(); renderInvForm(); renderLines(); refresh();
 });
 

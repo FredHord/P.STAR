@@ -83,6 +83,32 @@ cost of yours, so it lands on the cost sheet — applied to the whole order
 after FSF's markup and one-time fees — and never on the invoice. The rollup
 therefore separates **Payable to FSF** from **Total order cost**.
 
+### Photos
+
+Each line takes one photo. It is downscaled in the browser to 640px on its
+longest edge and re-encoded as JPEG before being stored, because the whole
+sheet lives in `localStorage` and a photo straight off a phone would spend
+that budget on its own. Photos appear on the line card and in the retail
+report, not on the invoice.
+
+### Retail report
+
+Section 5 turns the order into a merchandising view: landed unit cost,
+suggested retail, profit per unit, margin and line profit, with the photos
+and a totals block.
+
+**Landed cost** is FSF's price including their markup, plus that style's
+share of its pattern, grading and embellishment setup (split across its
+lines by unit count), plus the transportation & ancillary charge — so it is
+the real cost per unit, not the garment cost.
+
+**Suggested retail** is the cost sheet's selling price rounded to the
+nearest $5 (configurable in the Rates panel; 0 disables rounding). Any line
+can override it with a hand-set price, and the report marks those.
+
+Profit figures assume full sell-through at those prices, and the report says
+how many units cover the cost of the run.
+
 ### Invoicing
 
 Section 4 turns the order into a clean invoice — line items, one-time
