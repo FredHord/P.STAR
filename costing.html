@@ -412,9 +412,7 @@
       </div>
 
       <p class="subhead">Totals</p>
-      <div class="grid cols-4">
-        <label><span class="flabel">CA state tax (%)</span>
-          <input type="number" step="0.25" min="0" id="invTax"></label>
+      <div class="grid cols-3">
         <label><span class="flabel">Paid by</span>
           <select id="invPay">
             <option value="bank">Bank transfer / ACH — no fee</option>
@@ -547,7 +545,7 @@ const DEFAULTS = {
   feeGrading:250,
   packaging:3.50,
   finishing:0,          /* not quoted by Fred */
-  ancillary:10          /* transportation, ancillary dev and the unexpected */
+  ancillary:5           /* transportation, ancillary dev and the unexpected */
 };
 
 /* Embellishments are quoted per project — the rates move every run, so there are
@@ -569,11 +567,10 @@ function todayISO(){
 
 function freshInvoice(){
   return {
-    v:4,                      /* bump to re-apply the defaults below */
+    v:5,                      /* bump to re-apply the defaults below */
     mode:"fsf", number:"", issued:todayISO(),
     terms:0,                  /* due on issue — no net terms */
     deposit:50,               /* half on order, half before completion */
-    tax:7.25,                 /* CA statewide base — district rates sit on top */
     pay:"bank",               /* "bank" | "card" — the card fee applies only to card */
     ccFee:3,
     fromName:"", fromDetails:"", toName:"", toDetails:"",
@@ -587,6 +584,7 @@ function freshState(){
     trims:   {...DEFAULT_TRIMS},
     washes:  DEFAULT_WASHES.map(w => ({...w})),
     g:       {...DEFAULTS},
+    v:       5,          /* bump to re-apply the rate defaults above */
     lines:   [],
     inv:     freshInvoice()
   };
@@ -847,7 +845,7 @@ function oneTimeFees(){
 const INV_FIELDS = {
   invMode:"mode", invNumber:"number", invIssued:"issued", invTerms:"terms",
   invDeposit:"deposit", invFromName:"fromName", invFromDetails:"fromDetails",
-  invToName:"toName", invToDetails:"toDetails", invTax:"tax",
+  invToName:"toName", invToDetails:"toDetails",
   invPay:"pay", invCcFee:"ccFee", invNotes:"notes"
 };
 
@@ -1323,17 +1321,12 @@ function invoiceModel(){
 
   const subtotal = goods + feeTotal;
 
-  /* CA sales tax on the goods, then the processor's cut on what is actually
-     charged to the card — tax included, which is what they bill on. */
-  const taxPct   = num(I.tax);
-  const tax      = subtotal * taxPct / 100;
-  const taxed    = subtotal + tax;
-
+  /* The processor's cut on what is actually charged to the card. */
   const card     = I.pay === "card";
   const ccPct    = card ? num(I.ccFee) : 0;
-  const ccFee    = taxed * ccPct / 100;
+  const ccFee    = subtotal * ccPct / 100;
 
-  const total    = taxed + ccFee;
+  const total    = subtotal + ccFee;
   const depPct   = Math.min(100, Math.max(0, num(I.deposit)));
   const deposit  = total * depPct / 100;
 
@@ -1342,7 +1335,7 @@ function invoiceModel(){
 
   return {
     client, number, items, feeItems, goods, feeTotal, subtotal,
-    taxPct, tax, card, ccPct, ccFee, total, depPct, deposit, balance:total - deposit,
+    card, ccPct, ccFee, total, depPct, deposit, balance:total - deposit,
     issued:I.issued || todayISO(),
     due:addDays(I.issued || todayISO(), I.terms),
     terms:num(I.terms),
@@ -1408,7 +1401,6 @@ function renderInvoice(){
         <tr><td class="dim">Goods</td><td class="r">${money(v.goods)}</td></tr>
         ${v.feeTotal ? `<tr><td class="dim">One-time charges</td><td class="r">${money(v.feeTotal)}</td></tr>` : ""}
         <tr><td class="dim">Subtotal</td><td class="r">${money(v.subtotal)}</td></tr>
-        ${v.taxPct ? `<tr><td class="dim">CA state tax (${v.taxPct}%)</td><td class="r">${money(v.tax)}</td></tr>` : ""}
         ${v.ccPct ? `<tr><td class="dim">Card processing fee (${v.ccPct}%)</td><td class="r">${money(v.ccFee)}</td></tr>` : ""}
         <tr class="tot"><td>Total</td><td class="r">${money(v.total)}</td></tr>
         ${v.depPct ? `
@@ -1448,7 +1440,6 @@ function invoiceText(){
   out.push(pad("Goods", money(v.goods)));
   if(v.feeTotal) out.push(pad("One-time charges", money(v.feeTotal)));
   out.push(pad("Subtotal", money(v.subtotal)));
-  if(v.taxPct) out.push(pad("CA state tax (" + v.taxPct + "%)", money(v.tax)));
   if(v.ccPct)  out.push(pad("Card processing fee (" + v.ccPct + "%)", money(v.ccFee)));
   out.push(pad("TOTAL", money(v.total)));
   if(v.depPct){
@@ -1519,17 +1510,19 @@ function load(){
     if(p.trims) S.trims = Object.assign(S.trims, p.trims);
     if(Array.isArray(p.washes) && p.washes.length) S.washes = p.washes;
     if(p.g) S.g = Object.assign(S.g, p.g);
+    if(num(p.v) < 5) S.g.ancillary = 5;   /* was 10% */
+    S.v = 5;
     if(p.inv){
       S.inv = Object.assign(freshInvoice(), p.inv);
       const was = num(p.inv.v);
       if(was < 2){ S.inv.terms = 0; S.inv.deposit = 50; }
-      if(was < 4){                /* uplift left the invoice; CA tax and card fee arrived */
-        S.inv.tax = 7.25;
+      if(was < 4){                /* uplift left the invoice; the card fee arrived */
         S.inv.pay = "bank";
         S.inv.ccFee = 3;
       }
-      delete S.inv.ancillary;
-      S.inv.v = 4;
+      delete S.inv.ancillary;     /* moved to the worksheet */
+      delete S.inv.tax;           /* state tax removed */
+      S.inv.v = 5;
     }
     S.demo = !!p.demo;
     if(Array.isArray(p.lines)){
@@ -1742,7 +1735,7 @@ $("#lines").addEventListener("click", e => {
 $("#panelInv").addEventListener("input", e => {
   const k = INV_FIELDS[e.target.id];
   if(!k) return;
-  const numeric = ["terms","deposit","tax","ccFee"];
+  const numeric = ["terms","deposit","ccFee"];
   S.inv[k] = numeric.includes(k) ? num(e.target.value) : e.target.value;
   if(!$("#invoiceView").hidden) renderInvoice();
   save();

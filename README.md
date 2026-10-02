@@ -77,7 +77,7 @@ by URL, since it exposes cost prices.
 It opens on two worked example builds so the sheet is legible at a glance;
 "Clear examples" empties it. The order is then remembered per browser.
 
-A **transportation & ancillary** charge (10% by default, set in the Rates
+A **transportation & ancillary** charge (5% by default, set in the Rates
 panel) covers freight, ancillary development and the unexpected. It is a
 cost of yours, so it lands on the cost sheet — applied to the whole order
 after FSF's markup and one-time fees — and never on the invoice. The rollup
@@ -96,11 +96,10 @@ never appears on the document. Two directions:
 - **You billing a customer** charges the selling price instead; one-time
   fees are then optional.
 
-The invoice adds **CA state tax** (7.25% — the statewide base; district and
-city rates sit on top, so raise it to the delivery address's combined rate)
-and, when "Paid by" is set to credit card, a **card processing fee** (3%)
-charged on the subtotal *including* tax, which is what a processor bills on.
-Both are editable, and setting either to 0 drops its line from the document.
+When "Paid by" is set to credit card, the invoice adds a **card processing
+fee** (3%, editable) on the subtotal; set it to 0 to drop the line. The
+invoice charges no sales tax — add it as a line item if an order ever needs
+it.
 
 Payment terms default to **50% deposit on order, balance before production
 completion**, with the due date equal to the issue date (due on receipt, no
