@@ -200,7 +200,13 @@
   /* eight columns do not fit a phone: the table scrolls inside its own box
      rather than widening the page */
   .rep-scroll{overflow-x:auto;margin-top:30px;}
-  .rep-scroll table.rep{margin-top:0;min-width:620px;}
+  .rep-scroll table.rep{margin-top:0;min-width:760px;table-layout:fixed;}
+  /* the figures are the point of this table, so they get fixed room and the
+     style column takes what is left rather than the other way round */
+  table.rep th{white-space:normal;line-height:1.35;vertical-align:bottom;}
+  table.rep th.r,table.rep td.r{padding-left:14px;}
+  table.rep td:nth-child(2){padding-right:10px;}
+  table.rep td.r .sub{text-align:right;font-family:'Inter Tight',sans-serif;font-size:11.5px;margin-top:3px;}
   .inv-scroll{overflow-x:auto;margin-top:30px;}
   .inv-scroll table.inv{margin-top:0;min-width:460px;}
   .rep-note{margin-top:30px;padding-top:18px;border-top:1px solid var(--d-rule);font-size:12.5px;color:var(--d-muted);}
@@ -215,6 +221,7 @@
      gets printed, and a dark invoice reads as a screenshot rather than a bill. */
   .doc{--d-paper:#F7F5F0;--d-ink:#16181D;--d-rule:#CFCABF;--d-muted:#6A6E77;--d-accent:#8A6D1F;}
   #invoiceView{margin-top:28px;}
+  #reportView .paper{max-width:1000px;}
   .doc__bar{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:16px;}
   .paper{
     background:var(--d-paper);color:var(--d-ink);border-radius:var(--r);
@@ -235,7 +242,9 @@
     font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
     color:var(--d-muted);text-align:left;padding:0 0 8px;border-bottom:1px solid var(--d-rule);font-weight:500;
   }
-  table.inv th.r,table.inv td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  table.inv th.r,table.inv td.r{
+    text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:20px;
+  }
   table.inv td{padding:13px 0;border-bottom:1px solid rgba(207,202,191,.55);font-size:14px;vertical-align:top;}
   table.inv td.r{font-family:'JetBrains Mono',monospace;}
   table.inv td .sub{display:block;color:var(--d-muted);font-size:12.5px;margin-top:4px;line-height:1.55;}
@@ -293,6 +302,8 @@
     .paper{box-shadow:none;padding:0;max-width:none;background:#fff;}
     .rep-scroll,.inv-scroll{overflow:visible;}
     .rep-scroll table.rep,.inv-scroll table.inv{min-width:0;}
+    .paper{max-width:900px;margin:0 auto;}
+    #reportView .paper{max-width:1000px;}
     .doc__bar{display:none;}
     .sticky{display:none;}
   }
@@ -1715,15 +1726,23 @@ function renderReport(){
 
     <div class="rep-scroll">
     <table class="inv rep">
+      <colgroup>
+        <col style="width:66px">   <!-- photo -->
+        <col>                      <!-- style + detail: takes what is left -->
+        <col style="width:52px">   <!-- qty -->
+        <col style="width:104px">  <!-- COG -->
+        <col style="width:116px">  <!-- suggested retail -->
+        <col style="width:84px">   <!-- margin -->
+        <col style="width:126px">  <!-- profit -->
+      </colgroup>
       <thead>
         <tr>
           <th colspan="2">Style</th>
           <th class="r">Qty</th>
-          <th class="r">Unit cost</th>
-          <th class="r">Retail</th>
-          <th class="r">Profit / unit</th>
+          <th class="r">COG<br>per unit</th>
+          <th class="r">Sugg<br>retail</th>
           <th class="r">Margin</th>
-          <th class="r">Line profit</th>
+          <th class="r">Profit</th>
         </tr>
       </thead>
       <tbody>
@@ -1735,9 +1754,8 @@ function renderReport(){
             <td class="r">${qtyFmt(i.qty)}</td>
             <td class="r">${money(i.unitCost)}</td>
             <td class="r">${money(i.retail)}</td>
-            <td class="r">${money(i.profit)}</td>
             <td class="r"><span class="rep-margin">${i.margin.toFixed(1)}%</span></td>
-            <td class="r">${money(i.lineProfit)}</td>
+            <td class="r">${money(i.lineProfit)}<span class="sub">${money(i.profit)} per unit</span></td>
           </tr>`).join("")}
       </tbody>
     </table>
@@ -1771,8 +1789,9 @@ function reportText(){
   v.items.forEach(i => {
     out.push(pad(i.style + "  ×" + qtyFmt(i.qty), ""));
     if(i.sub) out.push("    " + i.sub);
-    out.push(pad("    cost " + money(i.unitCost) + " · retail " + money(i.retail),
-                 money(i.profit) + "/unit · " + i.margin.toFixed(1) + "%"));
+    out.push(pad("    COG " + money(i.unitCost) + " · sugg retail " + money(i.retail)
+                 + " · margin " + i.margin.toFixed(1) + "%",
+                 money(i.lineProfit)));
   });
   out.push("");
   out.push(pad("Cost of goods (landed)", money(v.cogs)));

@@ -103,9 +103,15 @@ photo, so an invoice without them is laid out exactly as before; a
 
 ### Retail report
 
-Section 5 turns the order into a merchandising view: landed unit cost,
-suggested retail, profit per unit, margin and line profit, with the photos
-and a totals block.
+Section 5 turns the order into a merchandising view — **Qty, COG per unit,
+Sugg retail, Margin, Profit** — with the photos and a totals block. Profit is
+the line's total, with the per-unit figure beneath it, so the column sums to
+the Gross profit headline.
+
+The figure columns have fixed widths and the style column takes what is
+left, so numbers never get squeezed into each other; the report page is
+wider than the invoice because it is a data table, and on a narrow screen
+the table scrolls inside its own box.
 
 **Landed cost** is FSF's price including their markup, plus that style's
 share of its pattern, grading and embellishment setup (split across its
