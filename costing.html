@@ -363,6 +363,7 @@
       <div class="grid cols-2">
         <label><span class="flabel">Packaging ($ per unit) — bagging &amp; tagging included</span><input type="number" step="0.05" min="0" id="defPackaging"></label>
         <label><span class="flabel">Finishing / other ($ per unit) — spare line, not quoted</span><input type="number" step="0.05" min="0" id="defFinishing"></label>
+        <label><span class="flabel">Distress grinding ($ per unit) — every style</span><input type="number" step="0.25" min="0" id="defGrinding"></label>
       </div>
     </div>
   </details>
@@ -562,48 +563,50 @@ const DEFAULT_WASHES = [
 ];
 
 /* body/rib yields in yards per unit; labor in $ per unit.
-   grind:null  = Fred has not quoted grinding for this style
+   Distress grinding is charged on every style at one rate (DEFAULTS.grinding).
+   Fred quoted $2.50/unit on hoodies and bottoms; the same rate is carried
+   across the tees, tank and track pieces — confirm it with him.
    trims       = zipper / hardware already quoted in the sheet */
 const STYLES = [
   { name:"Zip Hoodie", group:"Hoodies", fabric:"20oz Gabardine French Terry", yield:2.16,
     rib:"Rib Knit", ribYield:0.75, draw:0, elastic:0,
-    sew:20, cut:1, grind:2.5, trims:3.00, trimsNote:"Zipper $3.00" },
+    sew:20, cut:1, trims:3.00, trimsNote:"Zipper $3.00" },
   { name:"Pullover Hoodie", group:"Hoodies", fabric:"20oz Gabardine French Terry", yield:2.06,
     rib:"Rib Knit", ribYield:0.75, draw:0, elastic:0,
-    sew:15, cut:1, grind:2.5, trims:0 },
+    sew:15, cut:1, trims:0 },
   { name:"Specialized Zip Hoodie", group:"Hoodies", fabric:"20oz Gabardine French Terry", yield:2.16,
     rib:"Rib Knit", ribYield:0.75, draw:0, elastic:0,
-    sew:30, cut:1, grind:2.5, trims:3.00, trimsNote:"Zipper $3.00" },
+    sew:30, cut:1, trims:3.00, trimsNote:"Zipper $3.00" },
   { name:"Specialized Pullover Hoodie", group:"Hoodies", fabric:"20oz Gabardine French Terry", yield:2.06,
     rib:"Rib Knit", ribYield:0.75, draw:0, elastic:0,
-    sew:25, cut:1, grind:2.5, trims:0 },
+    sew:25, cut:1, trims:0 },
   { name:"Sweatpants", group:"Bottoms", fabric:"20oz Gabardine French Terry", yield:2.08,
     rib:"", ribYield:0, draw:2.25, elastic:1.5,
-    sew:18, cut:1, grind:2.5, trims:0 },
+    sew:18, cut:1, trims:0 },
   { name:"Sweat Shorts (Jorts Baggy Cut)", group:"Bottoms", fabric:"20oz Gabardine French Terry", yield:1.45,
     rib:"", ribYield:0, draw:2.25, elastic:1.5,
-    sew:16, cut:1, grind:2.5, trims:0 },
+    sew:16, cut:1, trims:0 },
   { name:"Short Sleeve Jersey Tee", group:"Tees", fabric:"Jersey", yield:1.08,
     rib:"Collar Rib (Tees)", ribYield:0.25, draw:0, elastic:0,
-    sew:10, cut:0.63, grind:null, trims:0 },
+    sew:10, cut:0.63, trims:0 },
   { name:"Long Sleeve Jersey Tee", group:"Tees", fabric:"Jersey", yield:1.60,
     rib:"Collar Rib (Tees)", ribYield:0.25, draw:0, elastic:0,
-    sew:12, cut:1, grind:null, trims:0 },
+    sew:12, cut:1, trims:0 },
   { name:"Thermal Long Sleeve", group:"Tees", fabric:"Thermal", yield:1.60,
     rib:"Collar Rib (Tees)", ribYield:0.25, draw:0, elastic:0,
-    sew:12, cut:1, grind:null, trims:0,
+    sew:12, cut:1, trims:0,
     note:"Sewing and cutting assumed same as long sleeve tee — confirm with Fred" },
   { name:"Tank Top", group:"Tees", fabric:"Rib Knit", yield:0.75,
     rib:"", ribYield:0, draw:0, elastic:0,
-    sew:8, cut:0.95, grind:null, trims:0,
+    sew:8, cut:0.95, trims:0,
     note:"Body fabric may change — Rib Knit assumed" },
   { name:"Track Jacket", group:"", fabric:"Nylon", yield:1.63,
     rib:"", ribYield:0, draw:0, elastic:0,
-    sew:60, cut:3.65, grind:null, trims:3.90, trimsNote:"Zipper $3.90",
+    sew:60, cut:3.65, trims:3.90, trimsNote:"Zipper $3.90",
     note:"Cutting = jacket + lining $3.50 + fuse $0.15. No wash group set" },
   { name:"Track Pants", group:"", fabric:"Nylon", yield:1.40,
     rib:"", ribYield:0, draw:0, elastic:1.5,
-    sew:20, cut:2, grind:null, trims:0,
+    sew:20, cut:2, trims:0,
     note:"Elastic 1.5 yd assumed same as sweatpants — confirm. No wash group set" }
 ];
 
@@ -615,7 +618,8 @@ const DEFAULTS = {
   packaging:3.50,
   finishing:0,          /* not quoted by Fred */
   ancillary:5,          /* transportation, ancillary dev and the unexpected */
-  retailRound:5         /* round suggested retail to the nearest $; 0 = don't */
+  retailRound:5,        /* round suggested retail to the nearest $; 0 = don't */
+  grinding:2.50         /* distress grinding, charged across every style */
 };
 
 /* Embellishments are quoted per project — the rates move every run, so there are
@@ -654,7 +658,7 @@ function freshState(){
     trims:   {...DEFAULT_TRIMS},
     washes:  DEFAULT_WASHES.map(w => ({...w})),
     g:       {...DEFAULTS},
-    v:       5,          /* bump to re-apply the rate defaults above */
+    v:       6,          /* bump to re-apply the rate defaults above */
     lines:   [],
     inv:     freshInvoice()
   };
@@ -678,8 +682,8 @@ function makeLine(styleName){
     elastic: st.elastic,
     sew: st.sew,
     cut: st.cut,
-    grindOn: st.grind !== null,      /* on by default only where Fred quoted it */
-    grind: st.grind === null ? 0 : st.grind,
+    grindOn: true,                   /* grinding is charged on every style */
+    grind: DEFAULTS.grinding,
     trims: st.trims,
     washOn: true,
     pkgOn: true,
@@ -826,7 +830,7 @@ function cost(L){
     const g = num(L.grind);
     add("Distress grinding", g);
     if(g === 0){
-      r.issues.push(L.style + ": grinding is switched on but the rate is $0 — Fred has not quoted grinding for this style, enter a price.");
+      r.issues.push(L.style + ": grinding is switched on but the rate is $0 — enter a price or switch it off.");
       r.flags.push({ cls:"warn", t:"Grinding rate needed" });
     }
   } else {
@@ -968,6 +972,7 @@ function renderRates(){
   $("#defFinishing").value = S.g.finishing;
   $("#defAncillary").value = S.g.ancillary;
   $("#defRetailRound").value = S.g.retailRound;
+  $("#defGrinding").value = S.g.grinding;
 }
 
 /* ============================================================
@@ -1031,7 +1036,7 @@ function renderLines(){
           <label class="check"><input type="checkbox" data-f="washOn" ${L.washOn ? "checked" : ""}>
             <span>Wash / dye<em>Fred's wash step</em></span></label>
           <label class="check"><input type="checkbox" data-f="grindOn" ${L.grindOn ? "checked" : ""}>
-            <span>Distress grinding<em>${st.grind === null ? "not quoted for this style" : money(st.grind) + " per unit"}</em></span></label>
+            <span>Distress grinding<em>${money(num(S.g.grinding))} per unit</em></span></label>
           <label class="check"><input type="checkbox" data-f="pattern" ${L.pattern ? "checked" : ""}>
             <span>Pattern needed<em>${money(num(S.g.feePattern),0)} once per style</em></span></label>
           <label class="check"><input type="checkbox" data-f="grading" ${L.grading ? "checked" : ""}>
@@ -1819,7 +1824,15 @@ function load(){
     if(Array.isArray(p.washes) && p.washes.length) S.washes = p.washes;
     if(p.g) S.g = Object.assign(S.g, p.g);
     if(num(p.v) < 5) S.g.ancillary = 5;   /* was 10% */
-    S.v = 5;
+    if(num(p.v) < 6 && Array.isArray(p.lines)){
+      /* grinding is charged on every style now. Switch it on only where it
+         had no rate at all — a line where it was priced and deliberately
+         switched off keeps that choice. */
+      p.lines.forEach(L => {
+        if(num(L.grind) === 0){ L.grind = S.g.grinding; L.grindOn = true; }
+      });
+    }
+    S.v = 6;
     if(p.inv){
       S.inv = Object.assign(freshInvoice(), p.inv);
       const was = num(p.inv.v);
@@ -1903,13 +1916,15 @@ $("#panelRates").addEventListener("input", e => {
   } else if(t.id){
     const map = { markup:"markup", multiple:"multiple", feePattern:"feePattern",
                   feeGrading:"feeGrading", defPackaging:"packaging", defFinishing:"finishing",
-                  defAncillary:"ancillary", defRetailRound:"retailRound" };
+                  defAncillary:"ancillary", defRetailRound:"retailRound",
+                  defGrinding:"grinding" };
     const k = map[t.id];
     if(k){
       S.g[k] = num(t.value);
       /* changing a default retunes lines still sitting on the old default */
       if(k === "packaging") S.lines.forEach(L => { if(!L._pkgEdited) L.pkg = S.g.packaging; });
       if(k === "finishing") S.lines.forEach(L => { if(!L._finEdited) L.fin = S.g.finishing; });
+      if(k === "grinding")  S.lines.forEach(L => { if(!L._grindEdited) L.grind = S.g.grinding; });
     }
   }
   refresh();
@@ -1988,6 +2003,7 @@ $("#lines").addEventListener("input", e => {
   L[f] = num(t.value);
   if(f === "pkg") L._pkgEdited = true;
   if(f === "fin") L._finEdited = true;
+  if(f === "grind") L._grindEdited = true;
   if(f === "grind" || f === "fin") t.classList.toggle("missing", num(t.value) === 0);
   t.classList.add("edited");
   refresh();
@@ -2024,10 +2040,7 @@ $("#lines").addEventListener("change", e => {
   const f = t.dataset.f;
   if(!f) return;
   L[f] = t.checked;
-  if(f === "grindOn" && t.checked && num(L.grind) === 0){
-    const st = STYLES.find(s => s.name === L.style);
-    if(st && st.grind !== null) L.grind = st.grind;
-  }
+  if(f === "grindOn" && t.checked && num(L.grind) === 0) L.grind = num(S.g.grinding);
   renderLines(); refresh();
 });
 

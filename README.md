@@ -56,8 +56,16 @@ price change can be tried out before it is committed back to the file.
 
 Behaviour worth knowing:
 
+- **Distress grinding is charged on every style** at one rate, set in the
+  Rates panel ($2.50/unit). Fred quoted that for hoodies and bottoms; the
+  same rate is carried across tees, tank and track pieces — confirm it with
+  him, since grinding a tee may not cost what grinding a hoodie does. It is
+  on by default and toggles off per line.
 - Unit costs match the spreadsheet's own computed totals to the cent for all 17
-  style/wash builds it contains.
+  style/wash builds it contains, once grinding is set to the state the
+  workbook represents (it includes grinding for hoodies and bottoms, not for
+  tees, tank or track). Tees, tank and track therefore quote $2.50 above the
+  workbook by default.
 - A fabric with no price (Nylon, as of this writing) is **excluded** from the
   total and flagged, rather than counted as zero — same as the spreadsheet.
 - Pattern and grading fees are charged **once per style**, so two lines of the
