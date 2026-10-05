@@ -154,6 +154,17 @@
   .rows td.dim{color:var(--muted);}
   .rows tr.off td{color:var(--muted);opacity:.6;}
 
+  /* job-level levers, right above the total they change */
+  .jobbar{
+    display:flex;gap:18px 28px;align-items:flex-end;flex-wrap:wrap;
+    border:1px solid var(--line);border-left:3px solid var(--star-dim);background:var(--ink-2);
+    border-radius:var(--r);padding:12px 16px;margin-top:22px;
+  }
+  .jobbar .jobbar__l{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--star);align-self:center;}
+  .jobbar .check{padding:0;align-items:center;}
+  .jobbar .jobbar__f{display:flex;align-items:center;gap:10px;}
+  .jobbar .jobbar__f .flabel{margin:0;white-space:nowrap;}
+  .jobbar .jobbar__f input{width:84px;}
   .tot{border:1px solid var(--star-dim);background:linear-gradient(180deg,rgba(216,178,92,.07),rgba(216,178,92,0));border-radius:var(--r);padding:20px;margin-top:22px;}
   .tot h3{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--star);margin:0 0 16px;font-weight:500;}
   .totgrid{display:grid;gap:14px;grid-template-columns:repeat(4,minmax(0,1fr));}
@@ -358,19 +369,15 @@
 
       <p class="subhead">Markup &amp; selling price</p>
       <div class="grid cols-2">
-        <label><span class="flabel">FSF commission (%) — this job's default; any line can set its own</span><input type="number" step="0.5" min="0" id="markup"></label>
+        <label><span class="flabel">FSF markup (%) — this job's default; any line can set its own</span><input type="number" step="0.5" min="0" id="markup"></label>
         <label><span class="flabel">Selling price multiple (×)</span><input type="number" step="0.1" min="0" id="multiple"></label>
       </div>
 
       <p class="subhead">Transportation &amp; ancillary</p>
       <p class="sec-note" style="margin:0 0 10px">One charge covering freight, ancillary development and whatever the run throws up. Applied to the whole order on the cost sheet below, after FSF's markup and one-time fees. It is a cost of yours, not something the invoice passes on.</p>
       <div class="grid cols-2">
-        <div>
-          <span class="flabel">Transportation &amp; ancillary (%)</span>
-          <input type="number" step="0.5" min="0" id="defAncillary">
-          <label class="check" style="padding:6px 0 0"><input type="checkbox" id="defAncillaryOn">
-            <span>Charge it on this job<em>off leaves the rate but drops the line</em></span></label>
-        </div>
+        <label><span class="flabel">Transportation &amp; ancillary (%) — switched on or off per job above the order total</span>
+          <input type="number" step="0.5" min="0" id="defAncillary"></label>
         <label><span class="flabel">Round suggested retail to nearest ($) — 0 = don't</span>
           <input type="number" step="1" min="0" id="defRetailRound"></label>
       </div>
@@ -424,6 +431,14 @@
   </div>
   <div id="issues"></div>
   <div id="builds"></div>
+  <div class="jobbar no-print" id="jobbar">
+    <span class="jobbar__l">Job settings</span>
+    <label class="check"><input type="checkbox" id="jobAncOn">
+      <span>Transportation &amp; ancillary <em style="display:inline" id="jobAncRate">5%</em></span></label>
+    <label class="jobbar__f"><span class="flabel">FSF markup (%)</span>
+      <input type="number" step="0.5" min="0" id="jobMarkup"></label>
+    <span class="mono" style="font-size:10.5px;color:var(--muted)">Rates and per-line overrides are in the panels above</span>
+  </div>
   <div id="rollup"></div>
 </section>
 
@@ -750,7 +765,7 @@ function makeLine(styleName){
     fin: DEFAULTS.finishing,
     grommets: st.grommets || 0,
     retail: null,                    /* null = use the calculated selling price */
-    markup: null,                    /* null = the job's FSF commission; a % overrides it for this line */
+    markup: null,                    /* null = the job's FSF markup; a % overrides it for this line */
     photo: "",                       /* downscaled data URI */
     emb: []
   };
@@ -807,8 +822,8 @@ function ancillaryPct(){
   return S.g.ancillaryOn ? num(S.g.ancillary) : 0;
 }
 
-/* The FSF commission for one line: its own rate if one was set, else the
-   job's default. */
+/* The FSF markup for one line: its own rate if one was set, else the job's
+   default. */
 function markupPctFor(L){
   const own = L.markup;
   const has = own !== null && own !== undefined && own !== "";
@@ -1019,6 +1034,14 @@ function renderInvForm(){
   $("#invIssued").disabled = !!S.inv.autoDate;
 }
 
+function syncJobBar(){
+  const on = $("#jobAncOn"), mk = $("#jobMarkup"), pm = $("#markup");
+  if(document.activeElement !== on) on.checked = !!S.g.ancillaryOn;
+  if(document.activeElement !== mk) mk.value = S.g.markup;
+  if(document.activeElement !== pm) pm.value = S.g.markup;
+  $("#jobAncRate").textContent = num(S.g.ancillary) + "%";
+}
+
 function renderRates(){
   /* fabrics */
   $("#fabricRows").innerHTML = S.fabrics.map((f,i) => `
@@ -1061,7 +1084,6 @@ function renderRates(){
   $("#defPackaging").value = S.g.packaging;
   $("#defFinishing").value = S.g.finishing;
   $("#defAncillary").value = S.g.ancillary;
-  $("#defAncillaryOn").checked = !!S.g.ancillaryOn;
   $("#defRetailRound").value = S.g.retailRound;
   $("#defGrinding").value = S.g.grinding;
 }
@@ -1216,9 +1238,9 @@ function renderLines(){
                 <input type="number" step="0.05" min="0" data-f="fin" value="${L.fin}" ${L.finOn ? "" : "disabled"}
                        class="${L.finOn && num(L.fin) === 0 ? "missing" : ""}"></label>
             </div>
-            <p class="subhead">Commission &amp; retail</p>
+            <p class="subhead">Markup &amp; retail</p>
             <div class="grid cols-2">
-              <label><span class="flabel">FSF commission (%) — blank uses the job's ${num(S.g.markup)}%</span>
+              <label><span class="flabel">FSF markup (%) — blank uses the job's ${num(S.g.markup)}%</span>
                 <input type="number" step="0.5" min="0" data-f="markup" value="${L.markup === null || L.markup === undefined ? "" : L.markup}"
                        placeholder="${num(S.g.markup)}"></label>
               <label><span class="flabel">Suggested retail ($/unit) — blank uses the calculated price</span>
@@ -1349,7 +1371,7 @@ function renderSheet(results, fees){
         <table>
           <tbody>
             <tr><td class="dim">Production cost — ${qtyFmt(units)} units</td><td class="v dim">${money(prod)}</td></tr>
-            <tr><td class="dim">FSF commission ${results.some(r => r.markupOwn) ? "— varies by line" : "@ " + num(S.g.markup) + "%"}</td><td class="v dim">${money(markupAmt)}</td></tr>
+            <tr><td class="dim">FSF markup ${results.some(r => r.markupOwn) ? "— varies by line" : "@ " + num(S.g.markup) + "%"}</td><td class="v dim">${money(markupAmt)}</td></tr>
             <tr class="sum"><td>Garments, incl. FSF markup</td><td class="v">${money(fsf)}</td></tr>
             ${fees.rows.length ? `<tr class="grp"><td colspan="2" style="padding-top:14px"><span class="flabel" style="margin:0">One-time fees — once per style, not per garment</span></td></tr>` : ""}
             ${feeRows}
@@ -1897,6 +1919,7 @@ function refresh(){
   lastResults = results; lastFees = fees;
   paintLineBadges(results);
   renderSheet(results, fees);
+  syncJobBar();
   $("#invSec").hidden = results.length === 0;
   $("#repSec").hidden = results.length === 0;
   if(!S.lines.length){ $("#sticky").hidden = true; hideInvoice(); hideReport(); }
@@ -2053,8 +2076,6 @@ $("#panelRates").addEventListener("input", e => {
     S.trims[t.dataset.trim] = num(t.value);
   } else if(t.id === "defGrommet"){
     S.piece.grommetPer1000 = num(t.value);
-  } else if(t.id === "defAncillaryOn"){
-    S.g.ancillaryOn = t.checked;
   } else if(t.dataset.wash !== undefined){
     const w = S.washes[+t.dataset.wash];
     if(!w) return;
@@ -2144,7 +2165,7 @@ $("#lines").addEventListener("input", e => {
 
   if(f === "fabric" || f === "wash"){ L[f] = t.value; refresh(); return; }
 
-  if(f === "markup"){                 /* blank means "use the job's commission" */
+  if(f === "markup"){                 /* blank means "use the job's markup" */
     L.markup = t.value === "" ? null : num(t.value);
     t.classList.toggle("edited", t.value !== "");
     refresh();
@@ -2245,6 +2266,10 @@ $("#lines").addEventListener("click", e => {
     renderLines(); refresh();
   }
 });
+
+/* --- job settings strip --- */
+$("#jobAncOn").addEventListener("change", e => { S.g.ancillaryOn = e.target.checked; refresh(); });
+$("#jobMarkup").addEventListener("input", e => { S.g.markup = num(e.target.value); refresh(); });
 
 /* --- invoice --- */
 $("#panelInv").addEventListener("input", e => {
