@@ -657,10 +657,10 @@ const STYLES = [
     rib:"", ribYield:0, draw:0, elastic:1.5,
     sew:20, cut:2, trims:0,
     note:"Elastic 1.5 yd assumed same as sweatpants — confirm. No wash group set" },
-  { name:"Tote Bag", group:"", fabric:"Canvas", yield:0.6601,
+  { name:"Tote Bag", group:"", fabric:"Canvas", yield:0.5825,
     rib:"", ribYield:0, draw:0, elastic:0,
     sew:5.50, cut:0.43, trims:0,
-    note:"Yield on a 65\" roll for a 17 x 13\u00be x 4 bag with a 13\" handle drop: body 18 x 33.5 (3 across), two gussets 5 x 15.25 (13 across), two handles cut 8 x 41 for a 2\" strap folded in quarters (8 across) \u2014 23.76\" of roll a bag, 91.4% of the cloth used. Assumes \u00bd\" seams, 1\" top hem, handles 8\" apart. No wash group set" },
+    note:"Yield on a 65\" roll for a 15 x 13\u00be x 4 bag with a 13\" handle drop: body 16 x 33.5 (4 across \u2014 64\" of the 65\"), two gussets 5 x 15.25 (13 across), two handles cut 8 x 41 for a 2\" strap folded in quarters (8 across) \u2014 20.97\" of roll a bag, 98.6% of the cloth used. Assumes \u00bd\" seams, 1\" top hem, handles 8\" apart. No wash group set" },
   { name:"Canvas Hangtag", group:"", fabric:"Canvas", yield:0.017857,
     rib:"", ribYield:0, draw:0, elastic:0,
     sew:0, cut:0.12, trims:0, grommets:1,
@@ -679,7 +679,8 @@ const STYLE_DEFAULT_CHANGES = [
   /* leftover canvas covers this job's tote and hangtag — from:false matches a
      line that has not been told otherwise */
   { v:9, style:"Tote Bag",       field:"fabricFree", from:false, to:true },
-  { v:9, style:"Canvas Hangtag", field:"fabricFree", from:false, to:true }
+  { v:9, style:"Canvas Hangtag", field:"fabricFree", from:false, to:true },
+  { v:10, style:"Tote Bag",      field:"yield", from:0.6601, to:0.5825 }   /* bag narrowed to 15": 4 bodies across */
 ];
 
 const DEFAULTS = {
@@ -735,7 +736,7 @@ function freshState(){
     piece:   {...DEFAULT_PIECE_TRIMS},
     washes:  DEFAULT_WASHES.map(w => ({...w})),
     g:       {...DEFAULTS},
-    v:       9,          /* bump to re-apply the rate defaults above */
+    v:       10,         /* bump to re-apply the rate defaults above */
     lines:   [],
     inv:     freshInvoice()
   };
@@ -2008,7 +2009,7 @@ function load(){
         if(num(L.grind) === 0){ L.grind = S.g.grinding; L.grindOn = true; }
       });
     }
-    S.v = 9;
+    S.v = 10;
     if(p.inv){
       S.inv = Object.assign(freshInvoice(), p.inv);
       const was = num(p.inv.v);

@@ -64,10 +64,11 @@ price change can be tried out before it is committed back to the file.
 Behaviour worth knowing:
 
 - **Canvas** ($7.75/yd, 65" roll) and the **Tote Bag** are not in the
-  workbook — they were quoted separately. The tote is 17 × 13¾ × 4 with a 13"
-  handle drop; its yield of 0.6601 yd is a measured nest on the 65" roll
-  (body 18 × 33.5, two gussets 5 × 15.25, two handles cut 8 × 41 for a 2"
-  strap folded in quarters; ½" seams, 1" top hem; 91.4% of the cloth used).
+  workbook — they were quoted separately. The tote is 15 × 13¾ × 4 with a 13"
+  handle drop; its yield of 0.5825 yd is a measured nest on the 65" roll
+  (body 16 × 33.5 — four across the roll — two gussets 5 × 15.25, two
+  handles cut 8 × 41 for a 2" strap folded in quarters; ½" seams, 1" top
+  hem; 98.6% of the cloth used).
   Sewing $5.50, cutting $0.43.
 - The **Canvas Hangtag** shares the canvas price and the $0.50 cutting, and
   takes one **grommet** — hardware priced by the piece at $59.50 per 1,000
