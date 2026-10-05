@@ -48,6 +48,11 @@ grinding, embellishments and quantity per line, and it produces a full cost
 sheet: per-unit breakdown, FSF markup, selling price, one-time fees and the
 order total.
 
+**FSF's commission** is the markup FSF adds to the production cost. The
+Rates panel sets the job's default (20%); any line can set its own rate in
+its override panel, since one order can carry styles on different terms. The
+rollup says "varies by line" when any does.
+
 Its numbers are transcribed from `docs/FSF_Production_Pricing.xlsx` (Fred, 9/30 –
 10/1/2026) into the `DEFAULT_FABRICS`, `DEFAULT_WASHES` and `STYLES` constants
 at the top of the page's script — **that block is the single place to edit when
@@ -105,7 +110,8 @@ It opens on two worked example builds so the sheet is legible at a glance;
 "Clear examples" empties it. The order is then remembered per browser.
 
 A **transportation & ancillary** charge (5% by default, set in the Rates
-panel) covers freight, ancillary development and the unexpected. It is a
+panel, with a tick to switch it off for a job that does not carry it — the
+rate is kept) covers freight, ancillary development and the unexpected. It is a
 cost of yours, so it lands on the cost sheet — applied to the whole order
 after FSF's markup and one-time fees — and never on the invoice. The rollup
 therefore separates **Payable to FSF** from **Total order cost**.

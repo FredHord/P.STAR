@@ -358,15 +358,19 @@
 
       <p class="subhead">Markup &amp; selling price</p>
       <div class="grid cols-2">
-        <label><span class="flabel">FSF markup (%)</span><input type="number" step="0.5" min="0" id="markup"></label>
+        <label><span class="flabel">FSF commission (%) — this job's default; any line can set its own</span><input type="number" step="0.5" min="0" id="markup"></label>
         <label><span class="flabel">Selling price multiple (×)</span><input type="number" step="0.1" min="0" id="multiple"></label>
       </div>
 
       <p class="subhead">Transportation &amp; ancillary</p>
       <p class="sec-note" style="margin:0 0 10px">One charge covering freight, ancillary development and whatever the run throws up. Applied to the whole order on the cost sheet below, after FSF's markup and one-time fees. It is a cost of yours, not something the invoice passes on.</p>
       <div class="grid cols-2">
-        <label><span class="flabel">Transportation &amp; ancillary (%)</span>
-          <input type="number" step="0.5" min="0" id="defAncillary"></label>
+        <div>
+          <span class="flabel">Transportation &amp; ancillary (%)</span>
+          <input type="number" step="0.5" min="0" id="defAncillary">
+          <label class="check" style="padding:6px 0 0"><input type="checkbox" id="defAncillaryOn">
+            <span>Charge it on this job<em>off leaves the rate but drops the line</em></span></label>
+        </div>
         <label><span class="flabel">Round suggested retail to nearest ($) — 0 = don't</span>
           <input type="number" step="1" min="0" id="defRetailRound"></label>
       </div>
@@ -667,6 +671,7 @@ const DEFAULTS = {
   packaging:3.50,
   finishing:0,          /* not quoted by Fred */
   ancillary:5,          /* transportation, ancillary dev and the unexpected */
+  ancillaryOn:true,     /* …charged on this job at all */
   retailRound:5,        /* round suggested retail to the nearest $; 0 = don't */
   grinding:2.50         /* distress grinding, charged across every style */
 };
@@ -745,6 +750,7 @@ function makeLine(styleName){
     fin: DEFAULTS.finishing,
     grommets: st.grommets || 0,
     retail: null,                    /* null = use the calculated selling price */
+    markup: null,                    /* null = the job's FSF commission; a % overrides it for this line */
     photo: "",                       /* downscaled data URI */
     emb: []
   };
@@ -793,6 +799,20 @@ function addDays(iso, n){
   if(!y) return iso;
   const dt = new Date(y, m-1, d + Math.round(num(n)));
   return new Date(dt.getTime() - dt.getTimezoneOffset()*60000).toISOString().slice(0,10);
+}
+
+/* The transportation & ancillary charge, or 0 when it is switched off for
+   this job. Every total that carries it reads it from here. */
+function ancillaryPct(){
+  return S.g.ancillaryOn ? num(S.g.ancillary) : 0;
+}
+
+/* The FSF commission for one line: its own rate if one was set, else the
+   job's default. */
+function markupPctFor(L){
+  const own = L.markup;
+  const has = own !== null && own !== undefined && own !== "";
+  return (has ? num(own) : num(S.g.markup)) / 100;
 }
 
 function fabricPrice(name){
@@ -935,7 +955,8 @@ function cost(L){
 
   /* --- totals --- */
   r.unit      = total;
-  r.markupPct = num(S.g.markup) / 100;
+  r.markupPct = markupPctFor(L);
+  r.markupOwn = L.markup !== null && L.markup !== undefined && L.markup !== "";
   r.markup    = r.unit * r.markupPct;
   r.unitFsf   = r.unit + r.markup;
   r.multiple  = num(S.g.multiple);
@@ -1040,6 +1061,7 @@ function renderRates(){
   $("#defPackaging").value = S.g.packaging;
   $("#defFinishing").value = S.g.finishing;
   $("#defAncillary").value = S.g.ancillary;
+  $("#defAncillaryOn").checked = !!S.g.ancillaryOn;
   $("#defRetailRound").value = S.g.retailRound;
   $("#defGrinding").value = S.g.grinding;
 }
@@ -1194,8 +1216,11 @@ function renderLines(){
                 <input type="number" step="0.05" min="0" data-f="fin" value="${L.fin}" ${L.finOn ? "" : "disabled"}
                        class="${L.finOn && num(L.fin) === 0 ? "missing" : ""}"></label>
             </div>
-            <p class="subhead">Retail</p>
+            <p class="subhead">Commission &amp; retail</p>
             <div class="grid cols-2">
+              <label><span class="flabel">FSF commission (%) — blank uses the job's ${num(S.g.markup)}%</span>
+                <input type="number" step="0.5" min="0" data-f="markup" value="${L.markup === null || L.markup === undefined ? "" : L.markup}"
+                       placeholder="${num(S.g.markup)}"></label>
               <label><span class="flabel">Suggested retail ($/unit) — blank uses the calculated price</span>
                 <input type="number" step="1" min="0" data-f="retail" value="${L.retail === null || L.retail === undefined ? "" : L.retail}"
                        placeholder="calculated"></label>
@@ -1300,7 +1325,7 @@ function renderSheet(results, fees){
   const sell     = results.reduce((a,r) => a + r.lineSell, 0);
   const markupAmt= fsf - prod;
   const payable  = fsf + fees.grand;
-  const ancPct   = num(S.g.ancillary);
+  const ancPct   = ancillaryPct();
   const ancillary= payable * ancPct / 100;
   const grand    = payable + ancillary;
   const margin   = sell > 0 ? (sell - grand) / sell * 100 : 0;
@@ -1324,7 +1349,7 @@ function renderSheet(results, fees){
         <table>
           <tbody>
             <tr><td class="dim">Production cost — ${qtyFmt(units)} units</td><td class="v dim">${money(prod)}</td></tr>
-            <tr><td class="dim">FSF markup @ ${(num(S.g.markup)).toString()}%</td><td class="v dim">${money(markupAmt)}</td></tr>
+            <tr><td class="dim">FSF commission ${results.some(r => r.markupOwn) ? "— varies by line" : "@ " + num(S.g.markup) + "%"}</td><td class="v dim">${money(markupAmt)}</td></tr>
             <tr class="sum"><td>Garments, incl. FSF markup</td><td class="v">${money(fsf)}</td></tr>
             ${fees.rows.length ? `<tr class="grp"><td colspan="2" style="padding-top:14px"><span class="flabel" style="margin:0">One-time fees — once per style, not per garment</span></td></tr>` : ""}
             ${feeRows}
@@ -1395,7 +1420,7 @@ function csv(results, fees){
   out.push(["Garments incl. FSF markup", fsf.toFixed(2)]);
   out.push(["One-time fees", fees.grand.toFixed(2)]);
   const payable = fsf + fees.grand;
-  const ancPct  = num(S.g.ancillary);
+  const ancPct  = ancillaryPct();
   const anc     = payable * ancPct / 100;
   out.push(["Payable to FSF", payable.toFixed(2)]);
   out.push(["Transportation & ancillary (" + ancPct + "%)", anc.toFixed(2)]);
@@ -1424,8 +1449,8 @@ function summaryText(results, fees){
     ...lines,
     "",
     `One-time fees: ${money(fees.grand)}`,
-    `Transportation & ancillary (${num(S.g.ancillary)}%): ${money((fsf + fees.grand) * num(S.g.ancillary) / 100)}`,
-    `TOTAL ORDER COST: ${money((fsf + fees.grand) * (1 + num(S.g.ancillary) / 100))} for ${qtyFmt(units)} units`,
+    `Transportation & ancillary (${ancillaryPct()}%): ${money((fsf + fees.grand) * ancillaryPct() / 100)}`,
+    `TOTAL ORDER COST: ${money((fsf + fees.grand) * (1 + ancillaryPct() / 100))} for ${qtyFmt(units)} units`,
     ...(issues.length ? ["", "Open items:", ...issues.map(t => "- " + t)] : [])
   ].join("\n");
 }
@@ -1692,7 +1717,7 @@ function roundRetail(n){
 function retailModel(){
   const results = lastResults.filter(r => r.qty > 0);
   const fees   = lastFees || { rows:[], setup:0, grand:0 };
-  const ancPct = num(S.g.ancillary);
+  const ancPct = ancillaryPct();
 
   /* pattern and grading are per style, so a style split across two lines
      carries them in proportion to the units on each */
@@ -2028,6 +2053,8 @@ $("#panelRates").addEventListener("input", e => {
     S.trims[t.dataset.trim] = num(t.value);
   } else if(t.id === "defGrommet"){
     S.piece.grommetPer1000 = num(t.value);
+  } else if(t.id === "defAncillaryOn"){
+    S.g.ancillaryOn = t.checked;
   } else if(t.dataset.wash !== undefined){
     const w = S.washes[+t.dataset.wash];
     if(!w) return;
@@ -2117,6 +2144,12 @@ $("#lines").addEventListener("input", e => {
 
   if(f === "fabric" || f === "wash"){ L[f] = t.value; refresh(); return; }
 
+  if(f === "markup"){                 /* blank means "use the job's commission" */
+    L.markup = t.value === "" ? null : num(t.value);
+    t.classList.toggle("edited", t.value !== "");
+    refresh();
+    return;
+  }
   if(f === "retail"){                 /* blank means "use the calculated price" */
     L.retail = t.value === "" ? null : num(t.value);
     t.classList.toggle("edited", t.value !== "");
