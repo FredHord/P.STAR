@@ -640,12 +640,21 @@ const STYLES = [
     note:"Elastic 1.5 yd assumed same as sweatpants — confirm. No wash group set" },
   { name:"Tote Bag", group:"", fabric:"Canvas", yield:0.50,
     rib:"", ribYield:0, draw:0, elastic:0,
-    sew:6, cut:0.50, trims:0,
+    sew:5.50, cut:0.43, trims:0,
     note:"Handles not priced separately; add them under Trims / other. No wash group set" },
   { name:"Canvas Hangtag", group:"", fabric:"Canvas", yield:0.020833,
     rib:"", ribYield:0, draw:0, elastic:0,
-    sew:0, cut:0.50, trims:0, grommets:1,
+    sew:0, cut:0.12, trims:0, grommets:1,
     note:"Yield: the 60\" roll is first cut into 16x20 print sheets \u2014 3 across x 2 down = 6 sheets a yard. Each sheet yields 4 x 4 = 16 cuts of 3.6218\" x 4.8306\", and 2 cuts make a tag, so 8 tags a sheet and 48 a yard (77.8% of the cloth used). Printing is priced per project \u2014 add it under Embellishments. Sewing not quoted. Packaging and grinding start off: a garment's $3.50 bag-and-tag and $2.50 grinding do not belong on a tag" }
+];
+
+/* When a style's quoted default changes, a saved line still carrying the old
+   default follows it; a line someone edited by hand keeps their value. One
+   entry per changed figure, keyed to the state version that introduced it. */
+const STYLE_DEFAULT_CHANGES = [
+  { v:7, style:"Tote Bag",       field:"cut", from:0.50, to:0.43 },
+  { v:7, style:"Tote Bag",       field:"sew", from:6,    to:5.50 },
+  { v:7, style:"Canvas Hangtag", field:"cut", from:0.50, to:0.12 }
 ];
 
 const DEFAULTS = {
@@ -700,7 +709,7 @@ function freshState(){
     piece:   {...DEFAULT_PIECE_TRIMS},
     washes:  DEFAULT_WASHES.map(w => ({...w})),
     g:       {...DEFAULTS},
-    v:       6,          /* bump to re-apply the rate defaults above */
+    v:       7,          /* bump to re-apply the rate defaults above */
     lines:   [],
     inv:     freshInvoice()
   };
@@ -1920,6 +1929,14 @@ function load(){
     }
     if(p.g) S.g = Object.assign(S.g, p.g);
     if(num(p.v) < 5) S.g.ancillary = 5;   /* was 10% */
+    if(Array.isArray(p.lines)){
+      const savedV = num(p.v);
+      STYLE_DEFAULT_CHANGES.filter(c => c.v > savedV).forEach(c => {
+        p.lines.forEach(L => {
+          if(L.style === c.style && num(L[c.field]) === c.from) L[c.field] = c.to;
+        });
+      });
+    }
     if(num(p.v) < 6 && Array.isArray(p.lines)){
       /* grinding is charged on every style now. Switch it on only where it
          had no rate at all — a line where it was priced and deliberately
@@ -1928,7 +1945,7 @@ function load(){
         if(num(L.grind) === 0){ L.grind = S.g.grinding; L.grindOn = true; }
       });
     }
-    S.v = 6;
+    S.v = 7;
     if(p.inv){
       S.inv = Object.assign(freshInvoice(), p.inv);
       const was = num(p.inv.v);
