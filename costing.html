@@ -1900,10 +1900,24 @@ function load(){
     if(!raw) return false;
     const p = JSON.parse(raw);
     if(!p || typeof p !== "object") return;
-    if(Array.isArray(p.fabrics) && p.fabrics.length) S.fabrics = p.fabrics;
+    /* A saved list replaces the defaults, so a sheet saved before a fabric
+       or wash was added would never receive it — and any style built on
+       that fabric would read as "missing fabric price". Merge in whatever
+       the defaults have gained since the sheet was saved. */
+    if(Array.isArray(p.fabrics) && p.fabrics.length){
+      S.fabrics = p.fabrics;
+      DEFAULT_FABRICS.forEach(d => {
+        if(!S.fabrics.some(f => f.name === d.name)) S.fabrics.push({ ...d });
+      });
+    }
     if(p.trims) S.trims = Object.assign(S.trims, p.trims);
     if(p.piece) S.piece = Object.assign(S.piece, p.piece);
-    if(Array.isArray(p.washes) && p.washes.length) S.washes = p.washes;
+    if(Array.isArray(p.washes) && p.washes.length){
+      S.washes = p.washes;
+      DEFAULT_WASHES.forEach(d => {
+        if(!S.washes.some(w => w.name === d.name)) S.washes.push({ ...d });
+      });
+    }
     if(p.g) S.g = Object.assign(S.g, p.g);
     if(num(p.v) < 5) S.g.ancillary = 5;   /* was 10% */
     if(num(p.v) < 6 && Array.isArray(p.lines)){
