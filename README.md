@@ -59,6 +59,12 @@ Behaviour worth knowing:
 - **Canvas** ($7.75/yd) and the **Tote Bag** (0.50 yd, sewing $6, cutting
   $0.50) are not in the workbook — they were quoted separately. Handles are
   not priced separately, so add them under Trims / other.
+- The **Canvas Hangtag** shares the canvas price and the $0.50 cutting, and
+  takes one **grommet** — hardware priced by the piece at $59.50 per 1,000
+  (a rate in the Rates panel, a count per line). Packaging and grinding start
+  off for it, since a garment's bag-and-tag and distressing do not belong on
+  a tag. **Its yield and sewing are not quoted**, so the fabric is excluded
+  from the total and flagged until a yield is entered.
 - **Distress grinding is charged on every style** at one rate, set in the
   Rates panel ($2.50/unit). Fred quoted that for hoodies and bottoms; the
   same rate is carried across tees, tank and track pieces — confirm it with

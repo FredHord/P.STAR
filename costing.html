@@ -347,6 +347,12 @@
       <p class="subhead">Trims priced by the yard ($ per yard)</p>
       <div class="grid cols-2" id="trimRows"></div>
 
+      <p class="subhead">Hardware priced by the piece</p>
+      <div class="grid cols-2">
+        <label><span class="flabel">Grommets ($ per 1,000)</span>
+          <input type="number" step="0.5" min="0" id="defGrommet"></label>
+      </div>
+
       <p class="subhead">Wash / finish — cost per unit by product group ($)</p>
       <div id="washRows"></div>
 
@@ -574,6 +580,10 @@ const DEFAULT_FABRICS = [
 
 const DEFAULT_TRIMS = { drawstring:0.55, elastic:1.00 };
 
+/* Hardware priced by the piece rather than the yard. Quoted per thousand
+   because that is how it is bought. */
+const DEFAULT_PIECE_TRIMS = { grommetPer1000:59.50 };
+
 const WASH_GROUPS = ["Hoodies","Bottoms","Tees"];
 
 const DEFAULT_WASHES = [
@@ -631,7 +641,11 @@ const STYLES = [
   { name:"Tote Bag", group:"", fabric:"Canvas", yield:0.50,
     rib:"", ribYield:0, draw:0, elastic:0,
     sew:6, cut:0.50, trims:0,
-    note:"Handles not priced separately; add them under Trims / other. No wash group set" }
+    note:"Handles not priced separately; add them under Trims / other. No wash group set" },
+  { name:"Canvas Hangtag", group:"", fabric:"Canvas", yield:0,
+    rib:"", ribYield:0, draw:0, elastic:0,
+    sew:0, cut:0.50, trims:0, grommets:1,
+    note:"YIELD NEEDED — yards of canvas per tag. Sewing not quoted either. Packaging and grinding start off: a garment's $3.50 bag-and-tag and $2.50 grinding do not belong on a tag" }
 ];
 
 const DEFAULTS = {
@@ -683,6 +697,7 @@ function freshState(){
   return {
     fabrics: DEFAULT_FABRICS.map(f => ({...f})),
     trims:   {...DEFAULT_TRIMS},
+    piece:   {...DEFAULT_PIECE_TRIMS},
     washes:  DEFAULT_WASHES.map(w => ({...w})),
     g:       {...DEFAULTS},
     v:       6,          /* bump to re-apply the rate defaults above */
@@ -709,14 +724,15 @@ function makeLine(styleName){
     elastic: st.elastic,
     sew: st.sew,
     cut: st.cut,
-    grindOn: true,                   /* grinding is charged on every style */
+    grindOn: st.grommets ? false : true,   /* grinding is a garment step */
     grind: DEFAULTS.grinding,
     trims: st.trims,
     washOn: true,
-    pkgOn: true,
+    pkgOn: st.grommets ? false : true,     /* so is bag-and-tag packaging */
     pkg: DEFAULTS.packaging,
     finOn: false,
     fin: DEFAULTS.finishing,
+    grommets: st.grommets || 0,
     retail: null,                    /* null = use the calculated selling price */
     photo: "",                       /* downscaled data URI */
     emb: []
@@ -808,6 +824,10 @@ function cost(L){
     add("Body fabric cost", null, { missing:true, detail:"excluded — no price for " + (L.fabric || "fabric") });
     r.issues.push((L.style) + ": no price for " + (L.fabric || "body fabric") + " — fabric is excluded from the total.");
     r.flags.push({ cls:"bad", t:"Missing fabric price" });
+  } else if(bYd === 0){
+    add("Body fabric cost", 0, { missing:true, detail:"no yield set for " + L.fabric });
+    r.issues.push(L.style + ": no yield set — enter yards of " + (L.fabric || "fabric") + " per unit.");
+    r.flags.push({ cls:"bad", t:"Missing yield" });
   } else {
     add("Body fabric cost", bYd * bp);
   }
@@ -830,11 +850,16 @@ function cost(L){
   }
 
   /* --- drawstring & elastic --- */
-  const dYd = num(L.draw), eYd = num(L.elastic);
-  if(dYd > 0 || eYd > 0){
-    r.rows.push({ group:"Drawstring & elastic" });
+  const dYd = num(L.draw), eYd = num(L.elastic), grom = num(L.grommets);
+  if(dYd > 0 || eYd > 0 || grom > 0){
+    r.rows.push({ group:"Trims" });
     if(dYd > 0) add("Drawstring", dYd * num(S.trims.drawstring), { detail:yd(dYd) + " @ " + money(num(S.trims.drawstring)) + "/yd" });
     if(eYd > 0) add("Elastic",    eYd * num(S.trims.elastic),    { detail:yd(eYd) + " @ " + money(num(S.trims.elastic)) + "/yd" });
+    if(grom > 0){
+      const per1000 = num(S.piece.grommetPer1000);
+      add("Grommets", grom * per1000 / 1000,
+          { detail:grom + " @ " + money(per1000) + " per 1,000" });
+    }
   }
 
   /* --- wash, labor, trims, packaging --- */
@@ -996,6 +1021,7 @@ function renderRates(){
                  value="${w[g] === null ? "" : w[g]}" placeholder="price needed"></label>`).join("")}
     </div>`).join("");
 
+  $("#defGrommet").value   = S.piece.grommetPer1000;
   $("#markup").value       = S.g.markup;
   $("#multiple").value     = S.g.multiple;
   $("#feePattern").value   = S.g.feePattern;
@@ -1135,6 +1161,8 @@ function renderLines(){
                 <input type="number" step="0.05" min="0" data-f="draw" value="${L.draw}"></label>
               <label><span class="flabel">Elastic (yd/unit)</span>
                 <input type="number" step="0.05" min="0" data-f="elastic" value="${L.elastic}"></label>
+              <label><span class="flabel">Grommets (per unit)</span>
+                <input type="number" step="1" min="0" data-f="grommets" value="${L.grommets}"></label>
               <label><span class="flabel">Trims / other ($/unit)</span>
                 <input type="number" step="0.05" min="0" data-f="trims" value="${L.trims}"></label>
               <label><span class="flabel">Wash price group</span>
@@ -1874,6 +1902,7 @@ function load(){
     if(!p || typeof p !== "object") return;
     if(Array.isArray(p.fabrics) && p.fabrics.length) S.fabrics = p.fabrics;
     if(p.trims) S.trims = Object.assign(S.trims, p.trims);
+    if(p.piece) S.piece = Object.assign(S.piece, p.piece);
     if(Array.isArray(p.washes) && p.washes.length) S.washes = p.washes;
     if(p.g) S.g = Object.assign(S.g, p.g);
     if(num(p.v) < 5) S.g.ancillary = 5;   /* was 10% */
@@ -1957,6 +1986,8 @@ $("#panelRates").addEventListener("input", e => {
     }
   } else if(t.dataset.trim){
     S.trims[t.dataset.trim] = num(t.value);
+  } else if(t.id === "defGrommet"){
+    S.piece.grommetPer1000 = num(t.value);
   } else if(t.dataset.wash !== undefined){
     const w = S.washes[+t.dataset.wash];
     if(!w) return;
