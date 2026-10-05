@@ -70,6 +70,13 @@ Behaviour worth knowing:
   handles cut 8 × 41 for a 2" strap folded in quarters; ½" seams, 1" top
   hem; 98.6% of the cloth used).
   Sewing $5.50, cutting $0.43.
+- The **enzyme wash** is priced by weight — $1.75/lb in the Rates panel —
+  rather than by garment group, so a style needs a weight to use it: the
+  tote is 0.5 lb (given) and the hangtag 0.013 lb (its 35 sq in of cloth
+  against the tote's 1,344.5 at 0.5 lb — about 77 to the pound). Both
+  default to it; it is one option in the line's wash dropdown, alongside the
+  group washes, and a style with no weight is flagged rather than washed for
+  nothing.
 - The **Canvas Hangtag** shares the canvas price and the $0.50 cutting, and
   takes one **grommet** — hardware priced by the piece at $59.50 per 1,000
   (a rate in the Rates panel, a count per line). Packaging and grinding start

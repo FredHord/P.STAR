@@ -358,6 +358,12 @@
       <p class="subhead">Trims priced by the yard ($ per yard)</p>
       <div class="grid cols-2" id="trimRows"></div>
 
+      <p class="subhead">Enzyme wash — priced by weight</p>
+      <div class="grid cols-2">
+        <label><span class="flabel">Enzyme wash ($ per lb) — pick it in a line's wash dropdown</span>
+          <input type="number" step="0.05" min="0" id="defWashLb"></label>
+      </div>
+
       <p class="subhead">Hardware priced by the piece</p>
       <div class="grid cols-2">
         <label><span class="flabel">Grommets ($ per 1,000)</span>
@@ -603,6 +609,12 @@ const DEFAULT_TRIMS = { drawstring:0.55, elastic:1.00 };
    because that is how it is bought. */
 const DEFAULT_PIECE_TRIMS = { grommetPer1000:59.50 };
 
+/* The enzyme wash is priced by weight rather than by garment group. The
+   dropdown offers it as WASH_BY_WEIGHT; a style needs a weight (lb per unit)
+   to use it. */
+const WASH_BY_WEIGHT = "__weight__";
+const DEFAULT_WASH_BY_LB = 1.75;
+
 const WASH_GROUPS = ["Hoodies","Bottoms","Tees"];
 
 const DEFAULT_WASHES = [
@@ -659,11 +671,13 @@ const STYLES = [
     note:"Elastic 1.5 yd assumed same as sweatpants — confirm. No wash group set" },
   { name:"Tote Bag", group:"", fabric:"Canvas", yield:0.5825,
     rib:"", ribYield:0, draw:0, elastic:0,
-    sew:5.50, cut:0.43, trims:0,
+    sew:5.50, cut:0.43, trims:0, lb:0.5, defaultWash:WASH_BY_WEIGHT,
     note:"Yield on a 65\" roll for a 15 x 13\u00be x 4 bag with a 13\" handle drop: body 16 x 33.5 (4 across \u2014 64\" of the 65\"), two gussets 5 x 15.25 (13 across), two handles cut 8 x 41 for a 2\" strap folded in quarters (8 across) \u2014 20.97\" of roll a bag, 98.6% of the cloth used. Assumes \u00bd\" seams, 1\" top hem, handles 8\" apart. No wash group set" },
   { name:"Canvas Hangtag", group:"", fabric:"Canvas", yield:0.017857,
     rib:"", ribYield:0, draw:0, elastic:0,
-    sew:0, cut:0.12, trims:0, grommets:1,
+    sew:0, cut:0.12, trims:0, grommets:1, lb:0.013, defaultWash:WASH_BY_WEIGHT,
+    /* 0.013 lb: a tag is 35 sq in of cloth against the tote's 1,344.5 sq in
+       at 0.5 lb, so 1/38.4 of a tote — about 77 to the pound */
     note:"Yield: the 65\" roll is first cut into 16x20 print sheets \u2014 a row of 4 upright (64\" x 20\") over a row of 3 turned (60\" x 16\") uses the full 36\" yard: 7 sheets. Each sheet yields 4 x 4 = 16 cuts of 3.6218\" x 4.8306\", and 2 cuts make a tag, so 8 tags a sheet and 56 a yard (83.7% of the cloth used). Printing is priced per project \u2014 add it under Embellishments. Sewing not quoted. Packaging and grinding start off: a garment's $3.50 bag-and-tag and $2.50 grinding do not belong on a tag" }
 ];
 
@@ -680,7 +694,10 @@ const STYLE_DEFAULT_CHANGES = [
      line that has not been told otherwise */
   { v:9, style:"Tote Bag",       field:"fabricFree", from:false, to:true },
   { v:9, style:"Canvas Hangtag", field:"fabricFree", from:false, to:true },
-  { v:10, style:"Tote Bag",      field:"yield", from:0.6601, to:0.5825 }   /* bag narrowed to 15": 4 bodies across */
+  { v:10, style:"Tote Bag",      field:"yield", from:0.6601, to:0.5825 },  /* bag narrowed to 15": 4 bodies across */
+  /* the canvas pieces are washed by the pound; a saved line with no wash chosen takes it */
+  { v:11, style:"Tote Bag",       field:"wash", from:"", to:WASH_BY_WEIGHT },
+  { v:11, style:"Canvas Hangtag", field:"wash", from:"", to:WASH_BY_WEIGHT }
 ];
 
 const DEFAULTS = {
@@ -734,9 +751,10 @@ function freshState(){
     fabrics: DEFAULT_FABRICS.map(f => ({...f})),
     trims:   {...DEFAULT_TRIMS},
     piece:   {...DEFAULT_PIECE_TRIMS},
+    washByLb: DEFAULT_WASH_BY_LB,
     washes:  DEFAULT_WASHES.map(w => ({...w})),
     g:       {...DEFAULTS},
-    v:       10,         /* bump to re-apply the rate defaults above */
+    v:       11,         /* bump to re-apply the rate defaults above */
     lines:   [],
     inv:     freshInvoice()
   };
@@ -749,7 +767,7 @@ function makeLine(styleName){
     style: st.name,
     qty: 50,
     group: st.group,                 /* wash group — editable, blank for track pieces */
-    wash: "",                        /* "" = no wash */
+    wash: st.defaultWash || "",      /* "" = no wash */
     pattern: true,
     grading: true,
     fabric: st.fabric,
@@ -769,6 +787,7 @@ function makeLine(styleName){
     finOn: false,
     fin: DEFAULTS.finishing,
     grommets: st.grommets || 0,
+    lb: st.lb || 0,                  /* weight per unit, for a wash priced by the pound */
     retail: null,                    /* null = use the calculated selling price */
     markup: null,                    /* null = the job's FSF markup; a % overrides it for this line */
     fabricFree: false,               /* fabric already on hand: yield still counted, cost not charged */
@@ -842,6 +861,11 @@ function fabricPrice(name){
   if(!f) return null;
   return (f.price === null || f.price === "" || f.price === undefined) ? null : num(f.price);
 }
+function washLabel(L){
+  if(!L || !L.washOn || !L.wash) return "";
+  return L.wash === WASH_BY_WEIGHT ? "Enzyme wash" : L.wash;
+}
+
 function washCost(washName, group){
   if(!washName || !group) return null;
   const w = S.washes.find(x => x.name === washName);
@@ -920,7 +944,16 @@ function cost(L){
   /* --- wash, labor, trims, packaging --- */
   r.rows.push({ group:"Wash, labor, trims & packaging" });
 
-  if(L.washOn && L.wash){
+  if(L.washOn && L.wash === WASH_BY_WEIGHT){
+    const lb = num(L.lb), rate = num(S.washByLb);
+    if(lb <= 0){
+      add("Enzyme wash", null, { missing:true, detail:"no weight set for this style" });
+      r.issues.push(L.style + ": the enzyme wash is priced by weight but the style has no weight — enter lb per unit.");
+      r.flags.push({ cls:"bad", t:"Missing weight" });
+    } else {
+      add("Enzyme wash", lb * rate, { detail:lb + " lb @ " + money(rate) + "/lb" });
+    }
+  } else if(L.washOn && L.wash){
     const wc = washCost(L.wash, L.group);
     if(wc === null){
       add("Wash — " + L.wash, null, { missing:true, detail:L.group ? "no price for this group" : "no wash group set for this style" });
@@ -1086,6 +1119,7 @@ function renderRates(){
     </div>`).join("");
 
   $("#defGrommet").value   = S.piece.grommetPer1000;
+  $("#defWashLb").value    = S.washByLb;
   $("#markup").value       = S.g.markup;
   $("#multiple").value     = S.g.multiple;
   $("#feePattern").value   = S.g.feePattern;
@@ -1115,7 +1149,11 @@ function renderLines(){
 
   host.innerHTML = S.lines.map((L,i) => {
     const st = STYLES.find(s => s.name === L.style) || {};
+    const byWt = num(L.lb) > 0
+      ? "Enzyme wash — " + L.lb + " lb @ " + money(num(S.washByLb)) + "/lb = " + money(num(L.lb) * num(S.washByLb))
+      : "Enzyme wash — set a weight for this style";
     const washOpts = `<option value=""${!L.wash ? " selected" : ""}>No wash</option>` +
+      `<option value="${WASH_BY_WEIGHT}"${L.wash === WASH_BY_WEIGHT ? " selected" : ""}>${esc(byWt)}</option>` +
       S.washes.map(w => {
         const p = L.group ? w[L.group] : null;
         const lbl = esc(w.name) + (p === null || p === "" || p === undefined ? " (no price)" : " — " + money(num(p)));
@@ -1229,6 +1267,8 @@ function renderLines(){
                 <input type="number" step="0.05" min="0" data-f="elastic" value="${L.elastic}"></label>
               <label><span class="flabel">Grommets (per unit)</span>
                 <input type="number" step="1" min="0" data-f="grommets" value="${L.grommets}"></label>
+              <label><span class="flabel">Weight (lb per unit) — enzyme wash</span>
+                <input type="number" step="0.001" min="0" data-f="lb" value="${L.lb}" placeholder="for the enzyme wash"></label>
               <label><span class="flabel">Trims / other ($/unit)</span>
                 <input type="number" step="0.05" min="0" data-f="trims" value="${L.trims}"></label>
               <label><span class="flabel">Wash price group</span>
@@ -1328,7 +1368,7 @@ function renderSheet(results, fees){
       <div class="build__head">
         <span class="build__name">${String(i+1).padStart(2,"0")} · ${esc(r.style)}</span>
         <span class="build__meta">
-          ${L && L.washOn && L.wash ? esc(L.wash) : "No wash"}
+          ${washLabel(L) ? esc(washLabel(L)) : "No wash"}
           · ${L && L.grindOn ? "grinding" : "no grinding"}
           · ${qtyFmt(r.qty)} unit${r.qty === 1 ? "" : "s"}
         </span>
@@ -1421,7 +1461,7 @@ function csv(results, fees){
             "Selling price/unit","Line production cost","Line payable to FSF","Line retail value","Status"]);
   results.forEach((r,i) => {
     const L = S.lines.find(x => x.id === r.id);
-    out.push([i+1, r.style, (L && L.washOn && L.wash) || "No wash", L && L.grindOn ? "Yes" : "No", r.qty,
+    out.push([i+1, r.style, washLabel(L) || "No wash", L && L.grindOn ? "Yes" : "No", r.qty,
               r.unit.toFixed(4), r.markup.toFixed(4), r.unitFsf.toFixed(4), r.sell.toFixed(4),
               r.lineCost.toFixed(2), r.lineFsf.toFixed(2), r.lineSell.toFixed(2),
               r.flags.map(f => f.t).join("; ")]);
@@ -1473,7 +1513,7 @@ function summaryText(results, fees){
   const fsf   = results.reduce((a,r) => a + r.lineFsf, 0);
   const lines = results.map((r,i) => {
     const L = S.lines.find(x => x.id === r.id);
-    return `${i+1}. ${r.style} — ${(L && L.washOn && L.wash) || "no wash"}${L && L.grindOn ? " + grinding" : ""}` +
+    return `${i+1}. ${r.style} — ${washLabel(L) || "no wash"}${L && L.grindOn ? " + grinding" : ""}` +
            ` — ${qtyFmt(r.qty)} units @ ${money(r.unitFsf)} = ${money(r.lineFsf)}`;
   });
   const issues = results.flatMap(r => r.issues);
@@ -1552,7 +1592,7 @@ function invoiceModel(){
   const items = results.filter(r => r.qty > 0).map(r => {
     const L = S.lines.find(x => x.id === r.id) || {};
     const bits = [];
-    if(L.washOn && L.wash) bits.push(L.wash);
+    if(washLabel(L)) bits.push(washLabel(L));
     if(L.grindOn) bits.push("distress grinding");
     (L.emb || []).forEach(e => {
       const per = Math.max(0, num(e.per));
@@ -1777,7 +1817,7 @@ function retailModel(){
     const lineProfit= profit * r.qty;
 
     const bits = [];
-    if(L.washOn && L.wash) bits.push(L.wash);
+    if(washLabel(L)) bits.push(washLabel(L));
     if(L.grindOn) bits.push("distress grinding");
     (L.emb || []).forEach(e => bits.push(e.type.toLowerCase() + (e.note ? " (" + e.note + ")" : "")));
     if(L.fabricFree) bits.push("fabric on hand");
@@ -1984,6 +2024,7 @@ function load(){
     }
     if(p.trims) S.trims = Object.assign(S.trims, p.trims);
     if(p.piece) S.piece = Object.assign(S.piece, p.piece);
+    if(p.washByLb !== undefined) S.washByLb = num(p.washByLb);
     if(Array.isArray(p.washes) && p.washes.length){
       S.washes = p.washes;
       DEFAULT_WASHES.forEach(d => {
@@ -1996,7 +2037,9 @@ function load(){
       const savedV = num(p.v);
       STYLE_DEFAULT_CHANGES.filter(c => c.v > savedV).forEach(c => {
         p.lines.forEach(L => {
-          const cur = typeof c.from === "boolean" ? !!L[c.field] : num(L[c.field]);
+          const cur = typeof c.from === "boolean" ? !!L[c.field]
+                    : typeof c.from === "string"  ? String(L[c.field] ?? "")
+                    : num(L[c.field]);
           if(L.style === c.style && cur === c.from) L[c.field] = c.to;
         });
       });
@@ -2009,7 +2052,7 @@ function load(){
         if(num(L.grind) === 0){ L.grind = S.g.grinding; L.grindOn = true; }
       });
     }
-    S.v = 10;
+    S.v = 11;
     if(p.inv){
       S.inv = Object.assign(freshInvoice(), p.inv);
       const was = num(p.inv.v);
@@ -2090,6 +2133,9 @@ $("#panelRates").addEventListener("input", e => {
     S.trims[t.dataset.trim] = num(t.value);
   } else if(t.id === "defGrommet"){
     S.piece.grommetPer1000 = num(t.value);
+  } else if(t.id === "defWashLb"){
+    S.washByLb = num(t.value);
+    renderLines();                  /* the wash dropdown quotes the rate */
   } else if(t.dataset.wash !== undefined){
     const w = S.washes[+t.dataset.wash];
     if(!w) return;
@@ -2112,6 +2158,7 @@ $("#panelRates").addEventListener("input", e => {
       if(k === "packaging") S.lines.forEach(L => { if(!L._pkgEdited) L.pkg = S.g.packaging; });
       if(k === "finishing") S.lines.forEach(L => { if(!L._finEdited) L.fin = S.g.finishing; });
       if(k === "grinding")  S.lines.forEach(L => { if(!L._grindEdited) L.grind = S.g.grinding; });
+
     }
   }
   refresh();
