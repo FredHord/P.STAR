@@ -82,6 +82,11 @@ Behaviour worth knowing:
 
 A line with a fabric but no yield is excluded from the total and flagged,
 the same way a fabric with no price is.
+- **Fabric on hand** is a per-line tick for cloth already owned: the fabric
+  cost drops to $0 while the yield stays counted, so the sheet still says how
+  much of the leftover a run uses, and the invoice and report note "fabric
+  supplied". It is a job setting, not a style one — a new line charges fabric
+  unless ticked. The current tote and hangtag lines are ticked on load.
 - **Distress grinding is charged on every style** at one rate, set in the
   Rates panel ($2.50/unit). Fred quoted that for hoodies and bottoms; the
   same rate is carried across tees, tank and track pieces — confirm it with

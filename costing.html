@@ -675,7 +675,11 @@ const STYLE_DEFAULT_CHANGES = [
   { v:7, style:"Tote Bag",       field:"sew", from:6,    to:5.50 },
   { v:7, style:"Canvas Hangtag", field:"cut", from:0.50, to:0.12 },
   { v:8, style:"Canvas Hangtag", field:"yield", from:0.020833, to:0.017857 },  /* roll is 65", not 60" */
-  { v:8, style:"Tote Bag",       field:"yield", from:0.50,     to:0.6601   }   /* measured, 13" drop handles */
+  { v:8, style:"Tote Bag",       field:"yield", from:0.50,     to:0.6601   },  /* measured, 13" drop handles */
+  /* leftover canvas covers this job's tote and hangtag — from:false matches a
+     line that has not been told otherwise */
+  { v:9, style:"Tote Bag",       field:"fabricFree", from:false, to:true },
+  { v:9, style:"Canvas Hangtag", field:"fabricFree", from:false, to:true }
 ];
 
 const DEFAULTS = {
@@ -731,7 +735,7 @@ function freshState(){
     piece:   {...DEFAULT_PIECE_TRIMS},
     washes:  DEFAULT_WASHES.map(w => ({...w})),
     g:       {...DEFAULTS},
-    v:       8,          /* bump to re-apply the rate defaults above */
+    v:       9,          /* bump to re-apply the rate defaults above */
     lines:   [],
     inv:     freshInvoice()
   };
@@ -766,6 +770,7 @@ function makeLine(styleName){
     grommets: st.grommets || 0,
     retail: null,                    /* null = use the calculated selling price */
     markup: null,                    /* null = the job's FSF markup; a % overrides it for this line */
+    fabricFree: false,               /* fabric already on hand: yield still counted, cost not charged */
     photo: "",                       /* downscaled data URI */
     emb: []
   };
@@ -866,7 +871,10 @@ function cost(L){
   r.rows.push({ label:"Fabric", text:L.fabric || "—" });
   r.rows.push({ label:"Yield", text:yd(bYd) });
   r.rows.push({ label:"Price per yard", text:bp === null ? "price needed" : money(bp) });
-  if(bp === null){
+  if(L.fabricFree){
+    /* already owned — the yield is still real, the cost is not */
+    add("Body fabric cost", 0, { off:true, detail:"on hand — " + yd(bYd) + " used, not charged" });
+  } else if(bp === null){
     add("Body fabric cost", null, { missing:true, detail:"excluded — no price for " + (L.fabric || "fabric") });
     r.issues.push((L.style) + ": no price for " + (L.fabric || "body fabric") + " — fabric is excluded from the total.");
     r.flags.push({ cls:"bad", t:"Missing fabric price" });
@@ -1158,6 +1166,8 @@ function renderLines(){
             <span>Packaging<em>${money(num(S.g.packaging))} per unit — bag &amp; tag</em></span></label>
           <label class="check"><input type="checkbox" data-f="finOn" ${L.finOn ? "checked" : ""}>
             <span>Finishing / other<em>spare line — beyond bag &amp; tag</em></span></label>
+          <label class="check"><input type="checkbox" data-f="fabricFree" ${L.fabricFree ? "checked" : ""}>
+            <span>Fabric on hand<em>no charge — yield still counted</em></span></label>
         </div>
 
         <details class="panel" style="background:var(--ink)">
@@ -1547,6 +1557,7 @@ function invoiceModel(){
       const per = Math.max(0, num(e.per));
       bits.push(e.type.toLowerCase() + (e.note ? " (" + e.note + ")" : "") + (per > 1 ? " ×" + per : ""));
     });
+    if(L.fabricFree) bits.push("fabric supplied");
     const unit = client ? r.sell : r.unitFsf;
     return { desc:r.style, sub:bits.join(", "), photo:L.photo || "",
              qty:r.qty, unit, amount:unit * r.qty };
@@ -1768,6 +1779,7 @@ function retailModel(){
     if(L.washOn && L.wash) bits.push(L.wash);
     if(L.grindOn) bits.push("distress grinding");
     (L.emb || []).forEach(e => bits.push(e.type.toLowerCase() + (e.note ? " (" + e.note + ")" : "")));
+    if(L.fabricFree) bits.push("fabric on hand");
 
     return {
       style:r.style, sub:bits.join(", "), photo:L.photo || "", qty:r.qty,
@@ -1983,7 +1995,8 @@ function load(){
       const savedV = num(p.v);
       STYLE_DEFAULT_CHANGES.filter(c => c.v > savedV).forEach(c => {
         p.lines.forEach(L => {
-          if(L.style === c.style && num(L[c.field]) === c.from) L[c.field] = c.to;
+          const cur = typeof c.from === "boolean" ? !!L[c.field] : num(L[c.field]);
+          if(L.style === c.style && cur === c.from) L[c.field] = c.to;
         });
       });
     }
@@ -1995,7 +2008,7 @@ function load(){
         if(num(L.grind) === 0){ L.grind = S.g.grinding; L.grindOn = true; }
       });
     }
-    S.v = 8;
+    S.v = 9;
     if(p.inv){
       S.inv = Object.assign(freshInvoice(), p.inv);
       const was = num(p.inv.v);
