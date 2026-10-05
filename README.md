@@ -63,8 +63,14 @@ Behaviour worth knowing:
   takes one **grommet** — hardware priced by the piece at $59.50 per 1,000
   (a rate in the Rates panel, a count per line). Packaging and grinding start
   off for it, since a garment's bag-and-tag and distressing do not belong on
-  a tag. **Its yield and sewing are not quoted**, so the fabric is excluded
-  from the total and flagged until a yield is entered.
+  a tag. Its yield is 0.020833 yd: the 60" roll is cut into
+  16×20 print sheets (3 across × 2 down = 6 a yard), each sheet yields 4×4 =
+  16 cuts of 3.6218"×4.8306", and 2 cuts make a tag — 8 tags a sheet, 48 a
+  yard, 77.8% of the cloth used. Printing is per project, so it goes under
+  Embellishments; sewing is still unquoted and sits at $0.
+
+A line with a fabric but no yield is excluded from the total and flagged,
+the same way a fabric with no price is.
 - **Distress grinding is charged on every style** at one rate, set in the
   Rates panel ($2.50/unit). Fred quoted that for hoodies and bottoms; the
   same rate is carried across tees, tank and track pieces — confirm it with
