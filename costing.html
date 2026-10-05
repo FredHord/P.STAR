@@ -1946,7 +1946,14 @@ function load(){
     if(Array.isArray(p.lines)){
       S.lines = p.lines.map(L => {
         const base = makeLine(L.style || STYLES[0].name);
+        const styleYield = base.yield;
         const merged = Object.assign(base, L);
+        /* Each line carries its own copy of the style's values, so a line
+           saved while its style had no yield yet keeps that 0 after the
+           style is fixed. A yield of 0 is never real — it is flagged as
+           missing — so taking the style's current value cannot clobber an
+           edit. */
+        if(num(merged.yield) === 0 && styleYield > 0) merged.yield = styleYield;
         merged.emb = Array.isArray(L.emb) ? L.emb.map(e => Object.assign(makeEmb(), e)) : [];
         merged.id = "L" + (uid++);
         return merged;
