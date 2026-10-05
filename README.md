@@ -56,6 +56,10 @@ price change can be tried out before it is committed back to the file.
 
 Behaviour worth knowing:
 
+- **Canvas** ($7.75/yd) and the **Tote Bag** (0.50 yd, sewing $6) are not in
+  the workbook — they were quoted separately. The tote's cutting has not been
+  quoted and counts as $0 until it is; its line card says so. Handles are not
+  priced separately either, so add them under Trims / other.
 - **Distress grinding is charged on every style** at one rate, set in the
   Rates panel ($2.50/unit). Fred quoted that for hoodies and bottoms; the
   same rate is carried across tees, tank and track pieces — confirm it with

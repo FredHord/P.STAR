@@ -568,6 +568,7 @@ const DEFAULT_FABRICS = [
   { name:"Jersey",                      price:3.95 },
   { name:"Collar Rib (Tees)",           price:3.95 },
   { name:"Thermal",                     price:4.95 },
+  { name:"Canvas",                      price:7.75 },
   { name:"Nylon",                       price:null, note:"Price needed — track jacket & track pants fabric" }
 ];
 
@@ -626,7 +627,11 @@ const STYLES = [
   { name:"Track Pants", group:"", fabric:"Nylon", yield:1.40,
     rib:"", ribYield:0, draw:0, elastic:1.5,
     sew:20, cut:2, trims:0,
-    note:"Elastic 1.5 yd assumed same as sweatpants — confirm. No wash group set" }
+    note:"Elastic 1.5 yd assumed same as sweatpants — confirm. No wash group set" },
+  { name:"Tote Bag", group:"", fabric:"Canvas", yield:0.50,
+    rib:"", ribYield:0, draw:0, elastic:0,
+    sew:6, cut:0, trims:0,
+    note:"Cutting not quoted — counts as $0 until Fred prices it. Handles not priced separately; add them under Trims / other. No wash group set" }
 ];
 
 const DEFAULTS = {
