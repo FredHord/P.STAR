@@ -56,17 +56,21 @@ price change can be tried out before it is committed back to the file.
 
 Behaviour worth knowing:
 
-- **Canvas** ($7.75/yd) and the **Tote Bag** (0.50 yd, sewing $6, cutting
-  $0.50) are not in the workbook — they were quoted separately. Handles are
-  not priced separately, so add them under Trims / other.
+- **Canvas** ($7.75/yd, 65" roll) and the **Tote Bag** are not in the
+  workbook — they were quoted separately. The tote is 17 × 13¾ × 4 with a 13"
+  handle drop; its yield of 0.6601 yd is a measured nest on the 65" roll
+  (body 18 × 33.5, two gussets 5 × 15.25, two handles cut 8 × 41 for a 2"
+  strap folded in quarters; ½" seams, 1" top hem; 91.4% of the cloth used).
+  Sewing $5.50, cutting $0.43.
 - The **Canvas Hangtag** shares the canvas price and the $0.50 cutting, and
   takes one **grommet** — hardware priced by the piece at $59.50 per 1,000
   (a rate in the Rates panel, a count per line). Packaging and grinding start
   off for it, since a garment's bag-and-tag and distressing do not belong on
-  a tag. Its yield is 0.020833 yd: the 60" roll is cut into
-  16×20 print sheets (3 across × 2 down = 6 a yard), each sheet yields 4×4 =
-  16 cuts of 3.6218"×4.8306", and 2 cuts make a tag — 8 tags a sheet, 48 a
-  yard, 77.8% of the cloth used. Printing is per project, so it goes under
+  a tag. Its yield is 0.017857 yd: the 65" roll is cut into
+  16×20 print sheets — a row of 4 upright over a row of 3 turned fills the
+  full 36" yard, 7 sheets — each sheet yields 4×4 = 16 cuts of
+  3.6218"×4.8306", and 2 cuts make a tag: 8 tags a sheet, 56 a yard, 83.7%
+  of the cloth used. Cutting $0.12. Printing is per project, so it goes under
   Embellishments; sewing is still unquoted and sits at $0.
 
 A line with a fabric but no yield is excluded from the total and flagged,

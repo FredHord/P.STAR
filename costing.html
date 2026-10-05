@@ -638,14 +638,14 @@ const STYLES = [
     rib:"", ribYield:0, draw:0, elastic:1.5,
     sew:20, cut:2, trims:0,
     note:"Elastic 1.5 yd assumed same as sweatpants — confirm. No wash group set" },
-  { name:"Tote Bag", group:"", fabric:"Canvas", yield:0.50,
+  { name:"Tote Bag", group:"", fabric:"Canvas", yield:0.6601,
     rib:"", ribYield:0, draw:0, elastic:0,
     sew:5.50, cut:0.43, trims:0,
-    note:"Handles not priced separately; add them under Trims / other. No wash group set" },
-  { name:"Canvas Hangtag", group:"", fabric:"Canvas", yield:0.020833,
+    note:"Yield on a 65\" roll for a 17 x 13\u00be x 4 bag with a 13\" handle drop: body 18 x 33.5 (3 across), two gussets 5 x 15.25 (13 across), two handles cut 8 x 41 for a 2\" strap folded in quarters (8 across) \u2014 23.76\" of roll a bag, 91.4% of the cloth used. Assumes \u00bd\" seams, 1\" top hem, handles 8\" apart. No wash group set" },
+  { name:"Canvas Hangtag", group:"", fabric:"Canvas", yield:0.017857,
     rib:"", ribYield:0, draw:0, elastic:0,
     sew:0, cut:0.12, trims:0, grommets:1,
-    note:"Yield: the 60\" roll is first cut into 16x20 print sheets \u2014 3 across x 2 down = 6 sheets a yard. Each sheet yields 4 x 4 = 16 cuts of 3.6218\" x 4.8306\", and 2 cuts make a tag, so 8 tags a sheet and 48 a yard (77.8% of the cloth used). Printing is priced per project \u2014 add it under Embellishments. Sewing not quoted. Packaging and grinding start off: a garment's $3.50 bag-and-tag and $2.50 grinding do not belong on a tag" }
+    note:"Yield: the 65\" roll is first cut into 16x20 print sheets \u2014 a row of 4 upright (64\" x 20\") over a row of 3 turned (60\" x 16\") uses the full 36\" yard: 7 sheets. Each sheet yields 4 x 4 = 16 cuts of 3.6218\" x 4.8306\", and 2 cuts make a tag, so 8 tags a sheet and 56 a yard (83.7% of the cloth used). Printing is priced per project \u2014 add it under Embellishments. Sewing not quoted. Packaging and grinding start off: a garment's $3.50 bag-and-tag and $2.50 grinding do not belong on a tag" }
 ];
 
 /* When a style's quoted default changes, a saved line still carrying the old
@@ -654,7 +654,9 @@ const STYLES = [
 const STYLE_DEFAULT_CHANGES = [
   { v:7, style:"Tote Bag",       field:"cut", from:0.50, to:0.43 },
   { v:7, style:"Tote Bag",       field:"sew", from:6,    to:5.50 },
-  { v:7, style:"Canvas Hangtag", field:"cut", from:0.50, to:0.12 }
+  { v:7, style:"Canvas Hangtag", field:"cut", from:0.50, to:0.12 },
+  { v:8, style:"Canvas Hangtag", field:"yield", from:0.020833, to:0.017857 },  /* roll is 65", not 60" */
+  { v:8, style:"Tote Bag",       field:"yield", from:0.50,     to:0.6601   }   /* measured, 13" drop handles */
 ];
 
 const DEFAULTS = {
@@ -709,7 +711,7 @@ function freshState(){
     piece:   {...DEFAULT_PIECE_TRIMS},
     washes:  DEFAULT_WASHES.map(w => ({...w})),
     g:       {...DEFAULTS},
-    v:       7,          /* bump to re-apply the rate defaults above */
+    v:       8,          /* bump to re-apply the rate defaults above */
     lines:   [],
     inv:     freshInvoice()
   };
@@ -1945,7 +1947,7 @@ function load(){
         if(num(L.grind) === 0){ L.grind = S.g.grinding; L.grindOn = true; }
       });
     }
-    S.v = 7;
+    S.v = 8;
     if(p.inv){
       S.inv = Object.assign(freshInvoice(), p.inv);
       const was = num(p.inv.v);
