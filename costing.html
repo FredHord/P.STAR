@@ -673,12 +673,12 @@ const STYLES = [
     rib:"", ribYield:0, draw:0, elastic:0,
     sew:5.50, cut:0.43, trims:0, lb:0.5, defaultWash:WASH_BY_WEIGHT,
     note:"Yield on a 65\" roll for a 15 x 13\u00be x 4 bag with a 13\" handle drop: body 16 x 33.5 (4 across \u2014 64\" of the 65\"), two gussets 5 x 15.25 (13 across), two handles cut 8 x 41 for a 2\" strap folded in quarters (8 across) \u2014 20.97\" of roll a bag, 98.6% of the cloth used. Assumes \u00bd\" seams, 1\" top hem, handles 8\" apart. No wash group set" },
-  { name:"Canvas Hangtag", group:"", fabric:"Canvas", yield:0.017857,
+  { name:"Canvas Hangtag", group:"", fabric:"Canvas", yield:0.008929,
     rib:"", ribYield:0, draw:0, elastic:0,
-    sew:0, cut:0.12, trims:0, grommets:1, lb:0.013, defaultWash:WASH_BY_WEIGHT,
-    /* 0.013 lb: a tag is 35 sq in of cloth against the tote's 1,344.5 sq in
-       at 0.5 lb, so 1/38.4 of a tote — about 77 to the pound */
-    note:"Yield: the 65\" roll is first cut into 16x20 print sheets \u2014 a row of 4 upright (64\" x 20\") over a row of 3 turned (60\" x 16\") uses the full 36\" yard: 7 sheets. Each sheet yields 4 x 4 = 16 cuts of 3.6218\" x 4.8306\", and 2 cuts make a tag, so 8 tags a sheet and 56 a yard (83.7% of the cloth used). Printing is priced per project \u2014 add it under Embellishments. Sewing not quoted. Packaging and grinding start off: a garment's $3.50 bag-and-tag and $2.50 grinding do not belong on a tag" }
+    sew:0, cut:0.12, trims:0, grommets:1, lb:0.0065, defaultWash:WASH_BY_WEIGHT,
+    /* 0.0065 lb: a tag is one 17.5 sq in cut against the tote's 1,344.5 sq in
+       at 0.5 lb, so 1/77 of a tote — about 154 to the pound */
+    note:"Yield: the 65\" roll is first cut into 16x20 print sheets \u2014 a row of 4 upright (64\" x 20\") over a row of 3 turned (60\" x 16\") uses the full 36\" yard: 7 sheets. Each sheet yields 4 x 4 = 16 cuts of 3.6218\" x 4.8306\", and one cut is a tag, so 16 tags a sheet and 112 a yard (83.7% of the cloth used). Printing is priced per project \u2014 add it under Embellishments. Sewing not quoted. Packaging and grinding start off: a garment's $3.50 bag-and-tag and $2.50 grinding do not belong on a tag" }
 ];
 
 /* When a style's quoted default changes, a saved line still carrying the old
@@ -697,7 +697,10 @@ const STYLE_DEFAULT_CHANGES = [
   { v:10, style:"Tote Bag",      field:"yield", from:0.6601, to:0.5825 },  /* bag narrowed to 15": 4 bodies across */
   /* the canvas pieces are washed by the pound; a saved line with no wash chosen takes it */
   { v:11, style:"Tote Bag",       field:"wash", from:"", to:WASH_BY_WEIGHT },
-  { v:11, style:"Canvas Hangtag", field:"wash", from:"", to:WASH_BY_WEIGHT }
+  { v:11, style:"Canvas Hangtag", field:"wash", from:"", to:WASH_BY_WEIGHT },
+  /* a tag is one cut now, not two: half the cloth, half the weight */
+  { v:12, style:"Canvas Hangtag", field:"yield", from:0.017857, to:0.008929 },
+  { v:12, style:"Canvas Hangtag", field:"lb",    from:0.013,    to:0.0065   }
 ];
 
 const DEFAULTS = {
@@ -754,7 +757,7 @@ function freshState(){
     washByLb: DEFAULT_WASH_BY_LB,
     washes:  DEFAULT_WASHES.map(w => ({...w})),
     g:       {...DEFAULTS},
-    v:       11,         /* bump to re-apply the rate defaults above */
+    v:       12,         /* bump to re-apply the rate defaults above */
     lines:   [],
     inv:     freshInvoice()
   };
@@ -2052,7 +2055,7 @@ function load(){
         if(num(L.grind) === 0){ L.grind = S.g.grinding; L.grindOn = true; }
       });
     }
-    S.v = 11;
+    S.v = 12;
     if(p.inv){
       S.inv = Object.assign(freshInvoice(), p.inv);
       const was = num(p.inv.v);

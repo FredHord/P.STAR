@@ -72,8 +72,8 @@ Behaviour worth knowing:
   Sewing $5.50, cutting $0.43.
 - The **enzyme wash** is priced by weight — $1.75/lb in the Rates panel —
   rather than by garment group, so a style needs a weight to use it: the
-  tote is 0.5 lb (given) and the hangtag 0.013 lb (its 35 sq in of cloth
-  against the tote's 1,344.5 at 0.5 lb — about 77 to the pound). Both
+  tote is 0.5 lb (given) and the hangtag 0.0065 lb (its one 17.5 sq in cut
+  against the tote's 1,344.5 at 0.5 lb — about 154 to the pound). Both
   default to it; it is one option in the line's wash dropdown, alongside the
   group washes, and a style with no weight is flagged rather than washed for
   nothing.
@@ -81,10 +81,10 @@ Behaviour worth knowing:
   takes one **grommet** — hardware priced by the piece at $59.50 per 1,000
   (a rate in the Rates panel, a count per line). Packaging and grinding start
   off for it, since a garment's bag-and-tag and distressing do not belong on
-  a tag. Its yield is 0.017857 yd: the 65" roll is cut into
+  a tag. Its yield is 0.008929 yd: the 65" roll is cut into
   16×20 print sheets — a row of 4 upright over a row of 3 turned fills the
   full 36" yard, 7 sheets — each sheet yields 4×4 = 16 cuts of
-  3.6218"×4.8306", and 2 cuts make a tag: 8 tags a sheet, 56 a yard, 83.7%
+  3.6218"×4.8306", and one cut is a tag: 16 tags a sheet, 112 a yard, 83.7%
   of the cloth used. Cutting $0.12. Printing is per project, so it goes under
   Embellishments; sewing is still unquoted and sits at $0.
 
