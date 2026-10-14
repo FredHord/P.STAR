@@ -77,6 +77,15 @@
     font-variant-numeric:tabular-nums;
   }
   input[type=text]{font-family:'Inter Tight',sans-serif;font-size:14px;}
+  textarea{
+    width:100%;background:var(--ink);border:1px solid var(--line);color:var(--paper);
+    border-radius:var(--r);padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:13px;
+    line-height:1.6;resize:vertical;min-height:96px;
+  }
+  textarea:focus-visible{outline:2px solid var(--star);outline-offset:1px;border-color:var(--star-dim);}
+  .quick-msg{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);line-height:1.6;margin-top:10px;white-space:pre-line;}
+  .quick-msg b{color:var(--paper);font-weight:500;}
+  .quick-msg .bad{color:var(--bad);}
   select{font-family:'Inter Tight',sans-serif;font-size:14px;cursor:pointer;}
   input:focus-visible,select:focus-visible{outline:2px solid var(--star);outline-offset:1px;border-color:var(--star-dim);}
   input:disabled{opacity:.38;cursor:not-allowed;}
@@ -414,6 +423,24 @@
       <button class="btn btn--primary" id="addLine">+ Add style</button>
     </div>
   </div>
+  <details class="panel" id="panelQuick">
+    <summary><span>Quick add — paste a list</span><span class="chev">›</span></summary>
+    <div class="panel__body">
+      <p class="sec-note" style="margin:0 0 10px">
+        One item per line, quantity then style — <code>50 Zip Hoodie</code>. Short names work:
+        "hoodie", "sweats", "thermals", "long sleeve tees". Each line is added at its style's
+        defaults; set washes and the rest on the cards afterwards.
+      </p>
+      <textarea id="quickAdd" rows="5" placeholder="50 Zip Hoodie
+50 Sweatpants
+50 Thermal Long Sleeve
+50 Long Sleeve Jersey Tee"></textarea>
+      <div class="btnrow" style="margin-top:10px">
+        <button class="btn btn--primary" id="quickAddBtn">Add these lines</button>
+      </div>
+      <div class="quick-msg" id="quickMsg"></div>
+    </div>
+  </details>
   <div class="demo" id="demoNote" hidden>
     <span>Two example builds, so the sheet opens working. Edit them, or clear them and start your own.</span>
     <button class="btn" id="clearDemo">Clear examples</button>
@@ -2328,6 +2355,62 @@ $("#lines").addEventListener("click", e => {
   if(e.target.closest("[data-delline]")){
     S.lines.splice(S.lines.indexOf(L), 1);
     renderLines(); refresh();
+  }
+});
+
+/* --- quick add --- */
+/* Find the style a loose name means. Exact wins; then a name that starts
+   with the text; then one that contains it — shortest first, so "hoodie"
+   is the Zip Hoodie and "sweats" is Sweatpants rather than Sweat Shorts. */
+function matchStyle(text){
+  const q = text.toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim()
+                .replace(/\b(tees|tee|shirts|shirt)\b/g, "tee").replace(/s\b/g, "");
+  if(!q) return null;
+  const norm = n => n.toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim().replace(/s\b/g, "");
+  const names = STYLES.map(st => ({ st, n:norm(st.name) }));
+  const exact = names.find(x => x.n === q);
+  if(exact) return exact.st;
+  /* a name that begins with the text beats one that merely contains the
+     words, so "long sleeve" is the jersey tee rather than the thermal */
+  const starts = names.filter(x => x.n.startsWith(q)).sort((a,b) => a.n.length - b.n.length);
+  if(starts.length) return starts[0].st;
+  const words = q.split(" ");
+  const allWords = names.filter(x => words.every(w => x.n.includes(w))).sort((a,b) => a.n.length - b.n.length);
+  if(allWords.length) return allWords[0].st;
+  const has = names.filter(x => x.n.includes(q)).sort((a,b) => a.n.length - b.n.length);
+  return has.length ? has[0].st : null;
+}
+
+function parseQuickLine(line){
+  let m = line.match(/^\s*(\d+)\s*[x×]?\s+(.+?)\s*$/i);          // "50 Zip Hoodie"
+  if(!m) m = line.match(/^\s*(.+?)\s*[x×,]\s*(\d+)\s*$/i) && [null, RegExp.$2, RegExp.$1];  // "Zip Hoodie x 50"
+  if(!m) return null;
+  return { qty:parseInt(m[1], 10), text:m[2] };
+}
+
+$("#quickAddBtn").addEventListener("click", () => {
+  const lines = $("#quickAdd").value.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const added = [], bad = [];
+  lines.forEach(line => {
+    const p = parseQuickLine(line);
+    const st = p && matchStyle(p.text);
+    if(!p || !st || !(p.qty > 0)){ bad.push(line); return; }
+    const L = makeLine(st.name); L.qty = p.qty;
+    added.push(L);
+  });
+  if(added.length){
+    if(S.demo){ S.lines = []; S.demo = false; }       /* an order replaces the examples */
+    S.lines.push(...added);
+    renderLines(); refresh();
+    $("#quickAdd").value = bad.join("\n");
+  }
+  $("#quickMsg").innerHTML =
+    (added.length ? "Added " + added.map(L => "<b>" + L.qty + " × " + esc(L.style) + "</b>").join(", ") + "." : "") +
+    (bad.length ? (added.length ? "\n" : "") + "<span class=\"bad\">Couldn't read:</span> " + bad.map(esc).join(" · ") + " — use a quantity and a style name." : "") ||
+    "Nothing to add — one item per line, like <b>50 Zip Hoodie</b>.";
+  if(added.length){
+    const last = $("#lines").lastElementChild;
+    if(last) last.scrollIntoView({ behavior:"smooth", block:"center" });
   }
 });
 

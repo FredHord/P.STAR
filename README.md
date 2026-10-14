@@ -124,6 +124,13 @@ by URL, since it exposes cost prices.
 It opens on two worked example builds so the sheet is legible at a glance;
 "Clear examples" empties it. The order is then remembered per browser.
 
+**Quick add** (a panel under the Add style button) takes a pasted list, one
+item per line — `50 Zip Hoodie` — and adds each at its style's defaults.
+Short names work: a name that starts with the text wins, then one containing
+all its words, shortest first, so "hoodie" is the Zip Hoodie, "sweats" is
+Sweatpants and "long sleeve" is the jersey tee. It reports what it matched
+and leaves any line it could not read in the box.
+
 A **transportation & ancillary** charge (5% by default, set in the Rates
 panel; the on/off tick is in the Job settings strip above the Order Total —
 off keeps the rate and drops the line) covers freight, ancillary development and the unexpected. It is a
