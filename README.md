@@ -48,6 +48,12 @@ grinding, embellishments and quantity per line, and it produces a full cost
 sheet: per-unit breakdown, FSF markup, selling price, one-time fees and the
 order total.
 
+A **damage allowance** (Job settings, +4 units per line by default) is made
+and paid for on top of each line's quantity but never sold: the cost sheet
+and invoice run on the made count, while the retail report sells only the
+entered quantity and lands its cost per *sellable* unit, so the allowance
+shows up honestly as a lower margin rather than disappearing.
+
 **FSF markup** is what FSF adds to the production cost. A **Job settings**
 strip sits directly above the Order Total with the job's rate (20%) and the
 transportation & ancillary on/off tick, so neither needs a panel opened. The

@@ -470,6 +470,8 @@
       <span>Transportation &amp; ancillary <em style="display:inline" id="jobAncRate">5%</em></span></label>
     <label class="jobbar__f"><span class="flabel">FSF markup (%)</span>
       <input type="number" step="0.5" min="0" id="jobMarkup"></label>
+    <label class="jobbar__f"><span class="flabel">Damage allowance (+ units per line)</span>
+      <input type="number" step="1" min="0" id="jobDamage"></label>
     <span class="mono" style="font-size:10.5px;color:var(--muted)">Rates and per-line overrides are in the panels above</span>
   </div>
   <div id="rollup"></div>
@@ -739,6 +741,7 @@ const DEFAULTS = {
   finishing:0,          /* not quoted by Fred */
   ancillary:5,          /* transportation, ancillary dev and the unexpected */
   ancillaryOn:true,     /* …charged on this job at all */
+  damage:4,             /* extra units made per line to cover damages; made and paid for, not sold */
   retailRound:5,        /* round suggested retail to the nearest $; 0 = don't */
   grinding:2.50         /* distress grinding, charged across every style */
 };
@@ -910,7 +913,12 @@ function washCost(washName, group){
 
 function cost(L){
   const st = STYLES.find(s => s.name === L.style) || {};
-  const r = { style:L.style, qty:Math.max(0, Math.round(num(L.qty))), rows:[], flags:[], issues:[], styleNote:st.note || "" };
+  /* The quantity entered is what will be sold. The damage allowance is made
+     and paid for on top of it, so every cost here runs on the made count,
+     and the retail report sells only the entered one. */
+  const sellQty = Math.max(0, Math.round(num(L.qty)));
+  const damage  = sellQty > 0 ? Math.max(0, Math.round(num(S.g.damage))) : 0;
+  const r = { style:L.style, qty:sellQty + damage, sellQty, damage, rows:[], flags:[], issues:[], styleNote:st.note || "" };
 
   let total = 0;
   const add = (label, amount, opts) => {
@@ -1107,9 +1115,10 @@ function renderInvForm(){
 }
 
 function syncJobBar(){
-  const on = $("#jobAncOn"), mk = $("#jobMarkup"), pm = $("#markup");
+  const on = $("#jobAncOn"), mk = $("#jobMarkup"), pm = $("#markup"), dm = $("#jobDamage");
   if(document.activeElement !== on) on.checked = !!S.g.ancillaryOn;
   if(document.activeElement !== mk) mk.value = S.g.markup;
+  if(document.activeElement !== dm) dm.value = S.g.damage;
   if(document.activeElement !== pm) pm.value = S.g.markup;
   $("#jobAncRate").textContent = num(S.g.ancillary) + "%";
 }
@@ -1354,7 +1363,8 @@ function paintLineBadges(results){
     const el = document.querySelector(`[data-line="${r.id}"]`);
     if(!el) return;
     el.querySelector("[data-unit]").textContent = money(r.unit);
-    el.querySelector("[data-ext]").textContent  = qtyFmt(r.qty) + " × = " + money(r.lineCost);
+    el.querySelector("[data-ext]").textContent  =
+      (r.damage ? qtyFmt(r.sellQty) + " + " + r.damage + " damage = " : "") + qtyFmt(r.qty) + " × = " + money(r.lineCost);
     el.querySelector("[data-sell]").textContent =
       "Incl. markup " + money(r.unitFsf) + " / unit · selling " + money(r.sell) + " · line " + money(r.lineFsf);
     el.querySelector("[data-flags]").innerHTML = r.flags.map(f =>
@@ -1400,7 +1410,7 @@ function renderSheet(results, fees){
         <span class="build__meta">
           ${washLabel(L) ? esc(washLabel(L)) : "No wash"}
           · ${L && L.grindOn ? "grinding" : "no grinding"}
-          · ${qtyFmt(r.qty)} unit${r.qty === 1 ? "" : "s"}
+          · ${r.damage ? qtyFmt(r.sellQty) + " + " + r.damage + " for damage = " : ""}${qtyFmt(r.qty)} unit${r.qty === 1 ? "" : "s"}
         </span>
       </div>
       <table class="rows">
@@ -1423,6 +1433,7 @@ function renderSheet(results, fees){
 
   /* rollup */
   const units    = results.reduce((a,r) => a + r.qty, 0);
+  const dmgUnits = results.reduce((a,r) => a + r.damage, 0);
   const prod     = results.reduce((a,r) => a + r.lineCost, 0);
   const fsf      = results.reduce((a,r) => a + r.lineFsf, 0);
   const sell     = results.reduce((a,r) => a + r.lineSell, 0);
@@ -1443,7 +1454,7 @@ function renderSheet(results, fees){
     <div class="tot">
       <h3>Order total</h3>
       <div class="totgrid">
-        <div class="kpi"><div class="l">Units</div><div class="n">${qtyFmt(units)}</div></div>
+        <div class="kpi"><div class="l">Units made</div><div class="n">${qtyFmt(units)}${dmgUnits ? ` <small>incl. ${qtyFmt(dmgUnits)} for damage</small>` : ""}</div></div>
         <div class="kpi"><div class="l">Styles</div><div class="n">${new Set(S.lines.map(l => l.style)).size} <small>/ ${results.length} build${results.length===1?"":"s"}</small></div></div>
         <div class="kpi kpi--star"><div class="l">Total order cost</div><div class="n">${money(grand,0)}</div></div>
         <div class="kpi"><div class="l">All-in cost per unit</div><div class="n">${money(avg)}</div></div>
@@ -1451,7 +1462,7 @@ function renderSheet(results, fees){
       <div class="totrows">
         <table>
           <tbody>
-            <tr><td class="dim">Production cost — ${qtyFmt(units)} units</td><td class="v dim">${money(prod)}</td></tr>
+            <tr><td class="dim">Production cost — ${qtyFmt(units)} units${dmgUnits ? " (" + qtyFmt(units - dmgUnits) + " to sell + " + qtyFmt(dmgUnits) + " for damage)" : ""}</td><td class="v dim">${money(prod)}</td></tr>
             <tr><td class="dim">FSF markup ${results.some(r => r.markupOwn) ? "— varies by line" : "@ " + num(S.g.markup) + "%"}</td><td class="v dim">${money(markupAmt)}</td></tr>
             <tr class="sum"><td>Garments, incl. FSF markup</td><td class="v">${money(fsf)}</td></tr>
             ${fees.rows.length ? `<tr class="grp"><td colspan="2" style="padding-top:14px"><span class="flabel" style="margin:0">One-time fees — once per style, not per garment</span></td></tr>` : ""}
@@ -1487,11 +1498,11 @@ function csv(results, fees){
   out.push(["FSF PRODUCTION COST SHEET"]);
   out.push(["Generated", new Date().toLocaleString()]);
   out.push([]);
-  out.push(["#","Style","Wash","Grinding","Qty","Cost/unit","Markup/unit","Cost incl. markup/unit",
+  out.push(["#","Style","Wash","Grinding","Qty made","Of which for damage","Cost/unit","Markup/unit","Cost incl. markup/unit",
             "Selling price/unit","Line production cost","Line payable to FSF","Line retail value","Status"]);
   results.forEach((r,i) => {
     const L = S.lines.find(x => x.id === r.id);
-    out.push([i+1, r.style, washLabel(L) || "No wash", L && L.grindOn ? "Yes" : "No", r.qty,
+    out.push([i+1, r.style, washLabel(L) || "No wash", L && L.grindOn ? "Yes" : "No", r.qty, r.damage,
               r.unit.toFixed(4), r.markup.toFixed(4), r.unitFsf.toFixed(4), r.sell.toFixed(4),
               r.lineCost.toFixed(2), r.lineFsf.toFixed(2), r.lineSell.toFixed(2),
               r.flags.map(f => f.t).join("; ")]);
@@ -1544,7 +1555,7 @@ function summaryText(results, fees){
   const lines = results.map((r,i) => {
     const L = S.lines.find(x => x.id === r.id);
     return `${i+1}. ${r.style} — ${washLabel(L) || "no wash"}${L && L.grindOn ? " + grinding" : ""}` +
-           ` — ${qtyFmt(r.qty)} units @ ${money(r.unitFsf)} = ${money(r.lineFsf)}`;
+           ` — ${qtyFmt(r.qty)} units${r.damage ? " (incl. " + r.damage + " for damage)" : ""} @ ${money(r.unitFsf)} = ${money(r.lineFsf)}`;
   });
   const issues = results.flatMap(r => r.issues);
   return [
@@ -1629,6 +1640,7 @@ function invoiceModel(){
       bits.push(e.type.toLowerCase() + (e.note ? " (" + e.note + ")" : "") + (per > 1 ? " ×" + per : ""));
     });
     if(L.fabricFree) bits.push("fabric supplied");
+    if(r.damage) bits.push("incl. " + r.damage + " for damage");
     const unit = client ? r.sell : r.unitFsf;
     return { desc:r.style, sub:bits.join(", "), photo:L.photo || "",
              qty:r.qty, unit, amount:unit * r.qty };
@@ -1836,24 +1848,26 @@ function retailModel(){
     const oneTime = (styleFee[r.style] || 0) * share + num(r.embSetup);
 
     const lineCost = (r.lineFsf + oneTime) * (1 + ancPct / 100);
-    const unitCost = r.qty ? lineCost / r.qty : 0;
+    /* landed cost per SELLABLE unit: the damage units are paid for but not sold */
+    const unitCost = r.sellQty ? lineCost / r.sellQty : 0;
 
     const suggested = roundRetail(r.sell);
     const custom    = L.retail !== null && L.retail !== undefined && L.retail !== "";
     const retail    = custom ? num(L.retail) : suggested;
 
     const profit    = retail - unitCost;
-    const lineRetail= retail * r.qty;
-    const lineProfit= profit * r.qty;
+    const lineRetail= retail * r.sellQty;
+    const lineProfit= profit * r.sellQty;
 
     const bits = [];
     if(washLabel(L)) bits.push(washLabel(L));
     if(L.grindOn) bits.push("distress grinding");
     (L.emb || []).forEach(e => bits.push(e.type.toLowerCase() + (e.note ? " (" + e.note + ")" : "")));
     if(L.fabricFree) bits.push("fabric on hand");
+    if(r.damage) bits.push(r.damage + " more made for damage");
 
     return {
-      style:r.style, sub:bits.join(", "), photo:L.photo || "", qty:r.qty,
+      style:r.style, sub:bits.join(", "), photo:L.photo || "", qty:r.sellQty, made:r.qty,
       unitCost, retail, custom, suggested, profit,
       margin: retail > 0 ? profit / retail * 100 : 0,
       lineCost, lineRetail, lineProfit,
@@ -1862,12 +1876,13 @@ function retailModel(){
   });
 
   const units  = items.reduce((a,i) => a + i.qty, 0);
+  const made   = items.reduce((a,i) => a + i.made, 0);
   const cogs   = items.reduce((a,i) => a + i.lineCost, 0);
   const revenue= items.reduce((a,i) => a + i.lineRetail, 0);
   const profit = revenue - cogs;
 
   return {
-    items, units, cogs, revenue, profit,
+    items, units, made, cogs, revenue, profit,
     margin: revenue > 0 ? profit / revenue * 100 : 0,
     avgCost: units ? cogs / units : 0,
     ancPct,
@@ -1886,7 +1901,7 @@ function renderReport(){
     <div class="inv-top">
       <div>
         <h2 class="inv-title">Retail report</h2>
-        <div class="inv-meta" style="text-align:left;margin-top:6px"><b>${qtyFmt(v.units)} units · ${v.items.length} build${v.items.length === 1 ? "" : "s"}</b></div>
+        <div class="inv-meta" style="text-align:left;margin-top:6px"><b>${qtyFmt(v.units)} to sell${v.made > v.units ? " · " + qtyFmt(v.made) + " made" : ""} · ${v.items.length} build${v.items.length === 1 ? "" : "s"}</b></div>
       </div>
       <div class="inv-meta">${fmtDate(todayISO())}</div>
     </div>
@@ -1937,7 +1952,7 @@ function renderReport(){
 
     <table class="inv-sum">
       <tbody>
-        <tr><td class="dim">Cost of goods — landed, ${qtyFmt(v.units)} units</td><td class="r">${money(v.cogs)}</td></tr>
+        <tr><td class="dim">Cost of goods — landed, ${qtyFmt(v.made)} made</td><td class="r">${money(v.cogs)}</td></tr>
         <tr><td class="dim">Retail value at full price</td><td class="r">${money(v.revenue)}</td></tr>
         <tr class="tot"><td>Gross profit</td><td class="r">${money(v.profit)}</td></tr>
         <tr class="due"><td>Gross margin</td><td class="r">${v.margin.toFixed(1)}%</td></tr>
@@ -1947,7 +1962,7 @@ function renderReport(){
     <div class="rep-note">
       Unit cost is landed: FSF's price including their markup, that style's share of the
       pattern, grading and embellishment setup, and the ${v.ancPct}% transportation and ancillary
-      charge. Retail value and profit assume every unit sells at full price —
+      charge${v.made > v.units ? ", spread over the units that sell — the " + qtyFmt(v.made - v.units) + " made for damage are paid for but bring in nothing" : ""}. Retail value and profit assume every unit sells at full price —
       <strong>${qtyFmt(v.breakEven)} of ${qtyFmt(v.units)} units</strong> covers the cost of the run.
     </div>
     ${v.open.length ? `<div class="inv-open no-print">
@@ -2417,6 +2432,7 @@ $("#quickAddBtn").addEventListener("click", () => {
 /* --- job settings strip --- */
 $("#jobAncOn").addEventListener("change", e => { S.g.ancillaryOn = e.target.checked; refresh(); });
 $("#jobMarkup").addEventListener("input", e => { S.g.markup = num(e.target.value); refresh(); });
+$("#jobDamage").addEventListener("input", e => { S.g.damage = num(e.target.value); refresh(); });
 
 /* --- invoice --- */
 $("#panelInv").addEventListener("input", e => {
