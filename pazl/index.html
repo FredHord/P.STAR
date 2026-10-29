@@ -20,11 +20,29 @@
     <symbol id="piece" viewBox="0 0 24 24"><path d="M3.5 3.5h5.3a3 3 0 1 1 6.4 0h5.3v5.3a3 3 0 1 0 0 6.4v5.3h-5.3a3 3 0 1 1-6.4 0H3.5v-5.3a3 3 0 1 0 0-6.4z"/></symbol>
   </svg>
   <a class="skip" href="#main">Skip to content</a>
+  <svg id="jigsaw-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs></defs></svg>
 
-  <header class="band">
-    <!-- A wireframe puzzle globe turns slowly behind the mark. The four pieces fly in and lock together on load; with reduced motion on they simply show assembled. -->
+  <header class="band band--wheel">
+    <!-- A ring of project pieces turns slowly around the mark; each piece opens its project. The four pieces fly in and lock together on load. -->
     <div class="band__stage">
-      <img class="band__globe" src="assets/img/puzzle-globe.png" width="796" height="789" alt="" aria-hidden="true" fetchpriority="high">
+      <div class="wheel__ring" aria-label="Selected projects">
+        <a class="wheel__item" href="work/yung-miami-watch-dis.html" style="--a: 0.0deg" aria-label="Watch Dis!, open project"><span class="wheel__piece"><img src="assets/img/cover-yungmiami.webp" alt="" loading="eager" decoding="async"></span></a>
+        <a class="wheel__item" href="work/heavy-is-the-crown.html" style="--a: 22.5deg" aria-label="Heavy Is the Crown, open project"><span class="wheel__piece"><img src="assets/img/paak-cordae.jpg" alt="" loading="eager" decoding="async"></span></a>
+        <a class="wheel__item" href="work/jid-x-kelloggs.html" style="--a: 45.0deg" aria-label="J.I.D × Kellogg's, open project"><span class="wheel__piece" style="--focus: 50% 35%"><img src="assets/img/kellogg-1.webp" alt="" loading="eager" decoding="async"></span></a>
+        <a class="wheel__item" href="work/jid-x-fear-of-god.html" style="--a: 67.5deg" aria-label="J.I.D × Fear of God, open project"><span class="wheel__piece"><img src="assets/img/jid-fog.webp" alt="" loading="eager" decoding="async"></span></a>
+        <a class="wheel__item" href="work/god-does-like-a-pop-up.html" style="--a: 90.0deg" aria-label="God Does Like a Pop Up, open project"><span class="wheel__piece" style="--focus: 50% 22%"><img src="assets/img/god-does-flyer.jpg" alt="" loading="eager" decoding="async"></span></a>
+        <a class="wheel__item" href="work/gunna-wun-world-tour.html" style="--a: 112.5deg" aria-label="Wun World Tour, open project"><span class="wheel__piece" style="--focus: 50% 22%"><img src="assets/img/gunna-2.webp" alt="" loading="eager" decoding="async"></span></a>
+        <a class="wheel__item" href="work/last-wun-pop-up.html" style="--a: 135.0deg" aria-label="The Last Wun Pop-Up, open project"><span class="wheel__piece"><img src="assets/img/last-wun-cover.jpg" alt="" loading="eager" decoding="async"></span></a>
+        <a class="wheel__item" href="work/godspeed.html" style="--a: 157.5deg" aria-label="Godspeed, open project"><span class="wheel__piece" style="--focus: 50% 8%"><img src="assets/img/godspeed-4.webp" alt="" loading="eager" decoding="async"></span></a>
+        <a class="wheel__item" href="work/deep-thoughts.html" style="--a: 180.0deg" aria-label="Deep Thoughts, open project"><span class="wheel__piece"><img src="assets/img/dt-cover.webp" alt="" loading="eager" decoding="async"></span></a>
+        <a class="wheel__item" href="work/kodak-black.html" style="--a: 202.5deg" aria-label="Just Getting Started, open project"><span class="wheel__piece" style="--focus: 50% 50%; --zoom: 1.08"><img src="assets/img/kodak-cover.webp" alt="" loading="eager" decoding="async"></span></a>
+        <a class="wheel__item" href="work/hawks-x-michelob.html" style="--a: 225.0deg" aria-label="Cease & Desist × Atlanta Hawks × Michelob Ultra, open project"><span class="wheel__piece"><img src="assets/img/hawks-cap-1.jpg" alt="" loading="eager" decoding="async"></span></a>
+        <a class="wheel__item" href="work/lil-durk-birthday-bash.html" style="--a: 247.5deg" aria-label="Birthday Bash, open project"><span class="wheel__piece"><img src="assets/img/durk-live.webp" alt="" loading="eager" decoding="async"></span></a>
+        <a class="wheel__item" href="work/lanvin-lab-x-future.html" style="--a: 270.0deg" aria-label="Lanvin Lab × Future, open project"><span class="wheel__piece" style="--focus: 50% 0%"><img src="assets/img/lanvin.webp" alt="" loading="eager" decoding="async"></span></a>
+        <a class="wheel__item" href="work/needles-kimono.html" style="--a: 292.5deg" aria-label="Needles Kimono, open project"><span class="wheel__piece" style="--focus: 50% 40%"><img src="assets/img/needles-kimono.jpg" alt="" loading="eager" decoding="async"></span></a>
+        <a class="wheel__item" href="work/lil-durk-amazon-music-live.html" style="--a: 315.0deg" aria-label="Amazon Music Live, open project"><span class="wheel__piece" style="--focus: 50% 0%; --shift: 18%"><img src="assets/img/durk-amazon-stage.jpg" alt="" loading="eager" decoding="async"></span></a>
+        <a class="wheel__item" href="work/beezy.html" style="--a: 337.5deg" aria-label="Beezy, open project"><span class="wheel__piece"><img src="assets/img/cover-beezy.webp" alt="" loading="eager" decoding="async"></span></a>
+      </div>
     <div class="assemble" role="group" aria-label="PAZL puzzle mark. Hover or press a piece to jump to that discipline's work.">
       <img class="assemble__piece" data-piece="music" style="--dx: -58%; --dy: -46%; --r: -16deg; --d: 0s; --hx: -7%; --hy: -6%; --hr: -4deg" src="assets/img/pieces/music.png" width="800" height="726" alt="" fetchpriority="high">
       <img class="assemble__piece" data-piece="art" style="--dx: 58%; --dy: -42%; --r: 14deg; --d: 0.14s; --hx: 7%; --hy: -6%; --hr: 4deg" src="assets/img/pieces/art.png" width="800" height="726" alt="" fetchpriority="high">
@@ -379,5 +397,6 @@
   </footer>
 
   <script src="assets/js/main.js"></script>
+  <script src="assets/js/jigsaw.js"></script>
 </body>
 </html>

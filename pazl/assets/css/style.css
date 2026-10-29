@@ -176,6 +176,24 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   .band__globe { animation: globe-spin 80s linear infinite; will-change: transform; }
 }
 @keyframes globe-spin { to { transform: rotate(360deg); } }
+/* home header: ring of project pieces turning around the mark */
+.band--wheel { background: var(--ink); color: var(--paper); padding: 28px var(--gutter) 22px; border-bottom: 1px solid var(--line); }
+.band--wheel .band__stage { --r: clamp(110px, 15vw, 150px); --s: clamp(52px, 7.5vw, 68px); width: calc(var(--r) * 2 + var(--s) + 16px); height: calc(var(--r) * 2 + var(--s) + 16px); aspect-ratio: auto; }
+.band--wheel .assemble { width: 34%; height: 30.9%; }
+.wheel__ring { position: absolute; inset: 0; }
+.wheel__item { position: absolute; left: 50%; top: 50%; width: var(--s); height: var(--s); margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2); transform: rotate(var(--a)) translate(var(--r)) rotate(calc(var(--a) * -1)); filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.18)); transition: filter 0.25s ease; }
+.wheel__item:hover, .wheel__item:focus-visible { filter: drop-shadow(0 16px 20px rgba(0, 0, 0, 0.3)); z-index: 3; outline: none; }
+.wheel__piece { position: absolute; inset: 0; display: block; overflow: hidden; background: var(--line-soft); }
+.wheel__piece img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--focus, 50% 50%); transform: translateY(var(--shift, 0)) scale(var(--zoom, 1)); transition: transform 0.3s ease; }
+.wheel__item:hover img, .wheel__item:focus-visible img { transform: translateY(var(--shift, 0)) scale(calc(var(--zoom, 1) * 1.12)); }
+@media (prefers-reduced-motion: no-preference) {
+  .wheel__ring { animation: wheel-spin 90s linear infinite; }
+  .wheel__piece { animation: wheel-counter 90s linear infinite; }
+  .band__stage:hover .wheel__ring, .band__stage:hover .wheel__piece { animation-play-state: paused; }
+}
+@keyframes wheel-spin { to { transform: rotate(360deg); } }
+@keyframes wheel-counter { to { transform: rotate(-360deg); } }
+
 .band__line {
   font-family: var(--font-display);
   font-weight: 600;
