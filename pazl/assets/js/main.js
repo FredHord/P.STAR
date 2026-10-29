@@ -75,6 +75,26 @@
     }
   }
 
+  /* Phones get the lighter film encode */
+  if (window.matchMedia && window.matchMedia('(max-width: 720px)').matches) {
+    document.querySelectorAll('video.film[data-src-sm]').forEach(function (v) { v.setAttribute('src', v.getAttribute('data-src-sm')); });
+  }
+
+  /* Motion control: a footer button pauses every animation and loop, remembered per browser */
+  (function () {
+    var root = document.documentElement, key = 'pazl-motion';
+    var off = false; try { off = localStorage.getItem(key) === 'off'; } catch (e) {}
+    function apply() {
+      root.classList.toggle('motion-off', off);
+      document.querySelectorAll('video.loop__video').forEach(function (v) { if (off) v.pause(); else if (v.getAttribute('src')) { var p = v.play(); if (p && p.catch) p.catch(function () {}); } });
+      document.querySelectorAll('.motion-btn').forEach(function (b) { b.textContent = off ? 'Play motion' : 'Pause motion'; b.setAttribute('aria-pressed', off ? 'true' : 'false'); });
+    }
+    var nav = document.querySelector('.footer__links');
+    if (nav) { var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'motion-btn'; nav.appendChild(btn); btn.addEventListener('click', function () { off = !off; try { localStorage.setItem(key, off ? 'off' : 'on'); } catch (e) {} apply(); }); }
+    apply();
+    if (off) document.addEventListener('play', function (e) { if (e.target.classList && e.target.classList.contains('loop__video')) e.target.pause(); }, true);
+  })();
+
   /* Footer year */
   document.querySelectorAll('[data-year]').forEach(function (el) {
     el.textContent = String(new Date().getFullYear());

@@ -356,6 +356,12 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .pillar { display: flex; flex-direction: column; gap: 14px; padding-top: 20px; border-top: 1px solid var(--line); }
 .pillar h3 { font-family: var(--font-display); font-weight: 600; font-size: 24px; line-height: 1.1; letter-spacing: -0.02em; text-transform: uppercase; }
 .pillar p { color: var(--soft); max-width: 34ch; }
+.pillar__num { display: flex; align-items: center; gap: 8px; }
+.pillar__ico { width: 16px; height: 16px; stroke: var(--paper); stroke-width: 1; }
+.pillar:nth-child(1) .pillar__ico { fill: var(--c-music); } .pillar:nth-child(2) .pillar__ico { fill: var(--c-art); } .pillar:nth-child(3) .pillar__ico { fill: var(--c-tech); } .pillar:nth-child(4) .pillar__ico { fill: var(--c-fashion); }
+/* motion control: the footer button adds .motion-off to <html> */
+.motion-off *, .motion-off *::before, .motion-off *::after { animation-play-state: paused !important; }
+.motion-btn { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
 .pillar .tags { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); line-height: 1.8; }
 
 @media (max-width: 820px) {
@@ -398,7 +404,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
 }
-.ticker__track { display: flex; width: max-content; animation: ticker 70s linear infinite; will-change: transform; }
+.ticker__track { display: flex; width: max-content; animation: ticker 110s linear infinite; will-change: transform; }
 .ticker:hover .ticker__track, .ticker:focus-within .ticker__track { animation-play-state: paused; }
 .ticker__set {
   display: flex; align-items: center; flex: none;
@@ -443,7 +449,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* ---------- work index ---------- */
 
 .index-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
-.index-head .h-section { font-size: clamp(40px, 6vw, 88px); letter-spacing: -0.035em; }
+.index-head .h-section { letter-spacing: -0.035em; }
 .index-count { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 
 .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 40px; font-size: 13px; }
@@ -486,7 +492,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 /* ---------- project page ---------- */
 
 .ph { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 48px; align-items: end; padding-top: 44px; padding-bottom: 40px; border-bottom: 1px solid var(--line-soft); }
-.ph .h-section { font-size: clamp(40px, 6vw, 88px); letter-spacing: -0.035em; }
+.ph .h-section { letter-spacing: -0.035em; }
 .meta { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px 16px; font-size: 13px; }
 .meta dt { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 
@@ -540,7 +546,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .founder__photo img { width: 100%; max-width: 440px; }
 .founder__text { display: flex; flex-direction: column; gap: 16px; max-width: 56ch; }
 .founder__text .bio { margin-top: 8px; }
-.founder__text .h-section { font-size: clamp(36px, 5vw, 72px); letter-spacing: -0.035em; }
+.founder__text .h-section { letter-spacing: -0.035em; }
 .founder__text .lede { font-size: 17px; }
 .bio { display: flex; flex-direction: column; gap: 16px; font-size: 15px; line-height: 1.6; color: var(--soft); }
 
@@ -619,7 +625,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 .project--cover .project__caption .eyebrow { color: rgba(255, 255, 255, 0.72); }
 .project--cover .project__caption .muted { color: rgba(255, 255, 255, 0.8); max-width: 44ch; }
-.project--cover .h-item { font-size: clamp(32px, 4.6vw, 64px); line-height: 0.98; max-width: 16ch; }
+.project--cover .h-item { font-size: clamp(32px, 4.5vw, 60px); line-height: 0.98; max-width: 16ch; }
 .project--cover .project__caption .ul { color: #fff; margin-top: 10px; }
 .project--cover .project__spacer { display: none; }
 .project--cover .roll__count { position: absolute; top: 24px; right: var(--gutter); left: auto; bottom: auto; color: rgba(255, 255, 255, 0.7); z-index: 1; }
