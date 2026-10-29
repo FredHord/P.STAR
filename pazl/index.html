@@ -23,7 +23,8 @@
 
   <header class="band">
     <!-- A wireframe puzzle globe turns slowly behind the mark. The four pieces fly in and lock together on load; with reduced motion on they simply show assembled. -->
-    <img class="band__globe" src="assets/img/puzzle-globe.png" width="796" height="789" alt="" aria-hidden="true" fetchpriority="high">
+    <div class="band__stage">
+      <img class="band__globe" src="assets/img/puzzle-globe.png" width="796" height="789" alt="" aria-hidden="true" fetchpriority="high">
     <div class="assemble" role="group" aria-label="PAZL puzzle mark. Hover or press a piece to jump to that discipline's work.">
       <img class="assemble__piece" data-piece="music" style="--dx: -58%; --dy: -46%; --r: -16deg; --d: 0s; --hx: -7%; --hy: -6%; --hr: -4deg" src="assets/img/pieces/music.png" width="800" height="726" alt="" fetchpriority="high">
       <img class="assemble__piece" data-piece="art" style="--dx: 58%; --dy: -42%; --r: 14deg; --d: 0.14s; --hx: 7%; --hy: -6%; --hr: 4deg" src="assets/img/pieces/art.png" width="800" height="726" alt="" fetchpriority="high">
@@ -36,8 +37,8 @@
         <button type="button" class="assemble__key" data-piece="art">Art</button>
       </div>
     </div>
+    </div>
     <p class="assemble__label" aria-live="polite"><span class="assemble__dot"></span><span class="assemble__word"></span></p>
-    <p class="band__mark" aria-hidden="true">PAZL</p>
     <p class="band__line">Pursue (A-Z) Laudably</p>
   </header>
 
