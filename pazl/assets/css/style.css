@@ -289,10 +289,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .hero .btn { align-self: flex-start; }
 .hero__text { position: relative; z-index: 1; }
 /* the wireframe puzzle globe turns slowly behind the copy, at the right */
-.hero__orbit { position: absolute; z-index: 0; right: var(--gutter); top: 50%; transform: translateY(-50%); width: clamp(270px, 36vw, 480px); pointer-events: none; }
-.hero__globe { display: block; width: 100%; height: auto; background: transparent; opacity: 0.4; }
+.hero__orbit { position: absolute; z-index: 0; left: 6%; top: 50%; transform: translateY(-50%); width: clamp(270px, 36vw, 480px); pointer-events: none; }
+.hero__globe { display: block; width: 100%; height: auto; background: transparent; opacity: 0.22; }
 @media (prefers-reduced-motion: no-preference) { .hero__globe { animation: globe-spin 80s linear infinite; will-change: transform; } }
-@media (max-width: 820px) { .hero__orbit { width: 240px; right: 0; opacity: 0.8; } }
+@media (max-width: 820px) { .hero__orbit { width: 300px; left: 0; } .hero__globe { opacity: 0.16; } }
 
 /* Looping film from the project's GIF, converted to MP4. Plays muted when on screen; the poster
    shows until then, with JavaScript off, or when the visitor prefers reduced motion. */
