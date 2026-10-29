@@ -285,7 +285,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 
 /* ---------- home: hero ---------- */
 
-.hero { padding-top: 28px; padding-bottom: 56px; }
+.hero { padding-top: 28px; padding-bottom: 28px; }
 .hero .btn { align-self: flex-start; }
 
 /* Looping film from the project's GIF, converted to MP4. Plays muted when on screen; the poster
@@ -296,7 +296,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 
 /* ---------- home: selected work feed ---------- */
 
-.feed-head { padding-top: 40px; padding-bottom: 20px; }
+.feed-head { padding-top: 20px; padding-bottom: 20px; }
 
 .project {
   display: grid;
