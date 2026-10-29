@@ -15,10 +15,10 @@
   --bone: #e9e7e2;
   --bone-ink: #141414;
   /* discipline colours, taken from the four pieces of the mark */
-  --c-music: #b8b3df;
-  --c-fashion: #f2f0e4;
-  --c-tech: #9ccbe2;
-  --c-art: #e3b56a;
+  --c-music: #777776;
+  --c-fashion: #c7c6c1;
+  --c-tech: #f2f1f0;
+  --c-art: #ffffff;
 
   --font-display: 'Syne', system-ui, sans-serif;
   --font-mono: 'Syne Mono', ui-monospace, monospace;
