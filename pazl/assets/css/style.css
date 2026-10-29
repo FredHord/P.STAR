@@ -157,7 +157,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .band {
   background: var(--bone);
   color: var(--bone-ink);
-  padding: 16px var(--gutter) 18px;
+  padding: 10px var(--gutter) 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -167,7 +167,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 .band > * { position: relative; z-index: 1; }
 /* wireframe puzzle globe turning behind the mark */
-.band__stage { position: relative; width: clamp(190px, 22vw, 220px); aspect-ratio: 796 / 789; }
+.band__stage { position: relative; width: clamp(140px, 15vw, 160px); aspect-ratio: 796 / 789; }
 .band__globe {
   position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%;
   margin: 0; background: transparent; opacity: 0.42; pointer-events: none;
@@ -681,7 +681,7 @@ html, body, body * {
 .assemble__key { opacity: 0; border: 0; background: transparent; padding: 0; margin: 0; font: inherit; color: inherit; }
 .assemble__key:focus-visible { opacity: 1; outline: 2px solid var(--bone-ink); outline-offset: -2px; border-radius: 6px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
 .assemble__label {
-  min-height: 22px; margin: 0 0 2px;
+  position: absolute; left: var(--gutter); top: 10px; z-index: 2; min-height: 22px; margin: 0;
   display: flex; align-items: center; gap: 8px;
   font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
   opacity: 0; transform: translateY(4px); transition: opacity 0.25s ease, transform 0.25s ease;
