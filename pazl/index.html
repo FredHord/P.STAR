@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PAZL — Independent creative company</title>
+  <meta name="description" content="Creative mastery is rarely linear. It's a puzzle. PAZL is an independent creative company bridging the pieces between art, music, fashion, and technology.">
+  <meta property="og:title" content="PAZL">
+  <meta property="og:description" content="Creative mastery is rarely linear. It's a puzzle. Independent creative company bridging art, music, fashion, and technology.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://www.fsf-studio.com/assets/img/lanvin-suit.webp">
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700&family=Syne+Mono&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="piece" viewBox="0 0 24 24"><path d="M3.5 3.5h5.3a3 3 0 1 1 6.4 0h5.3v5.3a3 3 0 1 0 0 6.4v5.3h-5.3a3 3 0 1 1-6.4 0H3.5v-5.3a3 3 0 1 0 0-6.4z"/></symbol>
+  </svg>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="band">
+    <!-- The four pieces fly in and lock together on load. With reduced motion on they simply show assembled. -->
+    <div class="assemble" role="group" aria-label="PAZL puzzle mark. Hover or press a piece to jump to that discipline's work.">
+      <img class="assemble__piece" data-piece="music" style="--dx: -58%; --dy: -46%; --r: -16deg; --d: 0s; --hx: -7%; --hy: -6%; --hr: -4deg" src="assets/img/pieces/music.png" width="800" height="726" alt="" fetchpriority="high">
+      <img class="assemble__piece" data-piece="art" style="--dx: 58%; --dy: -42%; --r: 14deg; --d: 0.14s; --hx: 7%; --hy: -6%; --hr: 4deg" src="assets/img/pieces/art.png" width="800" height="726" alt="" fetchpriority="high">
+      <img class="assemble__piece" data-piece="tech" style="--dx: -56%; --dy: 46%; --r: 12deg; --d: 0.28s; --hx: -7%; --hy: 6%; --hr: 3deg" src="assets/img/pieces/tech.png" width="800" height="726" alt="" fetchpriority="high">
+      <img class="assemble__piece" data-piece="fashion" style="--dx: 56%; --dy: 44%; --r: -14deg; --d: 0.42s; --hx: 7%; --hy: 6%; --hr: -4deg" src="assets/img/pieces/fashion.png" width="800" height="726" alt="" fetchpriority="high">
+      <div class="assemble__keys">
+        <button type="button" class="assemble__key" data-piece="music">Music</button>
+        <button type="button" class="assemble__key" data-piece="fashion">Fashion</button>
+        <button type="button" class="assemble__key" data-piece="tech">Tech</button>
+        <button type="button" class="assemble__key" data-piece="art">Art</button>
+      </div>
+    </div>
+    <p class="assemble__label" aria-live="polite"><span class="assemble__dot"></span><span class="assemble__word"></span></p>
+    <p class="band__mark" aria-hidden="true">PAZL</p>
+    <p class="band__line">Pursue (A-Z) Laudably</p>
+  </header>
+
+  <nav class="nav" aria-label="Primary">
+    <div class="wrap nav__inner">
+      <a class="nav__brand" href="index.html"><img class="nav__mark" src="assets/img/pazl-mark-512.png" width="512" height="464" alt="">PAZL</a>
+      <button class="nav__toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+        <span></span><span></span>
+      </button>
+      <div class="nav__links" id="nav-links">
+        <a href="work.html">Work</a>
+        <a href="#expertise">Expertise</a>
+        <a href="studio.html">Studio</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main">
+
+    <!-- 01 / HERO -->
+    <section class="wrap section hero stack stack--lg" aria-labelledby="hero-title">
+      <p class="eyebrow">01 — Hero</p>
+      <h1 id="hero-title" class="h-hero">Creative mastery is rarely linear. It's a puzzle.</h1>
+      <p class="lede">PAZL bridges the pieces between art, music, fashion, and technology: an insatiable curiosity to connect disciplines, refine craft, and chase discovery without end.</p>
+      <a class="btn" href="#work">Explore our work</a>
+    </section>
+
+    <!-- 02 / SELECTED WORK -->
+    <div id="work" class="wrap feed-head stack" aria-labelledby="work-title">
+      <p class="eyebrow">02 — Selected work</p>
+      <h2 id="work-title" class="h-section">Selected work</h2>
+      <p class="muted">A selection of projects across fashion, music, entertainment, and beyond.</p>
+    </div>
+
+    <article data-disciplines="fashion art" class="project project--cover">
+      <div class="project__caption">
+        <p class="eyebrow">Project 01</p>
+        <h3 class="h-item">Lanvin Lab × Future</h3>
+        <p class="muted"><em>Luxury Fashion / Design &amp; Development</em></p>
+        <ul class="chips" aria-label="Disciplines">
+          <li class="chip" data-piece="fashion"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Fashion</li>
+          <li class="chip" data-piece="art"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Art</li>
+        </ul>
+        <a class="ul" href="work/lanvin-lab-x-future.html">View project</a>
+      </div>
+      <div class="project__media">
+        <a class="loop" href="work/lanvin-lab-x-future.html" aria-label="Lanvin Lab × Future, view project">
+          <video class="loop__video" muted loop playsinline preload="none" poster="assets/video/lanvin.jpg?v=3" width="1600" height="832" data-src="assets/video/lanvin.mp4?v=3" aria-hidden="true"></video>
+        </a>
+      </div>
+      <div class="project__spacer"></div>
+    </article>
+
+    <article data-disciplines="music fashion" class="project project--cover">
+      <div class="project__caption">
+        <p class="eyebrow">Project 02</p>
+        <h3 class="h-item">Gunna / Wun World Tour</h3>
+        <p class="muted"><em>Stage Costume Design / Live Experience</em></p>
+        <ul class="chips" aria-label="Disciplines">
+          <li class="chip" data-piece="music"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Music</li>
+          <li class="chip" data-piece="fashion"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Fashion</li>
+        </ul>
+        <a class="ul" href="work/gunna-wun-world-tour.html">View project</a>
+      </div>
+      <div class="project__media">
+        <a class="loop" href="work/gunna-wun-world-tour.html" aria-label="Gunna, Wun World Tour, view project">
+          <video class="loop__video" muted loop playsinline preload="none" poster="assets/video/gunna.jpg?v=3" width="1578" height="860" data-src="assets/video/gunna.mp4?v=3" aria-hidden="true"></video>
+        </a>
+      </div>
+      <div class="project__spacer"></div>
+    </article>
+
+    <article data-disciplines="music art" class="project project--cover">
+      <div class="project__caption">
+        <p class="eyebrow">Project 03</p>
+        <h3 class="h-item">Yung Miami / Watch Dis!</h3>
+        <p class="muted"><em>Creative Direction / Art Direction</em></p>
+        <ul class="chips" aria-label="Disciplines">
+          <li class="chip" data-piece="music"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Music</li>
+          <li class="chip" data-piece="art"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Art</li>
+        </ul>
+        <a class="ul" href="work/yung-miami-watch-dis.html">View project</a>
+      </div>
+      <div class="project__media">
+        <a class="loop" href="work/yung-miami-watch-dis.html" aria-label="Yung Miami, Watch Dis, view project">
+          <video class="loop__video" muted loop playsinline preload="none" poster="assets/video/yung-miami.jpg?v=3" width="1600" height="900" data-src="assets/video/yung-miami.mp4?v=3" aria-hidden="true"></video>
+        </a>
+      </div>
+      <div class="project__spacer"></div>
+    </article>
+
+    <article data-disciplines="fashion art" class="project project--cover project--top">
+      <div class="project__caption">
+        <p class="eyebrow">Project 04</p>
+        <h3 class="h-item">Cease &amp; Desist</h3>
+        <p class="muted"><em>Fashion Design / Brand Development / Creative Direction</em></p>
+        <ul class="chips" aria-label="Disciplines">
+          <li class="chip" data-piece="fashion"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Fashion</li>
+          <li class="chip" data-piece="art"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Art</li>
+        </ul>
+        <a class="ul" href="work/cease-and-desist.html">View project</a>
+      </div>
+      <div class="project__media">
+        <a class="loop" href="work/cease-and-desist.html" aria-label="Cease &amp; Desist, view project">
+          <video class="loop__video" muted loop playsinline preload="none" poster="assets/video/cease-and-desist.jpg?v=3" width="1600" height="1172" data-src="assets/video/cease-and-desist.mp4?v=3" aria-hidden="true"></video>
+        </a>
+      </div>
+      <div class="project__spacer"></div>
+    </article>
+
+    <article data-disciplines="fashion art" class="project project--cover">
+      <div class="project__caption">
+        <p class="eyebrow">Project 05</p>
+        <h3 class="h-item">J.I.D × Fear of God</h3>
+        <p class="muted"><em>Creative Direction / Photography / Live Activation</em></p>
+        <ul class="chips" aria-label="Disciplines">
+          <li class="chip" data-piece="fashion"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Fashion</li>
+          <li class="chip" data-piece="art"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Art</li>
+        </ul>
+        <a class="ul" href="work/jid-x-fear-of-god.html">View project</a>
+      </div>
+      <div class="project__media">
+        <a class="roll roll--wide" href="work/jid-x-fear-of-god.html" data-interval="2200" aria-label="J.I.D × Fear of God, view project">
+          <img src="assets/img/jid-diptych-1.jpg?v=2" width="1612" height="1000" alt="Diptych: J.I.D among stacked chairs on a red floor, two frames from the Fear of God capsule" loading="lazy">
+          <img src="assets/img/jid-diptych-2.jpg?v=2" width="1612" height="1000" alt="" loading="lazy">
+          <img src="assets/img/jid-diptych-3.jpg?v=2" width="1612" height="1000" alt="" loading="lazy">
+          <span class="roll__count" aria-hidden="true">1 / 3</span>
+        </a>
+      </div>
+      <div class="project__spacer"></div>
+    </article>
+
+    <article data-disciplines="fashion art" class="project project--cover">
+      <div class="project__caption">
+        <p class="eyebrow">Project 06</p>
+        <h3 class="h-item">Godspeed</h3>
+        <p class="muted"><em>Commercial Film / Creative Direction &amp; Production</em></p>
+        <ul class="chips" aria-label="Disciplines">
+          <li class="chip" data-piece="fashion"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Fashion</li>
+          <li class="chip" data-piece="art"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Art</li>
+        </ul>
+        <a class="ul" href="work/godspeed.html">View project</a>
+      </div>
+      <div class="project__media">
+        <a class="loop" href="work/godspeed.html" aria-label="Godspeed, view project">
+          <video class="loop__video" muted loop playsinline preload="none" poster="assets/video/godspeed.jpg?v=3" width="1600" height="900" data-src="assets/video/godspeed.mp4?v=3" aria-hidden="true"></video>
+        </a>
+      </div>
+      <div class="project__spacer"></div>
+    </article>
+
+    <article data-disciplines="fashion art music" class="project project--cover project--top">
+      <div class="project__caption">
+        <p class="eyebrow">Project 07</p>
+        <h3 class="h-item">Future / Sinsational Perfume</h3>
+        <p class="muted"><em>Commercial Film / Creative Direction, Production &amp; Brand Development</em></p>
+        <ul class="chips" aria-label="Disciplines">
+          <li class="chip" data-piece="fashion"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Fashion</li>
+          <li class="chip" data-piece="art"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Art</li>
+          <li class="chip" data-piece="music"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Music</li>
+        </ul>
+        <a class="ul" href="work/sinsational-perfume.html">View project</a>
+      </div>
+      <div class="project__media">
+        <a class="loop" href="work/sinsational-perfume.html" aria-label="Sinsational Perfume, view project">
+          <video class="loop__video" muted loop playsinline preload="none" poster="assets/video/sinsational.jpg?v=4" width="1600" height="900" data-src="assets/video/sinsational.mp4?v=4" aria-hidden="true"></video>
+        </a>
+      </div>
+      <div class="project__spacer"></div>
+    </article>
+
+    <article data-disciplines="music fashion" class="project project--cover">
+      <div class="project__caption">
+        <p class="eyebrow">Project 08</p>
+        <h3 class="h-item">Lil Durk / Birthday Bash</h3>
+        <p class="muted"><em>Stage Design / Run of Show &amp; Wardrobe Design</em></p>
+        <ul class="chips" aria-label="Disciplines">
+          <li class="chip" data-piece="music"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Music</li>
+          <li class="chip" data-piece="fashion"><svg class="chip__ico" aria-hidden="true"><use href="#piece"/></svg>Fashion</li>
+        </ul>
+        <a class="ul" href="work/lil-durk-birthday-bash.html">View project</a>
+      </div>
+      <div class="project__media">
+        <a class="loop" href="work/lil-durk-birthday-bash.html" aria-label="Lil Durk, Birthday Bash, view project">
+          <video class="loop__video" muted loop playsinline preload="none" poster="assets/video/lil-durk-birthday-bash.jpg?v=4" width="1600" height="1200" data-src="assets/video/lil-durk-birthday-bash.mp4?v=4" aria-hidden="true"></video>
+        </a>
+      </div>
+      <div class="project__spacer"></div>
+    </article>
+
+    <div class="feed-foot">
+      <a class="btn" href="work.html">View all work</a>
+    </div>
+
+    <!-- 03 / EXPERTISE -->
+    <section id="expertise" class="wrap section" aria-labelledby="exp-title">
+      <div class="stack">
+        <p class="eyebrow">03 — Expertise</p>
+        <h2 id="exp-title" class="h-section">What we do</h2>
+        <p class="lede">We bring ideas to life through a multidisciplinary approach to creativity, design, and execution.</p>
+      </div>
+      <div class="pillars">
+        <div class="pillar">
+          <p class="eyebrow">01</p>
+          <h3>Creative direction</h3>
+          <p>Developing the ideas, visual narratives, and creative identities that shape how brands and audiences connect.</p>
+          <p class="tags">Creative direction / Art direction / Campaign concepts / Cultural collaborations</p>
+        </div>
+        <div class="pillar">
+          <p class="eyebrow">02</p>
+          <h3>Design &amp; development</h3>
+          <p>Translating ideas into tangible products and visual expressions, from initial concept through development.</p>
+          <p class="tags">Fashion / Product design / Merchandise / Visual identity / Development</p>
+        </div>
+        <div class="pillar">
+          <p class="eyebrow">03</p>
+          <h3>Production</h3>
+          <p>Bringing creative visions into the world through compelling content, physical environments, and experiences.</p>
+          <p class="tags">Film / Photography / Campaign production / Live experiences</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 / THE STUDIO -->
+    <section id="studio" class="wrap section studio" aria-labelledby="studio-title">
+      <div class="stack">
+        <p class="eyebrow">04 — The studio</p>
+        <h2 id="studio-title" class="h-section">Pursuing A–Z Laudably.</h2>
+      </div>
+      <div class="studio__body">
+        <p class="lead">Creative mastery is rarely linear. It's a puzzle whose pieces reveal themselves through study, experimentation, and collaboration.</p>
+        <p>Every breakthrough uncovers new questions, pushing the pursuit forward. PAZL exists inside that tension: an insatiable curiosity to connect disciplines, refine craft, and chase discovery without end.</p>
+        <p>We bridge the puzzle pieces between art, music, fashion, and technology, disciplines that have always evolved in dialogue. In the spirit of Renaissance polymaths, where artistic vision and invention were inseparable, PAZL continues that lineage through a modern cultural lens.</p>
+        <p>Our work honors the tradition of cross-disciplinary exploration while shaping ideas that are culturally aware, creatively fearless, and relentlessly refined.</p>
+        <a class="btn" href="studio.html">Discover the studio</a>
+      </div>
+    </section>
+
+    <!-- 05 / CLIENTS & COLLABORATORS -->
+    <section id="clients" class="wrap section stack stack--lg" aria-labelledby="clients-title">
+      <p class="eyebrow">05 — Clients &amp; collaborators</p>
+      <h2 id="clients-title" class="h-section">In good company.</h2>
+      <p class="muted">A selection of the brands, artists, and creative partners we've worked with.</p>
+      <div class="ticker" role="region" aria-label="Clients and collaborators">
+        <div class="ticker__track">
+          <ul class="ticker__set">
+          <li data-size="wide"><img src="assets/img/clients/lanvin.png" width="427" height="76" alt="Lanvin" loading="lazy"></li>
+          <li data-size="wide"><img src="assets/img/clients/amazon-music.png" width="421" height="91" alt="Amazon Music" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/atlantic-records.png" width="262" height="172" alt="Atlantic Records" loading="lazy"></li>
+          <li data-size="mid"><img src="assets/img/clients/reebok.png" width="305" height="150" alt="Reebok" loading="lazy"></li>
+          <li data-size="mid"><img src="assets/img/clients/republic-records.png" width="275" height="163" alt="Republic Records" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/bape.png" width="170" height="243" alt="BAPE" loading="lazy"></li>
+          <li data-size="wide"><img src="assets/img/clients/cease-and-desist.png" width="470" height="84" alt="Cease &amp; Desist" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/interscope-records.png" width="169" height="242" alt="Interscope Records" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/michelob-ultra.png" width="327" height="253" alt="Michelob Ultra" loading="lazy"></li>
+          <li data-size="mid"><img src="assets/img/clients/dreamville.png" width="396" height="140" alt="Dreamville" loading="lazy"></li>
+          <li data-size="wide"><img src="assets/img/clients/rca-records.png" width="295" height="98" alt="RCA Records" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/cactus-jack.png" width="148" height="316" alt="Cactus Jack" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/epic-records.png" width="281" height="201" alt="Epic Records" loading="lazy"></li>
+          <li data-size="mid"><img src="assets/img/clients/celsius.png" width="347" height="128" alt="Celsius" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/atlanta-hawks.png" width="319" height="318" alt="Atlanta Hawks" loading="lazy"></li>
+          <li data-size="wide"><img src="assets/img/clients/grailed.png" width="366" height="71" alt="Grailed" loading="lazy"></li>
+          <li data-size="mid"><img src="assets/img/clients/newport.png" width="337" height="153" alt="Newport" loading="lazy"></li>
+          <li data-size="mid"><img src="assets/img/clients/awal-sony-music.png" width="332" height="163" alt="AWAL / Sony Music" loading="lazy"></li>
+          <li data-size="mid"><img src="assets/img/clients/starboy.png" width="256" height="119" alt="Starboy" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/cleveland-cavaliers.png" width="210" height="301" alt="Cleveland Cavaliers" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/80s.png" width="181" height="181" alt="80s" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/stacey-abrams.png" width="197" height="197" alt="Stacey Abrams for Governor" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/uptown-records.png" width="368" height="192" alt="Uptown Records" loading="lazy"></li>
+          </ul>
+          <ul class="ticker__set" aria-hidden="true">
+          <li data-size="wide"><img src="assets/img/clients/lanvin.png" width="427" height="76" alt="" loading="lazy"></li>
+          <li data-size="wide"><img src="assets/img/clients/amazon-music.png" width="421" height="91" alt="" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/atlantic-records.png" width="262" height="172" alt="" loading="lazy"></li>
+          <li data-size="mid"><img src="assets/img/clients/reebok.png" width="305" height="150" alt="" loading="lazy"></li>
+          <li data-size="mid"><img src="assets/img/clients/republic-records.png" width="275" height="163" alt="" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/bape.png" width="170" height="243" alt="" loading="lazy"></li>
+          <li data-size="wide"><img src="assets/img/clients/cease-and-desist.png" width="470" height="84" alt="" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/interscope-records.png" width="169" height="242" alt="" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/michelob-ultra.png" width="327" height="253" alt="" loading="lazy"></li>
+          <li data-size="mid"><img src="assets/img/clients/dreamville.png" width="396" height="140" alt="" loading="lazy"></li>
+          <li data-size="wide"><img src="assets/img/clients/rca-records.png" width="295" height="98" alt="" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/cactus-jack.png" width="148" height="316" alt="" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/epic-records.png" width="281" height="201" alt="" loading="lazy"></li>
+          <li data-size="mid"><img src="assets/img/clients/celsius.png" width="347" height="128" alt="" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/atlanta-hawks.png" width="319" height="318" alt="" loading="lazy"></li>
+          <li data-size="wide"><img src="assets/img/clients/grailed.png" width="366" height="71" alt="" loading="lazy"></li>
+          <li data-size="mid"><img src="assets/img/clients/newport.png" width="337" height="153" alt="" loading="lazy"></li>
+          <li data-size="mid"><img src="assets/img/clients/awal-sony-music.png" width="332" height="163" alt="" loading="lazy"></li>
+          <li data-size="mid"><img src="assets/img/clients/starboy.png" width="256" height="119" alt="" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/cleveland-cavaliers.png" width="210" height="301" alt="" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/80s.png" width="181" height="181" alt="" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/stacey-abrams.png" width="197" height="197" alt="" loading="lazy"></li>
+          <li data-size="tall"><img src="assets/img/clients/uptown-records.png" width="368" height="192" alt="" loading="lazy"></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 / CONTACT -->
+    <section id="contact" class="wrap section section--last contact stack stack--lg" aria-labelledby="contact-title">
+      <p class="eyebrow">06 — Contact</p>
+      <h2 id="contact-title" class="h-hero">Let's make something matter.</h2>
+      <p class="lede">Have a project, partnership, or idea in mind? We'd love to hear about it.</p>
+      <a class="btn" href="studio.html#contact">Start a conversation</a>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer__grid">
+        <div>
+          <p class="footer__brand"><img class="footer__mark" src="assets/img/pazl-mark-512.png" width="512" height="464" alt="">PAZL</p>
+          <p class="muted">Independent creative company.</p>
+          <p class="footer__tag">Pursue (A-Z) Laudably</p>
+        </div>
+        <nav class="footer__links" aria-label="Footer">
+          <a href="work.html">Work</a>
+          <a href="#expertise">Expertise</a>
+          <a href="studio.html">Studio</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <div class="footer__links">
+          <!-- TODO: add the studio's Instagram handle -->
+          <a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a>
+          <a href="mailto:studio@fsf-studio.com">Email</a>
+        </div>
+      </div>
+      <p class="footer__legal">© PAZL <span data-year>2026</span></p>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
