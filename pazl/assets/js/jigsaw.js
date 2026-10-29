@@ -45,6 +45,7 @@
   drops.forEach(function (el, i) {
     var pick = i >= 24 ? rd2 : rd;
     var e; do { e = [0, 1, 2, 3].map(function () { var r = pick(); return r < 0.4 ? 1 : r < 0.8 ? -1 : 0; }); } while (e.filter(function (x) { return x === 1; }).length < 2);
+    if (el.getAttribute('data-title') === 'Pink Heartz') e = [-1, 1, 1, 1]; /* its drawn cut matched Cease & Desist */
     applyClip(el, clip('drop-' + i, cut(e[0], e[1], e[2], e[3])));
   });
 
