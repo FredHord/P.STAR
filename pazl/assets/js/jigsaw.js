@@ -51,11 +51,12 @@
   });
 
   /* home header wheel: each piece gets its own cut, clipped on the piece itself */
-  var wheel = Array.prototype.slice.call(document.querySelectorAll('.wheel__piece'));
+  var wheel = Array.prototype.slice.call(document.querySelectorAll('.wheel__item'));
   var rw = rng(77);
   wheel.forEach(function (el, i) {
     var e; do { e = [0, 1, 2, 3].map(function () { var r = rw(); return r < 0.4 ? 1 : r < 0.8 ? -1 : 0; }); } while (e.filter(function (x) { return x === 1; }).length < 2);
-    el.style.clipPath = clip('wheel-' + i, cut(e[0], e[1], e[2], e[3]));
+    var url = clip('wheel-' + i, cut(e[0], e[1], e[2], e[3]));
+    Array.prototype.forEach.call(el.querySelectorAll('.wheel__piece, .wheel__depth'), function (s) { s.style.clipPath = url; });
   });
 
   /* the assembled block */
