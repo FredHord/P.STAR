@@ -41,9 +41,10 @@
 
   /* timeline pieces: every piece gets its own cut, at least two tabs out so it reads as a piece */
   var drops = Array.prototype.slice.call(document.querySelectorAll('.drops .piece'));
-  var rd = rng(1028);
+  var rd = rng(1028), rd2 = rng(2026); /* pieces 25 onward take their cuts from a second sequence */
   drops.forEach(function (el, i) {
-    var e; do { e = [0, 1, 2, 3].map(function () { var r = rd(); return r < 0.4 ? 1 : r < 0.8 ? -1 : 0; }); } while (e.filter(function (x) { return x === 1; }).length < 2);
+    var pick = i >= 24 ? rd2 : rd;
+    var e; do { e = [0, 1, 2, 3].map(function () { var r = pick(); return r < 0.4 ? 1 : r < 0.8 ? -1 : 0; }); } while (e.filter(function (x) { return x === 1; }).length < 2);
     applyClip(el, clip('drop-' + i, cut(e[0], e[1], e[2], e[3])));
   });
 
