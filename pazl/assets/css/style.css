@@ -629,7 +629,11 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .project--cover .project__caption .ul { color: #fff; margin-top: 10px; }
 .project--cover .project__spacer { display: none; }
 .project--cover .roll__count { position: absolute; top: 24px; right: var(--gutter); left: auto; bottom: auto; color: rgba(255, 255, 255, 0.7); z-index: 1; }
+/* a project can carry a still for phones; the loop stays on larger screens */
+.loop__still { display: none; }
 @media (max-width: 720px) {
+  .project--cover .loop__still { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .project--cover .loop:has(.loop__still) .loop__video { display: none; }
   .project--cover { min-height: clamp(440px, 74vh, 680px); }
   .project--cover .project__caption { padding-bottom: 28px; }
 }

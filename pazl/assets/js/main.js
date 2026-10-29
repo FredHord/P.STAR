@@ -62,6 +62,7 @@
   var loops = Array.prototype.slice.call(document.querySelectorAll('video.loop__video[data-src]'));
   if (loops.length) {
     function arm(v) {
+      if (getComputedStyle(v).display === 'none') return; // a phone still stands in for this loop
       if (!v.getAttribute('src')) { v.setAttribute('src', v.getAttribute('data-src')); v.load(); }
       if (!reduce) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
     }
