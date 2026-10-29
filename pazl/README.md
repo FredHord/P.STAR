@@ -7,7 +7,7 @@ A static site: plain HTML, one stylesheet, one small script, no build step. Uplo
 | File | What it is |
 | --- | --- |
 | `index.html` | Home: hero, eight selected projects, expertise, studio, client ticker, contact |
-| `work.html` | All work, filterable by discipline (`work.html#video` deep-links a filter) |
+| `work.html` | Our work, filterable by discipline (`work.html#video` deep-links a filter) |
 | `work/*.html` | One page per selected project (eleven so far) |
 | `studio.html` | Founder, services, clients, press, contact form |
 | `404.html` | Not-found page (Netlify and Vercel pick it up automatically) |
@@ -58,7 +58,7 @@ Search the files for `TODO` and `[` to find every placeholder.
 
 Gallery blocks: a lone `<img>` is full width; wrap two in `<div class="gallery--two">` for a pair, three in `gallery--three`. A film is an `<a class="video">` tile linking to Vimeo or YouTube.
 
-## Adding a card to All work
+## Adding a card to Our work
 
 The index lists one card per project folder in `PAZL WEBSITE` (24 at the moment), each with a cover from that folder; the old one-card-per-deliverable list is kept at `work-before-folders.html` in the project notes if anything needs restoring. Copy any `<article class="card" data-cat="…">` in `work.html`. `data-cat` must be one of `fashion`, `photo`, `video`, `art`, `wardrobe`, `collab`, `merch`. The numbering is recalculated by the script, so order does not matter. Update the static count in the `data-count` element if you care about the no-JavaScript case.
 
