@@ -164,7 +164,7 @@
   (function () {
     // Header puzzle: hover, tilt, click. Listeners live on the document so they survive re-renders of the board.
     if (window.__pazlPuzzle) return; window.__pazlPuzzle = true;
-    var names = { music: 'Music', fashion: 'Fashion', tech: 'Tech', art: 'Art' };
+    var names = { music: 'Film', fashion: 'Fashion', tech: 'Brands', art: 'Art' };
     var colors = { music: 'var(--c-music)', fashion: 'var(--c-fashion)', tech: 'var(--c-tech)', art: 'var(--c-art)' };
     var SIZE = 160, maps = {}, current = null, leaving = false, hovered = false;
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -213,16 +213,9 @@
     }
     function go(a, name) {
       if (!name || leaving) return;
-      var target = document.querySelector('.project[data-disciplines~="' + name + '"]');
-      if (!target) { window.location.href = 'work.html'; return; }
       leaving = true;
       a.classList.add('is-leaving');
-      setTimeout(function () {
-        target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-        var chips = document.querySelectorAll('.project[data-disciplines~="' + name + '"] .chip[data-piece="' + name + '"]');
-        Array.prototype.forEach.call(chips, function (ch) { ch.classList.add('is-flash'); setTimeout(function () { ch.classList.remove('is-flash'); }, 1800); });
-        setTimeout(function () { var m = mark(); if (m) { m.classList.remove('is-leaving'); m.style.transform = ''; set(m, null); } leaving = false; }, 500);
-      }, reduce ? 0 : 420);
+      setTimeout(function () { window.location.href = 'work.html#' + name; }, reduce ? 0 : 450);
     }
     function within(ev) { return ev.target && ev.target.closest ? ev.target.closest('.assemble') : null; }
     // once the intro has played, hand control to the hover transforms
@@ -255,10 +248,31 @@
     if (window.innerWidth <= 820) { orbit.style.removeProperty('--globe'); last = 0; return; }
     var k = text.children; if (!k.length) return;
     var h = Math.round(k[k.length - 1].getBoundingClientRect().bottom - k[0].getBoundingClientRect().top);
+    var eb = document.querySelector('.hero__eyebrow'); if (eb) h -= Math.round(eb.getBoundingClientRect().height) + 16; /* the eyebrow shares the column */
     if (Math.abs(h - last) < 2 || runs > 4) return;
     last = h; runs += 1; orbit.style.setProperty('--globe', h + 'px');
   }
-  new ResizeObserver(fit).observe(text);
+  var ro = new ResizeObserver(function () { runs = 0; fit(); });
+  ro.observe(text); Array.prototype.forEach.call(text.children, function (el) { ro.observe(el); });
   window.addEventListener('resize', function () { runs = 0; fit(); });
+  window.addEventListener('load', function () { runs = 0; fit(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { runs = 0; fit(); }); /* Syne changes the copy's height once it lands */
   fit();
+})();
+
+/* Work index: #art, #fashion, #music (film) or #tech (brands) from the home globe narrows the timeline to that kind of work. */
+(function () {
+  var drops = Array.prototype.slice.call(document.querySelectorAll('.drops .drop')); if (!drops.length) return;
+  var GROUPS = { art: ['Art Direction', 'Photography'], fashion: ['Fashion', 'Wardrobe'], music: ['Video'], tech: ['Collaboration', 'Merchandise', 'Activation'] };
+  var NAMES = { art: 'Art', fashion: 'Fashion', music: 'Film', tech: 'Brands' };
+  var count = document.querySelector('[data-count]'), total = drops.length;
+  function apply() {
+    var key = window.location.hash.replace('#', ''), cats = GROUPS[key], n = 0;
+    drops.forEach(function (d) {
+      var c = d.querySelector('[data-cat]'), hit = !cats || (c && cats.indexOf(c.getAttribute('data-cat')) > -1);
+      d.hidden = !hit; if (hit) n += 1;
+    });
+    if (count) count.innerHTML = cats ? n + ' of ' + total + ' projects · ' + NAMES[key] + ' · <a class="ul" href="work.html">Show all</a>' : total + ' projects';
+  }
+  window.addEventListener('hashchange', apply); apply();
 })();
