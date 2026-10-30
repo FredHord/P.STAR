@@ -245,3 +245,20 @@
   })();
 
 })();
+
+/* Hero: size the globe column to the height of the copy beside it, so the two read as one block. */
+(function () {
+  var orbit = document.querySelector('.hero__orbit'), text = document.querySelector('.hero__text');
+  if (!orbit || !text || !('ResizeObserver' in window)) return;
+  var last = 0, runs = 0;
+  function fit() {
+    if (window.innerWidth <= 820) { orbit.style.removeProperty('--globe'); last = 0; return; }
+    var k = text.children; if (!k.length) return;
+    var h = Math.round(k[k.length - 1].getBoundingClientRect().bottom - k[0].getBoundingClientRect().top);
+    if (Math.abs(h - last) < 2 || runs > 4) return;
+    last = h; runs += 1; orbit.style.setProperty('--globe', h + 'px');
+  }
+  new ResizeObserver(fit).observe(text);
+  window.addEventListener('resize', function () { runs = 0; fit(); });
+  fit();
+})();
