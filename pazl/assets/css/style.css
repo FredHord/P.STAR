@@ -285,19 +285,15 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 
 /* ---------- home: hero ---------- */
 
-/* Hero: the puzzle globe sits in a column on the left, as tall as the copy beside it. */
-.hero { padding-top: 16px; padding-bottom: 16px; display: flex; align-items: stretch; gap: clamp(24px, 4vw, 56px); }
+/* Hero: the eyebrow runs across the top; below it the puzzle globe sits in a column on the left, as tall as the copy beside it. */
+.hero { padding-top: 16px; padding-bottom: 16px; }
+.hero__eyebrow { margin-bottom: 20px; }
+.hero__row { display: flex; align-items: stretch; gap: clamp(24px, 4vw, 56px); }
 .hero__text { position: relative; z-index: 1; justify-content: center; min-width: 0; }
 .hero .lede { font-size: 15px; }
-.hero__left { flex: 0 0 auto; align-self: center; display: flex; flex-direction: column; gap: 16px; perspective: 1100px; }
 /* the wireframe puzzle globe turns slowly behind the copy, at the right */
-.hero__orbit { --globe: clamp(200px, 24vw, 340px); display: block; position: relative; width: var(--globe); aspect-ratio: 1 / 1; } /* main.js sets --globe so eyebrow + globe match the copy's height */
+.hero__orbit { --globe: clamp(200px, 24vw, 340px); flex: 0 0 var(--globe); width: var(--globe); align-self: center; aspect-ratio: 1 / 1; pointer-events: none; } /* main.js sets --globe to the copy's height so both columns match */
 .hero__globe { display: block; width: 100%; height: 100%; object-fit: contain; background: transparent; opacity: 0.6; pointer-events: none; }
-/* the four-piece mark at the centre of the globe: no fly-in here, the pieces only answer to hover */
-.hero .assemble { width: 54%; height: 49%; animation: none; }
-.hero .assemble__piece { animation: none; }
-.hero .assemble__label { left: 50%; top: auto; bottom: 5%; transform: translate(-50%, 4px); padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.88); white-space: nowrap; }
-.hero .assemble__label.is-on { transform: translate(-50%, 0); }
 .reg { font-size: 0.42em; font-weight: 600; letter-spacing: 0; vertical-align: top; position: relative; top: 0.18em; margin-left: 0.08em; }
 .drop[hidden] { display: none; }
 @media (prefers-reduced-motion: no-preference) { .hero__globe { animation: globe-spin 80s linear infinite; will-change: transform; } }
@@ -306,12 +302,9 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 @media (prefers-reduced-motion: no-preference) { .hero .h-hero { animation: hero-slide 0.9s cubic-bezier(0.16, 0.9, 0.24, 1) 0.12s both; } }
 .motion-off .hero .h-hero { animation: none; }
 @media (max-width: 820px) {
-  .hero { display: block; position: relative; }
-  .hero__left { display: block; perspective: none; }
-  .hero__eyebrow { margin-bottom: 20px; }
+  .hero__row { display: block; position: relative; }
   .hero__orbit { position: absolute; z-index: 0; left: -24px; top: 50%; transform: translateY(-50%); width: 200px; height: 200px; }
   .hero__globe { opacity: 0.26; }
-  .hero .assemble__label { display: none; }
 }
 
 /* Looping film from the project's GIF, converted to MP4. Plays muted when on screen; the poster

@@ -130,8 +130,8 @@ A pixel-art pointing hand (`assets/img/cursor-hand.png`, with `cursor-hand@2x.pn
 
 Syne (display), Syne Mono (labels) and Inter (reading) load from Google Fonts. To self-host instead, download them from fonts.google.com, put the files in `assets/fonts/`, add `@font-face` rules at the top of `style.css` and remove the `<link>` tags in each page's `<head>`.
 
-## Hero mark and the registered sign (29 Oct, later)
+## Hero layout and the registered sign (29 Oct, later)
 
-- The home hero is two columns: on the left the eyebrow ("01 — PAZL®…") above the wireframe globe, on the right the headline and lede. `main.js` sizes the globe so eyebrow + gap + globe equals the copy's height (ResizeObserver on the copy and its children, re-run after `document.fonts.ready`).
-- The four-piece mark (`assets/img/pieces/*.png`) sits at the centre of the globe. The old header hover code in `main.js` drives it: the piece under the cursor comes loose with a label, click sends you to `work.html#<piece>`. The four pieces map to groups of work categories: art → Art Direction + Photography, fashion → Fashion + Wardrobe, music → Video ("Film"), tech → Collaboration + Merchandise + Activation ("Brands"). `work.html` reads that hash and hides the other timeline rows; the count line shows "n of 27 projects · Group · Show all".
+- The home hero is the eyebrow ("01 — PAZL®…") across the top, then a row: the wireframe globe in a column on the left, the headline and lede on the right. `main.js` sizes the globe to the copy's height (ResizeObserver on the copy and its children, re-run after `document.fonts.ready`). The hover mark on the globe was tried and dropped the same day.
+- `work.html` still understands `#art`, `#fashion`, `#music` (film) and `#tech` (brands) in the URL and narrows the timeline to those categories; nothing links to it at the moment.
 - Every visible "PAZL®" is `PAZL<span class="reg">®</span>` (a small raised ®); titles and attributes keep the plain character. `mkpages.py` applies this (`regmark`) after generating pages. Canvas boards carry the same span and a `.reg` rule in their `<style>`.

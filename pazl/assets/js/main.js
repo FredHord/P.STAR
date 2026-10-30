@@ -248,7 +248,6 @@
     if (window.innerWidth <= 820) { orbit.style.removeProperty('--globe'); last = 0; return; }
     var k = text.children; if (!k.length) return;
     var h = Math.round(k[k.length - 1].getBoundingClientRect().bottom - k[0].getBoundingClientRect().top);
-    var eb = document.querySelector('.hero__eyebrow'); if (eb) h -= Math.round(eb.getBoundingClientRect().height) + 16; /* the eyebrow shares the column */
     if (Math.abs(h - last) < 2 || runs > 4) return;
     last = h; runs += 1; orbit.style.setProperty('--globe', h + 'px');
   }
