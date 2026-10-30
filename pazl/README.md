@@ -135,3 +135,7 @@ Syne (display), Syne Mono (labels) and Inter (reading) load from Google Fonts. T
 - The home hero is the eyebrow ("01 — PAZL®…") across the top, then a row: the wireframe globe in a column on the left, the headline and lede on the right. `main.js` sizes the globe to the copy's height (ResizeObserver on the copy and its children, re-run after `document.fonts.ready`). The hover mark on the globe was tried and dropped the same day.
 - `work.html` still understands `#art`, `#fashion`, `#music` (film) and `#tech` (brands) in the URL and narrows the timeline to those categories; nothing links to it at the moment.
 - Every visible "PAZL®" is `PAZL<span class="reg">®</span>` (a small raised ®); titles and attributes keep the plain character. `mkpages.py` applies this (`regmark`) after generating pages. Canvas boards carry the same span and a `.reg` rule in their `<style>`.
+
+## Birthday Bash gallery (30 Oct)
+
+The racing-suit row is now a triptych, `assets/img/durk-triptych.jpg`: Durk on stage in the suit, the two suits on the rail, and the suit design sheet (front and back). The car row is a diptych, `assets/img/durk-cars.jpg`: the green Hellcat livery cropped to the right-hand side view and the top view, beside the wrapped yellow car. The grey and red colourways are no longer shown. Sources are in `Lil Durk/Lil Durk - Birthday Bash` (IMG_1070, IMG_2851, racingfit1).
