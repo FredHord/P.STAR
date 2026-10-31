@@ -143,5 +143,3 @@ The racing-suit rows are two diptychs: `assets/img/durk-stage-diptych.jpg` pairs
 ## Fear of God gallery + studio heading (30 Oct)
 
 The J.I.D × Fear of God page no longer ends on `jid-diptych-3.jpg` (it repeated looks five and six from the two-up above it; the file stays because the home page's rolling sequence still uses it). Three new diptychs from the January/February 2026 frames in `J.I.D X FEAR OF GOD` (FSF_FOG_JID_LB 15/16, 31/32, 30/33) follow the two-up: `jid-diptych-4.jpg`, `-5.jpg`, `-6.jpg`, each 1612×1000 with a 12 px white gutter; LB 33 is cropped to 4:5 to match. Diptychs 5 and 6 were rebuilt later the same evening from re-saved versions of LB 30–33 (`?v=2` on the page). The studio page heading now reads "Pursue A–Z Laudably."
-
-Later that evening the two-up of looks five and six and `jid-diptych-4.jpg` (the shouting pair) were removed from the page, so the gallery runs: chairs diptych, seated single, looks four/two, the floor pair, the chair/gloves pair. `jid-fog-5/6.webp` stay on disk for the home page roll; `jid-diptych-4.jpg` is deleted.
