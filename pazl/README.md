@@ -139,3 +139,7 @@ Syne (display), Syne Mono (labels) and Inter (reading) load from Google Fonts. T
 ## Birthday Bash gallery (30 Oct)
 
 The racing-suit rows are two diptychs: `assets/img/durk-stage-diptych.jpg` pairs the two onstage photos of Durk in the suit (on the mic, and under the white beams), and `assets/img/durk-suit-diptych.jpg` below it pairs the two suits on the rail with the suit design sheet (front and back). The old beams-plus-blue-runway diptych is gone; the blue wide shot of the stage is no longer shown. The car row is a diptych, `assets/img/durk-cars.jpg`: the green Hellcat livery cropped to the right-hand side view and the top view, beside the wrapped yellow car. The grey and red colourways are no longer shown. Sources are in `Lil Durk/Lil Durk - Birthday Bash` (IMG_3891+2, IMG_3892, IMG_1070, IMG_2851, racingfit1).
+
+## Fear of God gallery + studio heading (30 Oct)
+
+The J.I.D × Fear of God page no longer ends on `jid-diptych-3.jpg` (it repeated looks five and six from the two-up above it; the file stays because the home page's rolling sequence still uses it). Three new diptychs from the January/February 2026 frames in `J.I.D X FEAR OF GOD` (FSF_FOG_JID_LB 15/16, 31/32, 30/33) follow the two-up: `jid-diptych-4.jpg`, `-5.jpg`, `-6.jpg`, each 1612×1000 with a 12 px white gutter; LB 33 is cropped to 4:5 to match. The studio page heading now reads "Pursue A–Z Laudably."
