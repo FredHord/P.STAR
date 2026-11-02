@@ -41,7 +41,7 @@ In your domain registrar (or Squarespace Domains if the domain lives there), rep
 
 Search the files for `TODO` and `[` to find every placeholder.
 
-- **Contact form.** `studio.html` posts to Formspree. Create a free form at formspree.io, copy its endpoint and replace `YOUR_FORM_ID`. Until then, pressing Send opens an email draft to studio@fsf-studio.com instead.
+- **Contact form.** `studio.html` posts to Formspree. Create a free form at formspree.io, copy its endpoint and replace `YOUR_FORM_ID`. Until then, pressing Send opens an email draft to info@pazlstudio.co instead.
 - **Instagram.** Every footer has an Instagram link pointing at instagram.com. Replace with the studio's profile URL.
 - **Client logos.** The ticker on the home page shows the 22 logos in `assets/img/clients/` (transparent PNGs cut from the logo sheet). To add one, drop a PNG in that folder and add a matching `<li>` to *both* lists inside `.ticker__track` in `index.html`, with `data-size` set to `wide`, `mid` or `tall` depending on the logo's shape. To remove one, delete its `<li>` from both lists.
 - **Project years and photographers.** `[YEAR]` and `[PHOTOGRAPHER]` in the six project pages.
@@ -147,3 +147,8 @@ The J.I.D × Fear of God page no longer ends on `jid-diptych-3.jpg`, which repea
 ## Founder photo (2 Nov)
 
 - `studio.html` now shows `assets/img/founder.jpg` (1200×1500, baked from `fred.jpg` in the project folder with `sips -Z 1500`, JPEG quality 82): Fred in a dark double-breasted suit in front of a wall of books. The earlier `founder.webp` (seated outdoors) is deleted. Canvas Info board uses blob `e8d63fc6a86a0151f542423b2f7c292a`.
+
+## Domain and email (2 Nov)
+
+- Domain: pazlstudio.co (GoDaddy). Share-image (`og:image`) links on every page now use `https://pazlstudio.co/`. Hosting not yet decided; `DOMAIN.md` has the GitHub Pages route, Netlify drag-and-drop is the alternative.
+- Studio email is `info@pazlstudio.co` everywhere (mailto links, form fallback, footer). Source folder renamed `fsf-site` → `pazl-site`.
