@@ -101,16 +101,34 @@
     el.textContent = String(new Date().getFullYear());
   });
 
-  /* Contact form: until a real form endpoint is set, fall back to an email draft */
-  var form = document.querySelector('form.form[data-fallback]');
-  if (form && /YOUR_FORM_ID/.test(form.getAttribute('action') || '')) {
+  /* Contact form: posts to Netlify Forms in the background and confirms on the page.
+     If the post fails (e.g. the site is not on Netlify), open an email draft instead. */
+  var form = document.querySelector('form.form[data-netlify]');
+  if (form) {
+    var note = form.querySelector('.form__note');
+    var button = form.querySelector('button[type="submit"]');
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       var f = form.elements;
       var name = ((f.first_name && f.first_name.value) + ' ' + (f.last_name && f.last_name.value)).trim();
-      var subject = 'New enquiry' + (name ? ' from ' + name : '');
-      var body = (f.message ? f.message.value : '') + '\n\n' + name + (f.email ? '\n' + f.email.value : '');
-      window.location.href = form.getAttribute('data-fallback') + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      var data = new FormData(form);
+      if (f.subject) data.set('subject', 'New enquiry' + (name ? ' from ' + name : '') + ' via pazlstudio.co');
+      button.disabled = true; button.textContent = 'Sending…';
+      fetch(form.getAttribute('action') || '/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(data).toString()
+      }).then(function (r) {
+        if (!r.ok) throw new Error(String(r.status));
+        form.reset();
+        button.textContent = 'Sent';
+        if (note) note.textContent = 'Thank you. Your note is with us and we will come back to you soon.';
+      }).catch(function () {
+        button.disabled = false; button.textContent = 'Send';
+        var subject = 'New enquiry' + (name ? ' from ' + name : '');
+        var body = (f.message ? f.message.value : '') + '\n\n' + name + (f.email ? '\n' + f.email.value : '');
+        window.location.href = form.getAttribute('data-fallback') + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      });
     });
   }
 

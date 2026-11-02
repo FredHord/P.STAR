@@ -1,27 +1,33 @@
-# pazlstudio.co → GitHub Pages
+# pazlstudio.co on Netlify
 
-## 1. GitHub (you)
+## 1. Deploy (you)
 
-1. https://github.com/new → name `pazl`, Public, no README / .gitignore / license → Create repository.
-2. Tell Claude it exists. Claude pushes the prepared repo; the Actions workflow deploys it.
-3. After the first deploy: repo → Settings → Pages → Custom domain → `pazlstudio.co` → Save.
-   Tick **Enforce HTTPS** once GitHub shows the certificate as issued (can take up to an hour after DNS is right).
+1. https://app.netlify.com → Sites → drag the `pazl-site` folder onto the page (or "Add new site → Deploy manually").
+2. Netlify gives the site a `something.netlify.app` address. Open it and check a project page and the studio page.
 
-## 2. GoDaddy DNS (you)
+Later updates: drag the folder again, or Claude runs `netlify deploy --prod --dir=pazl-site` once the Netlify CLI is logged in.
 
-My Products → pazlstudio.co → DNS. Delete the two parked A records on `@` (15.197.148.33 and 3.33.130.190) and any existing `www` record, then add:
+## 2. Contact form (you, once)
 
-| Type  | Name | Value                | TTL     |
-|-------|------|----------------------|---------|
-| A     | @    | 185.199.108.153      | 600     |
-| A     | @    | 185.199.109.153      | 600     |
-| A     | @    | 185.199.110.153      | 600     |
-| A     | @    | 185.199.111.153      | 600     |
-| CNAME | www  | fredhord.github.io   | 600     |
+Site configuration → Forms → make sure forms are enabled (Netlify detects the `contact` form at deploy time).
+Then Forms → Form notifications → Add notification → Email notification → `info@pazlstudio.co`.
+Submissions also stay in the Netlify dashboard under Forms → contact. Free tier: 100 submissions a month.
 
-Leave the nameservers on GoDaddy (ns63/ns64.domaincontrol.com). Do not turn on GoDaddy forwarding.
+## 3. Domain (you)
 
-## 3. Check (Claude)
+Site configuration → Domain management → Add a domain → `pazlstudio.co`. Pick **"use external DNS"** (keep GoDaddy nameservers).
+
+In GoDaddy → My Products → pazlstudio.co → DNS, delete the two parked A records on `@` (15.197.148.33 and 3.33.130.190) and any `www` record, then add:
+
+| Type  | Name | Value                         | TTL |
+|-------|------|-------------------------------|-----|
+| A     | @    | 75.2.60.5                     | 600 |
+| CNAME | www  | `<your-site>.netlify.app`     | 600 |
+
+Netlify shows the exact values on the domain screen; use those if they differ. Leave GoDaddy forwarding off.
+Netlify issues the HTTPS certificate itself once DNS resolves (usually within the hour). Set `pazlstudio.co` as the primary domain so `www` redirects to it.
+
+## 4. Check (Claude)
 
 ```bash
 dig +short pazlstudio.co A
@@ -29,4 +35,4 @@ dig +short www.pazlstudio.co CNAME
 curl -sI https://pazlstudio.co | head -3
 ```
 
-The old address https://fredhord.github.io/P.STAR/pazl/ keeps working until the `pazl/` folder is removed from P.STAR.
+The old GitHub Pages address keeps working until the `pazl/` folder is removed from the P.STAR repo. The `CNAME` and `.github` files in the standalone GitHub copy are not needed for Netlify.

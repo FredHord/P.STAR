@@ -92,9 +92,11 @@
         <a class="email" href="mailto:info@pazlstudio.co">info@pazlstudio.co</a>
         <p class="muted" style="max-width: 44ch">Have a project, partnership, or idea in mind? We'd love to hear about it. Tell us what you are making, where it will live and when it needs to exist.</p>
 
-        <!-- The form posts to Formspree. Create a free form at formspree.io, then replace YOUR_FORM_ID below.
-             Until then the Send button falls back to opening an email. -->
-        <form class="form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" data-fallback="mailto:info@pazlstudio.co">
+        <!-- Netlify Forms: Netlify reads this form at deploy time and delivers submissions
+             to the address set under Site configuration → Forms → Form notifications. -->
+        <form class="form" name="contact" method="POST" action="/studio.html" data-netlify="true" netlify-honeypot="_gotcha" data-fallback="mailto:info@pazlstudio.co">
+          <input type="hidden" name="form-name" value="contact">
+          <input type="hidden" name="subject" value="New enquiry from pazlstudio.co">
           <div class="form__row">
             <label>First name<input type="text" name="first_name" autocomplete="given-name" required></label>
             <label>Last name<input type="text" name="last_name" autocomplete="family-name" required></label>
@@ -103,7 +105,7 @@
           <label>What are you making?<textarea name="message" rows="4" required></textarea></label>
           <input type="text" name="_gotcha" class="visually-hidden" tabindex="-1" autocomplete="off" aria-hidden="true">
           <button class="btn btn--solid" type="submit">Send</button>
-          <p class="form__note">Or email us directly at info@pazlstudio.co.</p>
+          <p class="form__note" aria-live="polite">Or email us directly at info@pazlstudio.co.</p>
         </form>
       </div>
     </section>

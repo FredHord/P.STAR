@@ -152,3 +152,9 @@ The J.I.D × Fear of God page no longer ends on `jid-diptych-3.jpg`, which repea
 
 - Domain: pazlstudio.co (GoDaddy). Share-image (`og:image`) links on every page now use `https://pazlstudio.co/`. Hosting not yet decided; `DOMAIN.md` has the GitHub Pages route, Netlify drag-and-drop is the alternative.
 - Studio email is `info@pazlstudio.co` everywhere (mailto links, form fallback, footer). Source folder renamed `fsf-site` → `pazl-site`.
+
+## Contact form → Netlify Forms (2 Nov)
+
+- Hosting choice: Netlify (drag-and-drop). The studio form is `name="contact"` with `data-netlify="true"` and `netlify-honeypot="_gotcha"`; `main.js` posts it in the background and swaps the note for a thank-you line. If the post fails (site not on Netlify), it falls back to the mailto draft.
+- After the first deploy, turn on an email notification to `info@pazlstudio.co` under Site configuration → Forms → Form notifications. See `DOMAIN.md` for domain + DNS.
+- Local preview: `.claude/launch.json` now serves `pazl-site` on 8788 (started from a terminal tab; the preview launcher can't getcwd).
