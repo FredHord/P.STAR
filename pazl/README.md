@@ -143,3 +143,7 @@ The racing-suit rows are two diptychs: `assets/img/durk-stage-diptych.jpg` pairs
 ## Fear of God gallery + studio heading (30–31 Oct)
 
 The J.I.D × Fear of God page no longer ends on `jid-diptych-3.jpg`, which repeated looks five and six from the two-up above it; the file stays because the home page's rolling sequence still uses it. After the two-up comes one diptych from the January/February 2026 frames in `J.I.D X FEAR OF GOD`: `jid-diptych-6.jpg` (FSF_FOG_JID_LB 30 holding the folding chair, LB 33 seated with the gloves to the face; 1612×1000, 12 px white gutter, LB 33 cropped to 4:5). Two more diptychs from LB 15/16 and 31/32 were tried and removed on 31 Oct; downsampled sources and specs are in the session scratchpad. The studio page heading reads "Pursue A–Z Laudably."
+
+## Founder photo (2 Nov)
+
+- `studio.html` now shows `assets/img/founder.jpg` (1200×1500, baked from `fred.jpg` in the project folder with `sips -Z 1500`, JPEG quality 82): Fred in a dark double-breasted suit in front of a wall of books. The earlier `founder.webp` (seated outdoors) is deleted. Canvas Info board uses blob `e8d63fc6a86a0151f542423b2f7c292a`.
