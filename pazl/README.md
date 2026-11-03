@@ -33,21 +33,21 @@ Then open http://localhost:8787. Any static server works; opening `index.html` d
 
 **Cloudflare Pages, Render, S3, or any shared host.** Upload the folder contents to the web root. No server config needed.
 
-### Pointing fsf-studio.com at the new site
+### Domain
 
-In your domain registrar (or Squarespace Domains if the domain lives there), replace the Squarespace DNS records with the ones your new host gives you: usually an `A` record for the root and a `CNAME` for `www`. Keep the Squarespace site live until the new one resolves, then cancel the Squarespace plan.
+The site is live at https://pazlstudio.co on Netlify; DNS is at GoDaddy (A `@` → 75.2.60.5, CNAME `www` → pazlstudio.co). See `DOMAIN.md`.
 
 ## Before launch: things to fill in
 
 Search the files for `TODO` and `[` to find every placeholder.
 
-- **Contact form.** `studio.html` posts to Formspree. Create a free form at formspree.io, copy its endpoint and replace `YOUR_FORM_ID`. Until then, pressing Send opens an email draft to info@pazlstudio.co instead.
+- **Contact form.** `studio.html` is a Netlify Form named `contact`; notifications go to create@pazlstudio.co (set in the Netlify dashboard). Off Netlify, Send falls back to an email draft.
 - **Instagram.** Every footer has an Instagram link pointing at instagram.com. Replace with the studio's profile URL.
 - **Client logos.** The ticker on the home page shows the 22 logos in `assets/img/clients/` (transparent PNGs cut from the logo sheet). To add one, drop a PNG in that folder and add a matching `<li>` to *both* lists inside `.ticker__track` in `index.html`, with `data-size` set to `wide`, `mid` or `tall` depending on the logo's shape. To remove one, delete its `<li>` from both lists.
 - **Project years and photographers.** `[YEAR]` and `[PHOTOGRAPHER]` in the six project pages.
 - **Press links.** The NYT and PAUSE links go to the publications' home pages. Swap in the article URLs.
 - **Video links.** The Vimeo and YouTube links were matched to titles by their order on the current site. Click each one once to confirm it plays the right film.
-- **Open Graph images.** The `og:image` tags assume the site lives at www.fsf-studio.com. Change the domain if it will live elsewhere.
+- **Open Graph images.** The `og:image` tags use https://pazlstudio.co/.
 
 ## Adding a project page
 
@@ -151,10 +151,16 @@ The J.I.D × Fear of God page no longer ends on `jid-diptych-3.jpg`, which repea
 ## Domain and email (2 Nov)
 
 - Domain: pazlstudio.co (GoDaddy). Share-image (`og:image`) links on every page now use `https://pazlstudio.co/`. Hosting not yet decided; `DOMAIN.md` has the GitHub Pages route, Netlify drag-and-drop is the alternative.
-- Studio email is `info@pazlstudio.co` everywhere (mailto links, form fallback, footer). Source folder renamed `fsf-site` → `pazl-site`.
+- Studio email is `create@pazlstudio.co` everywhere (mailto links, form fallback, footer). Source folder renamed `fsf-site` → `pazl-site`.
 
 ## Contact form → Netlify Forms (2 Nov)
 
 - Hosting choice: Netlify (drag-and-drop). The studio form is `name="contact"` with `data-netlify="true"` and `netlify-honeypot="_gotcha"`; `main.js` posts it in the background and swaps the note for a thank-you line. If the post fails (site not on Netlify), it falls back to the mailto draft.
-- After the first deploy, turn on an email notification to `info@pazlstudio.co` under Site configuration → Forms → Form notifications. See `DOMAIN.md` for domain + DNS.
+- After the first deploy, turn on an email notification to `create@pazlstudio.co` under Site configuration → Forms → Form notifications. See `DOMAIN.md` for domain + DNS.
 - Local preview: `.claude/launch.json` now serves `pazl-site` on 8788 (started from a terminal tab; the preview launcher can't getcwd).
+
+## Yung Miami out-of-home + create@ (2 Nov, evening)
+
+- `work/yung-miami-watch-dis.html` gallery ends with two new rows: a two-up of the Spotify billboards (`ym-ooh-day.jpg` from IMG_4503, `ym-ooh-night.jpg` from IMG_4502, 1500×1000) and a two-up of silent Times Square loops (`assets/video/ym-ooh-pandora.mp4` 1280×720 from IMG_4505, `ym-ooh-youtube.mp4` 1280×1332 from IMG_4506, both cut with `$N/cut`, posters alongside). `.gallery--ooh` CSS crops both loops to 16:9; the YouTube one is positioned at 22% from the top so the screen stays in frame. Scope and about text mention out-of-home.
+- Email is now `create@pazlstudio.co` everywhere (site, README, DOMAIN.md, all canvas boards). Netlify form notification must be re-pointed to it in the dashboard.
+- Netlify deploy is manual: drag `pazl-site` onto the Netlify Deploys page after each change.

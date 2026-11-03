@@ -10,7 +10,7 @@ Later updates: drag the folder again, or Claude runs `netlify deploy --prod --di
 ## 2. Contact form (you, once)
 
 Site configuration → Forms → make sure forms are enabled (Netlify detects the `contact` form at deploy time).
-Then Forms → Form notifications → Add notification → Email notification → `info@pazlstudio.co`.
+Then Forms → Form notifications → Add notification → Email notification → `create@pazlstudio.co`.
 Submissions also stay in the Netlify dashboard under Forms → contact. Free tier: 100 submissions a month.
 
 ## 3. Domain (you)
