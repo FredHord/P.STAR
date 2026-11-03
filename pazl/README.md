@@ -165,3 +165,7 @@ The J.I.D × Fear of God page no longer ends on `jid-diptych-3.jpg`, which repea
 - Email is now `create@pazlstudio.co` everywhere (site, README, DOMAIN.md, all canvas boards). Netlify form notification must be re-pointed to it in the dashboard.
 - Netlify deploy is manual: drag `pazl-site` onto the Netlify Deploys page after each change.
 - Yung Miami gallery (2 Nov, late): `ym-diptych-1` (Mercedes pair) and `ym-diptych-5` (garage pair) replaced by one diptych `ym-diptych-6.jpg` (1345×1000): left half of each, Mercedes left, garage right (spec `$N/ym/merge.json`). The two old files are deleted. Canvas blob `f9eb497c8ef4ebecd5764a18bb906f9f`.
+
+## Sinsational film (3 Nov)
+
+- The Sinsational spot is now self-hosted on `work/sinsational-perfume.html` under the loop: `assets/video/sinsational-film.mp4` (1280×720, 0:58, ~20 MB), `sinsational-film-sm.mp4` (640×360, ~7 MB) and poster `sinsational-film.jpg`. Source is the re-cut master `SINSATIONAL PERFUME/edit/sinsational_spot_edit_v5.mp4` (31–33 s and 44.5–49.5 s removed from the 1440p original; half-second dissolve at the first join, hard cut at the second; made with `.claude/tools/xfade`). Encoded with `.claude/tools/film` at 2600 / 900 kbps, poster at 12 s.
