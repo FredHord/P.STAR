@@ -101,6 +101,20 @@ the same way a fabric with no price is.
   much of the leftover a run uses, and the invoice and report note "fabric
   supplied". It is a job setting, not a style one — a new line charges fabric
   unless ticked. The current tote and hangtag lines are ticked on load.
+- The **Hat (finished, overseas)** is a finished good bought in, not made
+  by FSF: $9.70 a hat plus the shipment's freight broken down per unit —
+  $600 for 300 hats is $2.00 each, so $11.70 landed. Its card is the unit
+  price, the freight and how many units that freight covered; change any of
+  the three and the per-unit figure follows. Nothing on it is FSF's, so the
+  job's FSF markup is not applied (a rate can be set on the line) and the
+  transportation & ancillary charge does not touch it. The rollup keeps it
+  out of **Payable to FSF** and adds it as its own line before the Total
+  order cost; the FSF invoice leaves it off (and says so on screen) while a
+  customer invoice bills it at the selling price; the retail report lands it
+  without the ancillary charge. Pattern, grading, wash, grinding and
+  packaging never apply; embellishments do, since a hat may be decorated.
+  The damage allowance still adds its extra units — extras bought are extras
+  paid for. Quick add knows it as "hats".
 - **Distress grinding is charged on every style** at one rate, set in the
   Rates panel ($2.50/unit). Fred quoted that for hoodies and bottoms; the
   same rate is carried across tees, tank and track pieces — confirm it with
@@ -129,6 +143,9 @@ by URL, since it exposes cost prices.
 
 It opens on two worked example builds so the sheet is legible at a glance;
 "Clear examples" empties it. The order is then remembered per browser.
+**Clear order** (next to Add style) empties the lines to start from 0 — it
+arms on the first tap and acts on the second — and keeps the rates and
+invoice details; "Reset everything" in the footer also puts the rates back.
 
 **Quick add** (a panel under the Add style button) takes a pasted list, one
 item per line — `50 Zip Hoodie` — and adds each at its style's defaults.
@@ -143,6 +160,21 @@ off keeps the rate and drops the line) covers freight, ancillary development and
 cost of yours, so it lands on the cost sheet — applied to the whole order
 after FSF's markup and one-time fees — and never on the invoice. The rollup
 therefore separates **Payable to FSF** from **Total order cost**.
+
+### Saved pricing models
+
+The **Saved pricing models** panel (under Quick add) keeps named snapshots
+of the whole sheet — every line, rate and invoice detail — in the browser's
+own storage, beside the live order. Save the current order under a name,
+and the list shows when it was saved, its units, its total and its lines;
+**Load** replaces the order on the sheet with that model (two taps, since
+it overwrites what is there) and **Delete** removes it. A loaded model goes
+through the same migrations as a page open, so one saved before a requote
+picks the requote up. Storage is per browser and per copy of the page, so
+**Copy all as text** puts the whole list on the clipboard as JSON and
+**Import** pastes it into another browser or copy, skipping any model
+already there. Photos are the bulk of a snapshot: if saving one overflows
+the browser's storage it is saved again without them and the panel says so.
 
 ### Photos
 
@@ -228,9 +260,10 @@ A published Artifact runs in a locked-down frame where this page's document
 skeleton is supplied by the host, `print()` and `confirm()` do nothing, and
 script-driven downloads are inert. The script applies exactly those
 adaptations — dropping the Print buttons, turning the CSV export into a
-clipboard copy, and replacing the two confirm dialogs with a tap-again arm on
-the button — so the repo page keeps working as a normal web page and the two
-copies never drift by hand. Every substitution asserts it matched exactly
+clipboard copy, and replacing the two confirm dialogs with the page's own
+tap-again arm (the one Clear order and the saved-model buttons use) — so the
+repo page keeps working as a normal web page and the two copies never drift
+by hand. Every substitution asserts it matched exactly
 once, so editing `costing.html` in a way that invalidates one fails the build
 loudly instead of shipping a broken page. `build/` is not committed.
 

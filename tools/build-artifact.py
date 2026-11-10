@@ -89,26 +89,8 @@ $("#btnPrint2").addEventListener("click", doPrint);
     assert "function download(" not in s, "download() still present"
 
     # --- the frame's confirm() returns false without asking ---------------
-    s = sub(s, "const esc = s =>", """/* The artifact frame refuses the browser's confirm dialog: it returns false
-   without showing anything, so destructive actions arm on the button. */
-function armConfirm(btn, label, done){
-  if(btn.dataset.armed === "1"){
-    btn.dataset.armed = "";
-    btn.textContent = btn.dataset.orig;
-    done();
-    return;
-  }
-  btn.dataset.orig = btn.dataset.orig || btn.textContent;
-  btn.dataset.armed = "1";
-  btn.textContent = label;
-  clearTimeout(btn._armTimer);
-  btn._armTimer = setTimeout(() => {
-    btn.dataset.armed = "";
-    btn.textContent = btn.dataset.orig;
-  }, 4000);
-}
-
-const esc = s =>""")
+    # --- the frame's confirm() returns false without asking ---------------
+    # the page's own two-tap arm (tapTwice) stands in for the dialog
 
     s = sub(s, """    const used = S.lines.some(L => L.fabric === f.name || L.rib === f.name);
     if(used && !window.confirm(`"${f.name}" is used by a line in this order. Remove it anyway? Those lines will lose their fabric price.`)) return;
@@ -119,7 +101,7 @@ const esc = s =>""")
       S.fabrics.splice(+del.dataset.delfab, 1);
       renderRates(); renderLines(); refresh();
     };
-    if(used) armConfirm(del, "Used by a line — tap again", go);
+    if(used) tapTwice(del, "Used by a line — tap again", go);
     else go();""")
 
     s = sub(s, """  if(!window.confirm("Clear every line and put all rates back to Fred's quoted prices?")) return;
@@ -127,7 +109,7 @@ const esc = s =>""")
   hideInvoice(); hideReport();
   renderRates(); renderInvForm(); renderLines(); refresh();
 });""",
-            """  armConfirm(e.target, "Tap again to clear everything", () => {
+            """  tapTwice(e.target, "Tap again to clear everything", () => {
     S = freshState(); S.demo = false;
     hideInvoice(); hideReport();
     renderRates(); renderInvForm(); renderLines(); refresh();
