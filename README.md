@@ -96,6 +96,10 @@ Behaviour worth knowing:
 
 A line with a fabric but no yield is excluded from the total and flagged,
 the same way a fabric with no price is.
+
+The page carries no explanatory prose: the working notes behind each style
+(yield math, assumptions to confirm with Fred) live in the `STYLES` block
+and in this file, and show as a hover tooltip on a line's style picker.
 - **Fabric on hand** is a per-line tick for cloth already owned: the fabric
   cost drops to $0 while the yield stays counted, so the sheet still says how
   much of the leftover a run uses, and the invoice and report note "fabric
