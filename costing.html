@@ -340,6 +340,12 @@
 <header class="mast no-invoice">
   <p class="eyebrow">Production costing</p>
   <h1>FSF Cost <span class="star">Sheet</span></h1>
+  <p class="sub">
+    Pick the styles you want quoted, set the wash, grinding, embellishments and quantity for each,
+    and the sheet below builds itself — unit cost, FSF markup, selling price, one-time fees and the
+    full order total. Every number is pre-loaded from Fred's pricing but stays editable, so a changed
+    fabric price or a rate he hasn't quoted yet can be typed straight in.
+  </p>
 </header>
 
 <!-- ============ GLOBAL INPUTS ============ -->
@@ -348,6 +354,11 @@
     <h2>1 — Rates</h2>
     <span class="mono" style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Source: Fred, 9/30 – 10/1/2026</span>
   </div>
+  <p class="sec-note">
+    These feed every line. Change one here and the whole sheet recalculates. Anything Fred hasn't
+    priced is left blank and flagged — a blank fabric price is excluded from the total rather than
+    counted as zero, exactly like the spreadsheet does for Nylon.
+  </p>
 
   <details class="panel" id="panelRates">
     <summary><span>Fabrics, trims, wash, markup &amp; one-time fees</span><span class="chev">›</span></summary>
@@ -383,6 +394,7 @@
       </div>
 
       <p class="subhead">Transportation &amp; ancillary</p>
+      <p class="sec-note" style="margin:0 0 10px">One charge covering freight, ancillary development and whatever the run throws up. Applied to the whole order on the cost sheet below, after FSF's markup and one-time fees. It is a cost of yours, not something the invoice passes on.</p>
       <div class="grid cols-2">
         <label><span class="flabel">Transportation &amp; ancillary (%) — switched on or off per job above the order total</span>
           <input type="number" step="0.5" min="0" id="defAncillary"></label>
@@ -397,6 +409,7 @@
       </div>
 
       <p class="subhead">Per-unit defaults for steps Fred quotes flat</p>
+      <p class="sec-note" style="margin:0 0 10px">Packaging is Fred's flat $3.50 and covers bagging and tagging. Finishing is a spare line for anything beyond that — it stays off and unpriced unless you need it.</p>
       <div class="grid cols-2">
         <label><span class="flabel">Packaging ($ per unit) — bagging &amp; tagging included</span><input type="number" step="0.05" min="0" id="defPackaging"></label>
         <label><span class="flabel">Finishing / other ($ per unit) — spare line, not quoted</span><input type="number" step="0.05" min="0" id="defFinishing"></label>
@@ -419,6 +432,11 @@
   <details class="panel" id="panelQuick">
     <summary><span>Quick add — paste a list</span><span class="chev">›</span></summary>
     <div class="panel__body">
+      <p class="sec-note" style="margin:0 0 10px">
+        One item per line, quantity then style — <code>50 Zip Hoodie</code>. Short names work:
+        "hoodie", "sweats", "thermals", "long sleeve tees". Each line is added at its style's
+        defaults; set washes and the rest on the cards afterwards.
+      </p>
       <textarea id="quickAdd" rows="5" placeholder="50 Zip Hoodie
 50 Sweatpants
 50 Thermal Long Sleeve
@@ -432,6 +450,11 @@
   <details class="panel" id="panelHistory">
     <summary><span id="histTitle">Saved pricing models</span><span class="chev">›</span></summary>
     <div class="panel__body">
+      <p class="sec-note" style="margin:0 0 10px">
+        Save the order as it stands — every line, rate and invoice detail — under a name, and load
+        it back later to compare or reuse. Saved models live in this browser; <b>Copy all as text</b>
+        and <b>Import</b> carry them to another browser or another copy of this sheet.
+      </p>
       <div class="btnrow" style="align-items:flex-end">
         <label style="flex:1;min-width:220px"><span class="flabel">Name</span>
           <input type="text" id="histName" placeholder="e.g. Spring drop — 350 pcs + hats"></label>
@@ -480,6 +503,7 @@
       <input type="number" step="0.5" min="0" id="jobMarkup"></label>
     <label class="jobbar__f"><span class="flabel">Damage allowance (+ units per line)</span>
       <input type="number" step="1" min="0" id="jobDamage"></label>
+    <span class="mono" style="font-size:10.5px;color:var(--muted)">Rates and per-line overrides are in the panels above</span>
   </div>
   <div id="rollup"></div>
 </section>
@@ -490,6 +514,10 @@
     <h2>4 — Invoice</h2>
     <span class="mono" style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Built from the order above</span>
   </div>
+  <p class="sec-note">
+    Fill in who is billing whom, then submit. The invoice is a clean document —
+    no working breakdown, no cost prices the recipient shouldn't see.
+  </p>
 
   <details class="panel" id="panelInv">
     <summary><span>Invoice details</span><span class="chev">›</span></summary>
@@ -564,6 +592,12 @@
     <h2>5 — Retail report</h2>
     <span class="mono" style="font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">Cost, retail &amp; profit</span>
   </div>
+  <p class="sec-note">
+    What each style lands at once FSF's markup, its share of the one-time fees and the
+    transportation charge are carried — against what it should sell for, and what is left.
+    Add a photo to a line and it appears here. Override a suggested retail price on any
+    line if you want a rounder number.
+  </p>
   <div class="btnrow" style="margin-top:16px">
     <button class="btn btn--primary" id="btnReport">Generate retail report</button>
   </div>
@@ -1259,6 +1293,12 @@ function embPanel(L){
   return `        <details class="panel" style="background:var(--ink)">
           <summary><span>Embellishments${L.emb.length ? " — " + L.emb.length : ""}</span><span class="chev">›</span></summary>
           <div class="panel__body">
+            <p class="sec-note" style="margin:0 0 4px">
+              Embellishment pricing is quoted per project and moves every run, so nothing is
+              pre-loaded here — price this one on its own. <strong>Per unit</strong> is the rate for one
+              placement on one garment; <strong>placements</strong> is how many go on each garment.
+              Setup is charged once for the whole order (screens, digitizing).
+            </p>
             ${L.emb.map((e,j) => `
               <div class="emb">
                 <div class="grid cols-5" style="align-items:end;gap:10px">
@@ -1303,7 +1343,7 @@ function sourcedCard(L, i){
         <div class="line__main">
           <div class="grid cols-3">
             <label><span class="flabel">Style</span>
-              <select data-f="style" title="${esc(st.note || "")}">${STYLES.map(s =>
+              <select data-f="style">${STYLES.map(s =>
                 `<option value="${esc(s.name)}"${s.name === L.style ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label>
             <label><span class="flabel">FSF price per unit ($)</span>
               <input type="number" step="0.05" min="0" data-f="unitCost" value="${L.unitCost}"
@@ -1326,6 +1366,7 @@ function sourcedCard(L, i){
               <div class="mono" style="padding:9px 0;font-size:13px" data-fsfmargin>—</div></div>
           </div>
           <div class="flags" data-flags></div>
+          ${st.note ? `<p class="sec-note" style="margin-top:9px;font-size:12.5px">${esc(st.note)}</p>` : ""}
         </div>
         <div class="line__tot">
           <div class="t num" data-unit>—</div>
@@ -1340,6 +1381,10 @@ function sourcedCard(L, i){
         <details class="panel" style="background:var(--ink)">
           <summary><span>Markup &amp; retail for this line</span><span class="chev">›</span></summary>
           <div class="panel__body">
+            <p class="sec-note" style="margin:0 0 4px">
+              FSF's margin is already in their price, so the job's ${num(S.g.markup)}% FSF markup is not
+              added again. Set a rate here only if something more should be priced on top.
+            </p>
             <div class="grid cols-2">
               <label><span class="flabel">Markup (%) — blank is none</span>
                 <input type="number" step="0.5" min="0" data-f="markup" value="${L.markup === null || L.markup === undefined ? "" : L.markup}"
@@ -1397,7 +1442,7 @@ function renderLines(){
         <div class="line__main">
           <div class="grid cols-3">
             <label><span class="flabel">Style</span>
-              <select data-f="style" title="${esc(st.note || "")}">${STYLES.map(s =>
+              <select data-f="style">${STYLES.map(s =>
                 `<option value="${esc(s.name)}"${s.name === L.style ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label>
             <label><span class="flabel">Wash / finish</span>
               <select data-f="wash" ${L.washOn ? "" : "disabled"}>${washOpts}</select></label>
@@ -1405,6 +1450,7 @@ function renderLines(){
               <input type="number" step="1" min="0" data-f="qty" value="${L.qty}"></label>
           </div>
           <div class="flags" data-flags></div>
+          ${st.note ? `<p class="sec-note" style="margin-top:9px;font-size:12.5px">${esc(st.note)}</p>` : ""}
         </div>
         <div class="line__tot">
           <div class="t num" data-unit>—</div>
@@ -1436,6 +1482,10 @@ function renderLines(){
         <details class="panel" style="background:var(--ink)">
           <summary><span>Override yields, labor &amp; rates for this build</span><span class="chev">›</span></summary>
           <div class="panel__body">
+            <p class="sec-note" style="margin:0 0 4px">
+              Pre-loaded from Fred's quote for <strong>${esc(L.style)}</strong>. Edit anything that has
+              changed for this build — fabric prices themselves live in the Rates panel at the top.
+            </p>
             <p class="subhead">Fabric &amp; trims</p>
             <div class="grid cols-4">
               <label><span class="flabel">Body fabric</span>
