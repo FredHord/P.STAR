@@ -2060,13 +2060,11 @@ function retailModel(){
     const lineRetail= retail * r.sellQty;
     const lineProfit= profit * r.sellQty;
 
+    /* a customer-facing line: what the piece is, not how it was costed */
     const bits = [];
-    if(r.sourced) bits.push("finished, via FSF, freight in");
     if(washLabel(L)) bits.push(washLabel(L));
     if(!r.sourced && L.grindOn) bits.push("distress grinding");
     (L.emb || []).forEach(e => bits.push(e.type.toLowerCase() + (e.note ? " (" + e.note + ")" : "")));
-    if(L.fabricFree) bits.push("fabric on hand");
-    if(r.damage) bits.push(r.damage + " more made for damage");
 
     return {
       style:r.style, sub:bits.join(", "), photo:L.photo || "", qty:r.sellQty, made:r.qty,
@@ -2141,7 +2139,7 @@ function renderReport(){
           <tr>
             <td class="ph">${shot(i)}</td>
             <td>${esc(i.style)}${i.sub ? `<span class="sub">${esc(i.sub)}</span>` : ""}
-              ${i.custom ? `<span class="sub">retail set by hand — calculated ${money(i.suggested)}</span>` : ""}</td>
+</td>
             <td class="r">${qtyFmt(i.qty)}</td>
             <td class="r">${money(i.unitCost)}</td>
             <td class="r">${money(i.retail)}</td>
@@ -2161,12 +2159,6 @@ function renderReport(){
       </tbody>
     </table>
 
-    <div class="rep-note">
-      Unit cost is landed: FSF's price including their markup, that style's share of the
-      pattern, grading and embellishment setup, and the ${v.ancPct}% transportation and ancillary
-      charge${v.made > v.units ? ", spread over the units that sell — the " + qtyFmt(v.made - v.units) + " made for damage are paid for but bring in nothing" : ""}. Retail value and profit assume every unit sells at full price —
-      <strong>${qtyFmt(v.breakEven)} of ${qtyFmt(v.units)} units</strong> covers the cost of the run.
-    </div>
     ${v.open.length ? `<div class="inv-open no-print">
       <b>Not final:</b> ${v.open.length} price${v.open.length === 1 ? " is" : "s are"} still open on the
       cost sheet, so these figures will move.</div>` : ""}

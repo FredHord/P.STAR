@@ -209,10 +209,12 @@ the real cost per unit, not the garment cost.
 
 **Suggested retail** is the cost sheet's selling price rounded to the
 nearest $5 (configurable in the Rates panel; 0 disables rounding). Any line
-can override it with a hand-set price, and the report marks those.
+can override it with a hand-set price.
 
-Profit figures assume full sell-through at those prices, and the report says
-how many units cover the cost of the run.
+Profit figures assume full sell-through at those prices. The report carries
+no explanatory note: it is a customer-facing document, so how the landed
+cost is built (FSF's markup, the fee shares, the ancillary charge) stays on
+the cost sheet.
 
 ### Invoicing
 
