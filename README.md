@@ -101,20 +101,24 @@ the same way a fabric with no price is.
   much of the leftover a run uses, and the invoice and report note "fabric
   supplied". It is a job setting, not a style one — a new line charges fabric
   unless ticked. The current tote and hangtag lines are ticked on load.
-- The **Hat (finished, overseas)** is a finished good bought in, not made
-  by FSF: $9.70 a hat plus the shipment's freight broken down per unit —
-  $600 for 300 hats is $2.00 each, so $11.70 landed. Its card is the unit
-  price, the freight and how many units that freight covered; change any of
-  the three and the per-unit figure follows. Nothing on it is FSF's, so the
-  job's FSF markup is not applied (a rate can be set on the line) and the
-  transportation & ancillary charge does not touch it. The rollup keeps it
-  out of **Payable to FSF** and adds it as its own line before the Total
-  order cost; the FSF invoice leaves it off (and says so on screen) while a
-  customer invoice bills it at the selling price; the retail report lands it
-  without the ancillary charge. Pattern, grading, wash, grinding and
-  packaging never apply; embellishments do, since a hat may be decorated.
-  The damage allowance still adds its extra units — extras bought are extras
-  paid for. Quick add knows it as "hats".
+- The **Hat (finished, via FSF)** is a finished good FSF supplies rather
+  than makes: FSF charges $9.70 a hat on a $5.70 supplier cost, and the
+  shipment's freight is broken down per unit — $600 for 300 hats is $2.00
+  each, so $11.70 landed. Its card is FSF's price, the supplier's cost
+  (reference only — it shows FSF's margin, $4.00, and never enters the
+  total), the freight and how many units that freight covered; change any
+  of them and the figures follow. FSF's margin is already in the $9.70, so
+  the job's FSF markup is not added again (a rate can be set on the line),
+  and the transportation & ancillary charge is taken on the made goods and
+  fees only, since the hat's freight is already in. The rollup lists it as
+  "Finished goods supplied by FSF" inside **Payable to FSF**; the FSF
+  invoice bills it at $9.70 + $2.00 freight per unit and a customer invoice
+  at the selling price; the retail report lands it without the ancillary
+  charge. Pattern, grading, wash, grinding and packaging never apply;
+  embellishments do, since a hat may be decorated. The damage allowance
+  still adds its extra units — extras bought are extras paid for. Quick add
+  knows it as "hats". A sheet saved under its first name, "Hat (finished,
+  overseas)", is renamed on load.
 - **Distress grinding is charged on every style** at one rate, set in the
   Rates panel ($2.50/unit). Fred quoted that for hoodies and bottoms; the
   same rate is carried across tees, tank and track pieces — confirm it with

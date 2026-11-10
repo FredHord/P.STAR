@@ -739,13 +739,14 @@ const STYLES = [
     /* 0.0065 lb: a tag is one 17.5 sq in cut against the tote's 1,344.5 sq in
        at 0.5 lb, so 1/77 of a tote — about 154 to the pound */
     note:"Yield: the 65\" roll is first cut into 16x20 print sheets \u2014 a row of 4 upright (64\" x 20\") over a row of 3 turned (60\" x 16\") uses the full 36\" yard: 7 sheets. Each sheet yields 4 x 4 = 16 cuts of 3.6218\" x 4.8306\", and one cut is a tag, so 16 tags a sheet and 112 a yard (83.7% of the cloth used). Printing is priced per project \u2014 add it under Embellishments. Sewing not quoted. Packaging and grinding start off: a garment's $3.50 bag-and-tag and $2.50 grinding do not belong on a tag" },
-  /* A finished good bought in, not made by FSF: a unit price plus the
-     shipment's freight spread across the units it carried. */
-  { name:"Hat (finished, overseas)", group:"", fabric:"", yield:0,
+  /* A finished good FSF buys in rather than makes: FSF's price per unit
+     (their margin already in it) plus the shipment's freight spread across
+     the units it carried. The supplier's own cost is kept for reference. */
+  { name:"Hat (finished, via FSF)", group:"", fabric:"", yield:0,
     rib:"", ribYield:0, draw:0, elastic:0,
     sew:0, cut:0, trims:0,
-    sourced:true, unitCost:9.70, freight:600, freightPer:300,
-    note:"Bought finished from the maker overseas (China), not made by FSF: $9.70 a hat, plus its share of the shipment's freight \u2014 about $600 for 300 hats, so $2.00 each and $11.70 landed. Nothing here is FSF's, so FSF's markup is not applied and the transportation & ancillary charge does not touch it (its freight is already in). Decoration is per project \u2014 add it under Embellishments" }
+    sourced:true, unitCost:9.70, supplierCost:5.70, freight:600, freightPer:300,
+    note:"Finished hats from the maker overseas (China), supplied through FSF: FSF charges $9.70 a hat on a $5.70 supplier cost, and the shipment's freight is spread per unit \u2014 about $600 for 300 hats, so $2.00 each and $11.70 landed. FSF's margin is already in the $9.70, so the job's FSF markup is not added again, and the transportation & ancillary charge leaves it alone (its freight is already in). Decoration is per project \u2014 add it under Embellishments" }
 ];
 
 /* When a style's quoted default changes, a saved line still carrying the old
@@ -867,7 +868,8 @@ function makeLine(styleName){
     /* a finished good bought in: priced per unit, plus a share of the
        freight on the shipment it came in */
     sourced: !!st.sourced,
-    unitCost: st.unitCost || 0,
+    unitCost: st.unitCost || 0,          /* FSF's price per unit */
+    supplierCost: st.supplierCost || 0,  /* what FSF pays for it — reference only */
     freight: st.freight || 0,
     freightPer: st.freightPer || 0
   };
@@ -930,8 +932,8 @@ function markupPctFor(L){
   const own = L.markup;
   const has = own !== null && own !== undefined && own !== "";
   if(has) return num(own) / 100;
-  /* nothing FSF made: a finished good bought in carries no FSF markup
-     unless one is set on the line */
+  /* FSF's margin on a finished good they supply is already in its price,
+     so the job's markup is not added again unless a rate is set on the line */
   return L.sourced ? 0 : num(S.g.markup) / 100;
 }
 
@@ -975,23 +977,27 @@ function cost(L){
   };
 
   if(L.sourced){
-    /* A finished good bought in: its unit price plus the shipment's freight
-       broken down per unit. None of FSF's steps apply. */
+    /* A finished good FSF supplies: their price per unit plus the shipment's
+       freight broken down per unit. None of the production steps apply. */
     const unitCost = num(L.unitCost);
+    const supplier = num(L.supplierCost);
     const freight  = num(L.freight);
     const per      = Math.max(0, Math.round(num(L.freightPer)));
     const perUnit  = per > 0 ? freight / per : 0;
-    r.sourced     = true;
-    r.freightUnit = perUnit;
-    r.rows.push({ group:"Finished goods" });
-    r.rows.push({ label:"Source", text:"bought finished, overseas" });
-    add("Unit price, finished", unitCost);
+    r.sourced      = true;
+    r.freightUnit  = perUnit;
+    r.supplierCost = supplier;
+    r.fsfMargin    = unitCost - supplier;
+    r.rows.push({ group:"Finished goods — supplied by FSF" });
+    r.rows.push({ label:"Source", text:"made overseas, finished" });
+    if(supplier > 0) r.rows.push({ label:"Supplier cost (FSF's, for reference)", text:money(supplier) + " — FSF margin " + money(unitCost - supplier) });
+    add("FSF price per unit", unitCost, { detail:"their margin already in" });
     r.rows.push({ group:"Shipping" });
     r.rows.push({ label:"Freight for the shipment", text:money(freight) + " for " + qtyFmt(per) + " units" });
     add("Freight per unit", perUnit, { detail:money(freight) + " \u00f7 " + qtyFmt(per) });
     if(unitCost === 0){
-      r.issues.push(L.style + ": no unit price — enter what each finished unit costs.");
-      r.flags.push({ cls:"bad", t:"Unit price needed" });
+      r.issues.push(L.style + ": no FSF price — enter what FSF charges per unit.");
+      r.flags.push({ cls:"bad", t:"FSF price needed" });
     }
     if(freight > 0 && per === 0){
       r.issues.push(L.style + ": freight is set but not how many units the shipment carries, so none is charged per unit.");
@@ -1167,9 +1173,10 @@ function oneTimeFees(){
 }
 
 /* The order total, added up the same way everywhere it is quoted. FSF's
-   markup, the one-time fees and the transportation & ancillary charge sit
-   on what FSF makes; a finished good bought in lands at its own price with
-   its freight already in, and is added after them. */
+   markup and the one-time fees sit on what FSF makes; a finished good FSF
+   supplies is payable to FSF at their price with its freight already in,
+   so the transportation & ancillary charge is taken on the made goods and
+   fees only. */
 function rollup(results, fees){
   const made   = results.filter(r => !r.sourced);
   const bought = results.filter(r =>  r.sourced);
@@ -1179,10 +1186,10 @@ function rollup(results, fees){
   const fsf       = sum(made, "lineFsf");
   const sourced   = sum(bought, "lineFsf");
   const sell      = sum(results, "lineSell");
-  const payable   = fsf + fees.grand;
+  const payable   = fsf + fees.grand + sourced;
   const ancPct    = ancillaryPct();
-  const ancillary = payable * ancPct / 100;
-  const grand     = payable + ancillary + sourced;
+  const ancillary = (fsf + fees.grand) * ancPct / 100;
+  const grand     = payable + ancillary;
   return {
     units, dmgUnits:sum(results, "damage"),
     madeUnits:sum(made, "qty"), madeDmg:sum(made, "damage"),
@@ -1319,10 +1326,10 @@ function embPanel(L){
         </details>`;
 }
 
-/* A finished good bought in has no fabric, labor or wash: its card is the
-   unit price, the shipment's freight and how many units that freight
-   covers. The job's damage allowance still applies — extras bought are
-   extras paid for. */
+/* A finished good FSF supplies has no fabric, labor or wash: its card is
+   FSF's price, the supplier's cost for reference, the shipment's freight and
+   how many units that freight covers. The job's damage allowance still
+   applies — extras bought are extras paid for. */
 function sourcedCard(L, i){
   const st = STYLES.find(s => s.name === L.style) || {};
   return `
@@ -1338,7 +1345,7 @@ function sourcedCard(L, i){
             <label><span class="flabel">Style</span>
               <select data-f="style">${STYLES.map(s =>
                 `<option value="${esc(s.name)}"${s.name === L.style ? " selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label>
-            <label><span class="flabel">Unit price, finished ($)</span>
+            <label><span class="flabel">FSF price per unit ($)</span>
               <input type="number" step="0.05" min="0" data-f="unitCost" value="${L.unitCost}"
                      class="${num(L.unitCost) === 0 ? "missing" : ""}" placeholder="price needed"></label>
             <label><span class="flabel">Quantity (units)</span>
@@ -1351,6 +1358,12 @@ function sourcedCard(L, i){
               <input type="number" step="1" min="0" data-f="freightPer" value="${L.freightPer}"></label>
             <div><span class="flabel">Freight per unit</span>
               <div class="mono" style="padding:9px 0;font-size:13px" data-freight>—</div></div>
+          </div>
+          <div class="grid cols-3" style="margin-top:10px">
+            <label><span class="flabel">Supplier cost per unit ($) — reference</span>
+              <input type="number" step="0.05" min="0" data-f="supplierCost" value="${L.supplierCost}"></label>
+            <div style="grid-column:span 2"><span class="flabel">FSF's margin on it</span>
+              <div class="mono" style="padding:9px 0;font-size:13px" data-fsfmargin>—</div></div>
           </div>
           <div class="flags" data-flags></div>
           ${st.note ? `<p class="sec-note" style="margin-top:9px;font-size:12.5px">${esc(st.note)}</p>` : ""}
@@ -1369,8 +1382,8 @@ function sourcedCard(L, i){
           <summary><span>Markup &amp; retail for this line</span><span class="chev">›</span></summary>
           <div class="panel__body">
             <p class="sec-note" style="margin:0 0 4px">
-              Nothing here is FSF's, so the job's ${num(S.g.markup)}% FSF markup is not applied.
-              Set a rate if your own handling or a middleman should be priced in.
+              FSF's margin is already in their price, so the job's ${num(S.g.markup)}% FSF markup is not
+              added again. Set a rate here only if something more should be priced on top.
             </p>
             <div class="grid cols-2">
               <label><span class="flabel">Markup (%) — blank is none</span>
@@ -1553,6 +1566,10 @@ function paintLineBadges(results){
       " " + money(r.unitFsf) + " / unit · selling " + money(r.sell) + " · line " + money(r.lineFsf);
     const fr = el.querySelector("[data-freight]");
     if(fr) fr.textContent = money(r.freightUnit || 0) + " per unit";
+    const fm = el.querySelector("[data-fsfmargin]");
+    if(fm) fm.textContent = r.supplierCost > 0
+      ? money(r.fsfMargin) + " per unit — " + (r.fsfMargin / r.supplierCost * 100).toFixed(0) + "% on the supplier's " + money(r.supplierCost)
+      : "enter the supplier's cost to see it";
     el.querySelector("[data-flags]").innerHTML = r.flags.map(f =>
       `<span class="flag flag--${f.cls}">${esc(f.t)}</span>`).join("");
     el.style.borderLeftColor = r.flags.some(f => f.cls === "bad") ? "var(--bad)"
@@ -1594,7 +1611,7 @@ function renderSheet(results, fees){
       <div class="build__head">
         <span class="build__name">${String(i+1).padStart(2,"0")} · ${esc(r.style)}</span>
         <span class="build__meta">
-          ${r.sourced ? "bought finished overseas · freight in"
+          ${r.sourced ? "finished, supplied by FSF · freight in"
                       : (washLabel(L) ? esc(washLabel(L)) : "No wash") + " · " + (L && L.grindOn ? "grinding" : "no grinding")}
           · ${r.damage ? qtyFmt(r.sellQty) + " + " + r.damage + " for damage = " : ""}${qtyFmt(r.qty)} unit${r.qty === 1 ? "" : "s"}
         </span>
@@ -1604,13 +1621,13 @@ function renderSheet(results, fees){
           ${body}
           <tr class="sum big"><td>${r.sourced ? "Landed cost per unit" : "Total cost per unit"}</td><td class="v">${money(r.unit)}</td></tr>
           <tr class="grp"><td colspan="2">Pricing</td></tr>
-          <tr><td class="dim">${r.sourced ? "Markup" : "FSF markup"} (${(r.markupPct*100).toFixed(1).replace(/\.0$/,"")}%)</td><td class="v dim">${money(r.markup)}</td></tr>
+          <tr><td class="dim">${r.sourced ? "Markup on top" : "FSF markup"} (${(r.markupPct*100).toFixed(1).replace(/\.0$/,"")}%)</td><td class="v dim">${money(r.markup)}</td></tr>
           <tr class="sum"><td>${r.sourced ? "Landed cost incl. markup" : "Total cost incl. FSF markup"}</td><td class="v">${money(r.unitFsf)}</td></tr>
           <tr><td class="dim">Selling price multiple</td><td class="v dim">${r.multiple}×</td></tr>
           <tr class="sum"><td>Selling price per unit</td><td class="v">${money(r.sell)}</td></tr>
           <tr class="grp"><td colspan="2">Line totals — ${qtyFmt(r.qty)} units</td></tr>
           <tr><td class="dim">${r.sourced ? "Landed cost" : "Production cost"}</td><td class="v dim">${money(r.lineCost)}</td></tr>
-          <tr class="sum big"><td>${r.sourced ? "Line cost, landed (incl. markup)" : "Payable to FSF (incl. markup)"}</td><td class="v">${money(r.lineFsf)}</td></tr>
+          <tr class="sum big"><td>Payable to FSF${r.sourced ? " (landed)" : " (incl. markup)"}</td><td class="v">${money(r.lineFsf)}</td></tr>
           <tr><td class="dim">Retail value at ${r.multiple}×</td><td class="v dim">${money(r.lineSell)}</td></tr>
         </tbody>
       </table>
@@ -1624,17 +1641,15 @@ function renderSheet(results, fees){
       ${f.pattern ? "" : ` <span class="dim">· no pattern</span>`}${f.grading ? "" : ` <span class="dim">· no grading</span>`}</td>
       <td class="v dim">${money(f.sub)}</td></tr>`).join("");
 
-  /* what FSF makes — left out when the order is only goods bought in */
-  const fsfRows = (T.madeUnits || fees.grand) ? `
+  /* what FSF makes — left out when the order is only goods they supply */
+  const madeRows = (T.madeUnits || fees.grand) ? `
             <tr><td class="dim">Production cost — ${qtyFmt(T.madeUnits)} units${T.madeDmg ? " (" + qtyFmt(T.madeUnits - T.madeDmg) + " to sell + " + qtyFmt(T.madeDmg) + " for damage)" : ""}</td><td class="v dim">${money(T.prod)}</td></tr>
             <tr><td class="dim">FSF markup ${results.some(r => r.markupOwn && !r.sourced) ? "— varies by line" : "@ " + num(S.g.markup) + "%"}</td><td class="v dim">${money(T.markupAmt)}</td></tr>
             <tr class="sum"><td>Garments, incl. FSF markup</td><td class="v">${money(T.fsf)}</td></tr>
             ${fees.rows.length ? `<tr class="grp"><td colspan="2" style="padding-top:14px"><span class="flabel" style="margin:0">One-time fees — once per style, not per garment</span></td></tr>` : ""}
             ${feeRows}
             ${fees.setup ? `<tr><td class="dim">Embellishment setup (screens, digitizing)</td><td class="v dim">${money(fees.setup)}</td></tr>` : ""}
-            ${fees.grand ? `<tr class="sum"><td>Total one-time fees</td><td class="v">${money(fees.grand)}</td></tr>` : ""}
-            <tr class="sum"><td>Payable to FSF</td><td class="v">${money(T.payable)}</td></tr>
-            ${T.ancPct ? `<tr><td class="dim">Transportation &amp; ancillary (${T.ancPct}%)</td><td class="v dim">${money(T.ancillary)}</td></tr>` : ""}` : "";
+            ${fees.grand ? `<tr class="sum"><td>Total one-time fees</td><td class="v">${money(fees.grand)}</td></tr>` : ""}` : "";
 
   $("#rollup").innerHTML = `
     <div class="tot">
@@ -1648,8 +1663,10 @@ function renderSheet(results, fees){
       <div class="totrows">
         <table>
           <tbody>
-            ${fsfRows}
-            ${T.sourcedUnits ? `<tr class="sum"><td>Finished goods bought in — ${qtyFmt(T.sourcedUnits)} units, freight included</td><td class="v">${money(T.sourced)}</td></tr>` : ""}
+            ${madeRows}
+            ${T.sourcedUnits ? `<tr class="sum"><td>Finished goods supplied by FSF — ${qtyFmt(T.sourcedUnits)} units, freight included</td><td class="v">${money(T.sourced)}</td></tr>` : ""}
+            <tr class="sum"><td>Payable to FSF</td><td class="v">${money(T.payable)}</td></tr>
+            ${T.ancPct && (T.madeUnits || fees.grand) ? `<tr><td class="dim">Transportation &amp; ancillary (${T.ancPct}%) — on the made goods and fees</td><td class="v dim">${money(T.ancillary)}</td></tr>` : ""}
             <tr class="big"><td>Total order cost</td><td class="v">${money(T.grand)}</td></tr>
             <tr><td class="dim">Retail value at ${num(S.g.multiple)}×</td><td class="v dim">${money(T.sell)}</td></tr>
             <tr><td class="dim">Gross margin if everything sells at full price</td><td class="v dim">${T.margin.toFixed(1)}%</td></tr>
@@ -1681,7 +1698,7 @@ function csv(results, fees){
             "Selling price/unit","Line production cost","Line payable to FSF","Line retail value","Status"]);
   results.forEach((r,i) => {
     const L = S.lines.find(x => x.id === r.id);
-    out.push([i+1, r.style, r.sourced ? "Bought finished" : (washLabel(L) || "No wash"), !r.sourced && L && L.grindOn ? "Yes" : "No", r.qty, r.damage,
+    out.push([i+1, r.style, r.sourced ? "Finished, via FSF" : (washLabel(L) || "No wash"), !r.sourced && L && L.grindOn ? "Yes" : "No", r.qty, r.damage,
               r.unit.toFixed(4), r.markup.toFixed(4), r.unitFsf.toFixed(4), r.sell.toFixed(4),
               r.lineCost.toFixed(2), r.lineFsf.toFixed(2), r.lineSell.toFixed(2),
               r.flags.map(f => f.t).join("; ")]);
@@ -1710,9 +1727,9 @@ function csv(results, fees){
   out.push(["Units", T.units]);
   out.push(["Garments incl. FSF markup", T.fsf.toFixed(2)]);
   out.push(["One-time fees", fees.grand.toFixed(2)]);
+  if(T.sourcedUnits) out.push(["Finished goods supplied by FSF, freight included (" + T.sourcedUnits + " units)", T.sourced.toFixed(2)]);
   out.push(["Payable to FSF", T.payable.toFixed(2)]);
-  out.push(["Transportation & ancillary (" + T.ancPct + "%)", T.ancillary.toFixed(2)]);
-  if(T.sourcedUnits) out.push(["Finished goods bought in, freight included (" + T.sourcedUnits + " units)", T.sourced.toFixed(2)]);
+  out.push(["Transportation & ancillary (" + T.ancPct + "%) on made goods and fees", T.ancillary.toFixed(2)]);
   out.push(["TOTAL ORDER COST", T.grand.toFixed(2)]);
   out.push(["Retail value", T.sell.toFixed(2)]);
   const issues = results.flatMap(r => r.issues);
@@ -1728,7 +1745,7 @@ function summaryText(results, fees){
   const T = rollup(results, fees);
   const lines = results.map((r,i) => {
     const L = S.lines.find(x => x.id === r.id);
-    const what = r.sourced ? "bought finished, freight in"
+    const what = r.sourced ? "finished, via FSF, freight in"
                : (washLabel(L) || "no wash") + (L && L.grindOn ? " + grinding" : "");
     return `${i+1}. ${r.style} — ${what}` +
            ` — ${qtyFmt(r.qty)} units${r.damage ? " (incl. " + r.damage + " for damage)" : ""} @ ${money(r.unitFsf)} = ${money(r.lineFsf)}`;
@@ -1739,8 +1756,9 @@ function summaryText(results, fees){
     ...lines,
     "",
     `One-time fees: ${money(fees.grand)}`,
+    ...(T.sourcedUnits ? [`Finished goods supplied by FSF, freight included (${qtyFmt(T.sourcedUnits)} units): ${money(T.sourced)}`] : []),
+    `Payable to FSF: ${money(T.payable)}`,
     `Transportation & ancillary (${T.ancPct}%): ${money(T.ancillary)}`,
-    ...(T.sourcedUnits ? [`Finished goods bought in, freight included (${qtyFmt(T.sourcedUnits)} units): ${money(T.sourced)}`] : []),
     `TOTAL ORDER COST: ${money(T.grand)} for ${qtyFmt(T.units)} units`,
     ...(issues.length ? ["", "Open items:", ...issues.map(t => "- " + t)] : [])
   ].join("\n");
@@ -1807,13 +1825,13 @@ function invoiceModel(){
   const client = I.mode === "client";
   const results = lastResults, fees = lastFees || { rows:[], setup:0, grand:0 };
 
-  /* FSF bills what FSF made: a finished good bought in is not on their
-     invoice. Billing a customer, it is a line like any other. */
-  const billable = results.filter(r => r.qty > 0 && (client || !r.sourced));
-  const items = billable.map(r => {
+  /* A finished good FSF supplies is billed at their price plus its share of
+     the freight; a customer invoice bills it at the selling price like any
+     other line. */
+  const items = results.filter(r => r.qty > 0).map(r => {
     const L = S.lines.find(x => x.id === r.id) || {};
     const bits = [];
-    if(r.sourced) bits.push("finished goods, freight included");
+    if(r.sourced) bits.push(client ? "finished goods" : "finished goods — " + money(num(L.unitCost)) + " + freight " + money(r.freightUnit || 0) + " per unit");
     if(washLabel(L)) bits.push(washLabel(L));
     if(!r.sourced && L.grindOn) bits.push("distress grinding");
     (L.emb || []).forEach(e => {
@@ -1871,7 +1889,6 @@ function invoiceModel(){
     toDetails:I.toDetails || "",
     notes:I.notes || "",
     units:items.reduce((a,i) => a + i.qty, 0),
-    leftOff:results.filter(r => r.qty > 0 && r.sourced && !client).length,
     open:results.flatMap(r => r.issues)
   };
 }
@@ -1945,9 +1962,6 @@ function renderInvoice(){
     </table>
 
     ${v.notes ? `<div class="inv-notes"><div class="l">Notes</div>${esc(v.notes)}</div>` : ""}
-    ${v.leftOff ? `<div class="inv-open no-print">
-      <b>Not on this invoice:</b> ${v.leftOff} line${v.leftOff === 1 ? "" : "s"} of finished goods bought
-      overseas — FSF is not making them. Bill them on a customer invoice instead.</div>` : ""}
     ${v.open.length ? `<div class="inv-open no-print">
       <b>Not final:</b> ${v.open.length} price${v.open.length === 1 ? " is" : "s are"} still open on the cost
       sheet, so these figures will move. This banner is on screen only — it does not print.</div>` : ""}
@@ -2032,7 +2046,7 @@ function retailModel(){
     const share   = styleUnits[r.style] ? r.qty / styleUnits[r.style] : 1;
     const oneTime = (styleFee[r.style] || 0) * share + num(r.embSetup);
 
-    /* the ancillary charge is on what FSF makes; a finished good bought in
+    /* the ancillary charge is on what FSF makes; a finished good they supply
        has its freight in already */
     const lineCost = r.sourced ? r.lineFsf + oneTime : (r.lineFsf + oneTime) * (1 + ancPct / 100);
     /* landed cost per SELLABLE unit: the damage units are paid for but not sold */
@@ -2047,7 +2061,7 @@ function retailModel(){
     const lineProfit= profit * r.sellQty;
 
     const bits = [];
-    if(r.sourced) bits.push("bought finished, freight in");
+    if(r.sourced) bits.push("finished, via FSF, freight in");
     if(washLabel(L)) bits.push(washLabel(L));
     if(!r.sourced && L.grindOn) bits.push("distress grinding");
     (L.emb || []).forEach(e => bits.push(e.type.toLowerCase() + (e.note ? " (" + e.note + ")" : "")));
@@ -2302,6 +2316,7 @@ function load(){
     S.demo = !!p.demo;
     if(Array.isArray(p.lines)){
       S.lines = p.lines.map(L => {
+        if(L.style === "Hat (finished, overseas)") L.style = "Hat (finished, via FSF)";
         const base = makeLine(L.style || STYLES[0].name);
         const styleYield = base.yield;
         const merged = Object.assign(base, L);
