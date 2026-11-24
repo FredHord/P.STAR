@@ -79,10 +79,11 @@ Behaviour worth knowing:
 - The **enzyme wash** is priced by weight — $1.75/lb in the Rates panel —
   rather than by garment group, so a style needs a weight to use it: the
   tote is 0.5 lb (given) and the hangtag 0.0065 lb (its one 17.5 sq in cut
-  against the tote's 1,344.5 at 0.5 lb — about 154 to the pound). Both
-  default to it; it is one option in the line's wash dropdown, alongside the
-  group washes, and a style with no weight is flagged rather than washed for
-  nothing.
+  against the tote's 1,344.5 at 0.5 lb — about 154 to the pound). The tote
+  defaults to it; the hangtag is not washed, but keeps its weight so the
+  wash can be switched on. It is one option in the line's wash dropdown,
+  alongside the group washes, and a style with no weight is flagged rather
+  than washed for nothing.
 - The **Canvas Hangtag** shares the canvas price. It is cut at $0.25 and
   **pressed** at $0.75 a tag (the pressing step is the line's finishing
   slot under its own name, on by default and immune to the global finishing
