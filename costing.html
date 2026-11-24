@@ -382,6 +382,10 @@
       <div class="grid cols-2">
         <label><span class="flabel">Grommets ($ per 1,000)</span>
           <input type="number" step="0.5" min="0" id="defGrommet"></label>
+        <label><span class="flabel">Nickel-plated ball chain ($ per 1,000, incl. shipping)</span>
+          <input type="number" step="0.5" min="0" id="defChain"></label>
+        <label><span class="flabel">Silver bulb safety pins ($ per 1,000, incl. tax &amp; shipping) — pack of 1,000 assumed</span>
+          <input type="number" step="0.5" min="0" id="defPin"></label>
       </div>
 
       <p class="subhead">Wash / finish — cost per unit by product group ($)</p>
@@ -667,7 +671,17 @@ const DEFAULT_TRIMS = { drawstring:0.55, elastic:1.00 };
 
 /* Hardware priced by the piece rather than the yard. Quoted per thousand
    because that is how it is bought. */
-const DEFAULT_PIECE_TRIMS = { grommetPer1000:59.50 };
+const DEFAULT_PIECE_TRIMS = {
+  grommetPer1000:59.50,
+  chainPer1000:219.41,   /* nickel-plated ball chain, 1,000 pc incl. shipping */
+  pinPer1000:50.77       /* silver bulb safety pins, incl. tax & shipping — a pack of 1,000 assumed, confirm the count */
+};
+/* the hardware a line counts per unit, priced by the thousand above */
+const PIECE_TRIMS = [
+  { field:"grommets", rate:"grommetPer1000", label:"Grommets" },
+  { field:"chains",   rate:"chainPer1000",   label:"Ball chain" },
+  { field:"pins",     rate:"pinPer1000",     label:"Safety pins" }
+];
 
 /* The enzyme wash is priced by weight rather than by garment group. The
    dropdown offers it as WASH_BY_WEIGHT; a style needs a weight (lb per unit)
@@ -735,10 +749,11 @@ const STYLES = [
     note:"Yield on a 65\" roll for a 15 x 13\u00be x 4 bag with a 13\" handle drop: body 16 x 33.5 (4 across \u2014 64\" of the 65\"), two gussets 5 x 15.25 (13 across), two handles cut 8 x 41 for a 2\" strap folded in quarters (8 across) \u2014 20.97\" of roll a bag, 98.6% of the cloth used. Assumes \u00bd\" seams, 1\" top hem, handles 8\" apart. No wash group set" },
   { name:"Canvas Hangtag", group:"", fabric:"Canvas", yield:0.008929,
     rib:"", ribYield:0, draw:0, elastic:0,
-    sew:0, cut:0.12, trims:0, grommets:1, lb:0.0065, defaultWash:WASH_BY_WEIGHT,
+    sew:0, cut:0.25, trims:0, grommets:1, chains:1, pins:1, lb:0.0065, defaultWash:WASH_BY_WEIGHT,
+    fin:0.75, finOn:true, finLabel:"Pressing",
     /* 0.0065 lb: a tag is one 17.5 sq in cut against the tote's 1,344.5 sq in
        at 0.5 lb, so 1/77 of a tote — about 154 to the pound */
-    note:"Yield: the 65\" roll is first cut into 16x20 print sheets \u2014 a row of 4 upright (64\" x 20\") over a row of 3 turned (60\" x 16\") uses the full 36\" yard: 7 sheets. Each sheet yields 4 x 4 = 16 cuts of 3.6218\" x 4.8306\", and one cut is a tag, so 16 tags a sheet and 112 a yard (83.7% of the cloth used). Printing is priced per project \u2014 add it under Embellishments. Sewing not quoted. Packaging and grinding start off: a garment's $3.50 bag-and-tag and $2.50 grinding do not belong on a tag" },
+    note:"Yield: the 65\" roll is first cut into 16x20 print sheets \u2014 a row of 4 upright (64\" x 20\") over a row of 3 turned (60\" x 16\") uses the full 36\" yard: 7 sheets. Each sheet yields 4 x 4 = 16 cuts of 3.6218\" x 4.8306\", and one cut is a tag, so 16 tags a sheet and 112 a yard (83.7% of the cloth used). Cutting $0.25 and pressing $0.75 a tag; each tag takes a grommet, a nickel-plated ball chain and a bulb safety pin, all priced by the thousand in the Rates panel. Printing is priced per project \u2014 add it under Embellishments. Sewing not quoted. Packaging and grinding start off: a garment's $3.50 bag-and-tag and $2.50 grinding do not belong on a tag" },
   /* A finished good FSF buys in rather than makes: FSF's price per unit
      (their margin already in it) plus the shipment's freight spread across
      the units it carried. The supplier's own cost is kept for reference. */
@@ -768,7 +783,14 @@ const STYLE_DEFAULT_CHANGES = [
   { v:11, style:"Canvas Hangtag", field:"wash", from:"", to:WASH_BY_WEIGHT },
   /* a tag is one cut now, not two: half the cloth, half the weight */
   { v:12, style:"Canvas Hangtag", field:"yield", from:0.017857, to:0.008929 },
-  { v:12, style:"Canvas Hangtag", field:"lb",    from:0.013,    to:0.0065   }
+  { v:12, style:"Canvas Hangtag", field:"lb",    from:0.013,    to:0.0065   },
+  /* requoted: cutting $0.25, a $0.75 pressing step, and the chain and pin
+     each tag hangs by */
+  { v:13, style:"Canvas Hangtag", field:"cut",    from:0.12,  to:0.25 },
+  { v:13, style:"Canvas Hangtag", field:"finOn",  from:false, to:true },
+  { v:13, style:"Canvas Hangtag", field:"fin",    from:0,     to:0.75 },
+  { v:13, style:"Canvas Hangtag", field:"chains", from:0,     to:1 },
+  { v:13, style:"Canvas Hangtag", field:"pins",   from:0,     to:1 }
 ];
 
 const DEFAULTS = {
@@ -826,7 +848,7 @@ function freshState(){
     washByLb: DEFAULT_WASH_BY_LB,
     washes:  DEFAULT_WASHES.map(w => ({...w})),
     g:       {...DEFAULTS},
-    v:       12,         /* bump to re-apply the rate defaults above */
+    v:       13,         /* bump to re-apply the rate defaults above */
     lines:   [],
     inv:     freshInvoice()
   };
@@ -856,9 +878,11 @@ function makeLine(styleName){
     washOn: !st.sourced,
     pkgOn: !(st.grommets || st.sourced),     /* so is bag-and-tag packaging */
     pkg: DEFAULTS.packaging,
-    finOn: false,
-    fin: DEFAULTS.finishing,
+    finOn: !!st.finOn,                /* a style can quote its own finishing step (the hangtag's pressing) */
+    fin: st.fin !== undefined ? st.fin : DEFAULTS.finishing,
     grommets: st.grommets || 0,
+    chains: st.chains || 0,
+    pins: st.pins || 0,
     lb: st.lb || 0,                  /* weight per unit, for a wash priced by the pound */
     retail: null,                    /* null = use the calculated selling price */
     markup: null,                    /* null = the job's FSF markup; a % overrides it for this line */
@@ -1044,16 +1068,16 @@ function cost(L){
     }
 
     /* --- drawstring & elastic --- */
-    const dYd = num(L.draw), eYd = num(L.elastic), grom = num(L.grommets);
-    if(dYd > 0 || eYd > 0 || grom > 0){
+    const dYd = num(L.draw), eYd = num(L.elastic);
+    const pieces = PIECE_TRIMS.map(t => ({ ...t, n:num(L[t.field]) })).filter(t => t.n > 0);
+    if(dYd > 0 || eYd > 0 || pieces.length){
       r.rows.push({ group:"Trims" });
       if(dYd > 0) add("Drawstring", dYd * num(S.trims.drawstring), { detail:yd(dYd) + " @ " + money(num(S.trims.drawstring)) + "/yd" });
       if(eYd > 0) add("Elastic",    eYd * num(S.trims.elastic),    { detail:yd(eYd) + " @ " + money(num(S.trims.elastic)) + "/yd" });
-      if(grom > 0){
-        const per1000 = num(S.piece.grommetPer1000);
-        add("Grommets", grom * per1000 / 1000,
-            { detail:grom + " @ " + money(per1000) + " per 1,000" });
-      }
+      pieces.forEach(t => {
+        const per1000 = num(S.piece[t.rate]);
+        add(t.label, t.n * per1000 / 1000, { detail:t.n + " @ " + money(per1000) + " per 1,000" });
+      });
     }
 
     /* --- wash, labor, trims, packaging --- */
@@ -1101,7 +1125,7 @@ function cost(L){
 
     if(L.finOn){
       const f = num(L.fin);
-      add("Finishing / other", f);
+      add(st.finLabel || "Finishing / other", f);
       if(f === 0){
         r.issues.push(L.style + ": finishing is switched on but the rate is $0 — not quoted by Fred, enter a price or switch it off (bagging and tagging are already in packaging).");
         r.flags.push({ cls:"warn", t:"Finishing rate needed" });
@@ -1265,6 +1289,8 @@ function renderRates(){
     </div>`).join("");
 
   $("#defGrommet").value   = S.piece.grommetPer1000;
+  $("#defChain").value     = S.piece.chainPer1000;
+  $("#defPin").value       = S.piece.pinPer1000;
   $("#defWashLb").value    = S.washByLb;
   $("#markup").value       = S.g.markup;
   $("#multiple").value     = S.g.multiple;
@@ -1472,7 +1498,7 @@ function renderLines(){
           <label class="check"><input type="checkbox" data-f="pkgOn" ${L.pkgOn ? "checked" : ""}>
             <span>Packaging<em>${money(num(S.g.packaging))} per unit — bag &amp; tag</em></span></label>
           <label class="check"><input type="checkbox" data-f="finOn" ${L.finOn ? "checked" : ""}>
-            <span>Finishing / other<em>spare line — beyond bag &amp; tag</em></span></label>
+            <span>${st.finLabel ? esc(st.finLabel) : "Finishing / other"}<em>${st.finLabel ? money(num(L.fin)) + " per unit" : "spare line — beyond bag &amp; tag"}</em></span></label>
           <label class="check"><input type="checkbox" data-f="fabricFree" ${L.fabricFree ? "checked" : ""}>
             <span>Fabric on hand<em>no charge — yield still counted</em></span></label>
         </div>
@@ -1502,6 +1528,10 @@ function renderLines(){
                 <input type="number" step="0.05" min="0" data-f="elastic" value="${L.elastic}"></label>
               <label><span class="flabel">Grommets (per unit)</span>
                 <input type="number" step="1" min="0" data-f="grommets" value="${L.grommets}"></label>
+              <label><span class="flabel">Ball chain (per unit)</span>
+                <input type="number" step="1" min="0" data-f="chains" value="${L.chains}"></label>
+              <label><span class="flabel">Safety pins (per unit)</span>
+                <input type="number" step="1" min="0" data-f="pins" value="${L.pins}"></label>
               <label><span class="flabel">Weight (lb per unit) — enzyme wash</span>
                 <input type="number" step="0.001" min="0" data-f="lb" value="${L.lb}" placeholder="for the enzyme wash"></label>
               <label><span class="flabel">Trims / other ($/unit)</span>
@@ -1520,7 +1550,7 @@ function renderLines(){
                        class="${L.grindOn && num(L.grind) === 0 ? "missing" : ""}"></label>
               <label><span class="flabel">Packaging ($/unit)</span>
                 <input type="number" step="0.05" min="0" data-f="pkg" value="${L.pkg}" ${L.pkgOn ? "" : "disabled"}></label>
-              <label><span class="flabel">Finishing / other ($/unit)</span>
+              <label><span class="flabel">${st.finLabel ? esc(st.finLabel) : "Finishing / other"} ($/unit)</span>
                 <input type="number" step="0.05" min="0" data-f="fin" value="${L.fin}" ${L.finOn ? "" : "disabled"}
                        class="${L.finOn && num(L.fin) === 0 ? "missing" : ""}"></label>
             </div>
@@ -2291,7 +2321,7 @@ function load(){
         if(num(L.grind) === 0){ L.grind = S.g.grinding; L.grindOn = true; }
       });
     }
-    S.v = 12;
+    S.v = 13;
     if(p.inv){
       S.inv = Object.assign(freshInvoice(), p.inv);
       const was = num(p.inv.v);
@@ -2570,6 +2600,10 @@ $("#panelRates").addEventListener("input", e => {
     S.trims[t.dataset.trim] = num(t.value);
   } else if(t.id === "defGrommet"){
     S.piece.grommetPer1000 = num(t.value);
+  } else if(t.id === "defChain"){
+    S.piece.chainPer1000 = num(t.value);
+  } else if(t.id === "defPin"){
+    S.piece.pinPer1000 = num(t.value);
   } else if(t.id === "defWashLb"){
     S.washByLb = num(t.value);
     renderLines();                  /* the wash dropdown quotes the rate */
@@ -2593,7 +2627,10 @@ $("#panelRates").addEventListener("input", e => {
       S.g[k] = num(t.value);
       /* changing a default retunes lines still sitting on the old default */
       if(k === "packaging") S.lines.forEach(L => { if(!L._pkgEdited) L.pkg = S.g.packaging; });
-      if(k === "finishing") S.lines.forEach(L => { if(!L._finEdited) L.fin = S.g.finishing; });
+      if(k === "finishing") S.lines.forEach(L => {
+        const own = (STYLES.find(x => x.name === L.style) || {}).fin !== undefined;   /* a style's own step keeps its rate */
+        if(!L._finEdited && !own) L.fin = S.g.finishing;
+      });
       if(k === "grinding")  S.lines.forEach(L => { if(!L._grindEdited) L.grind = S.g.grinding; });
 
     }

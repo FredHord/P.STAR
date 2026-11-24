@@ -83,15 +83,21 @@ Behaviour worth knowing:
   default to it; it is one option in the line's wash dropdown, alongside the
   group washes, and a style with no weight is flagged rather than washed for
   nothing.
-- The **Canvas Hangtag** shares the canvas price and the $0.50 cutting, and
-  takes one **grommet** — hardware priced by the piece at $59.50 per 1,000
-  (a rate in the Rates panel, a count per line). Packaging and grinding start
-  off for it, since a garment's bag-and-tag and distressing do not belong on
-  a tag. Its yield is 0.008929 yd: the 65" roll is cut into
+- The **Canvas Hangtag** shares the canvas price. It is cut at $0.25 and
+  **pressed** at $0.75 a tag (the pressing step is the line's finishing
+  slot under its own name, on by default and immune to the global finishing
+  rate), and each tag takes one **grommet** ($59.50 per 1,000), one
+  **nickel-plated ball chain** ($219.41 per 1,000 including shipping) and
+  one **silver bulb safety pin** ($50.77 including tax and shipping — a
+  pack of 1,000 is assumed, so confirm the count and retype the rate if the
+  pack is smaller). Hardware is priced by the piece: a rate per thousand in
+  the Rates panel, a count per line (the `PIECE_TRIMS` list drives all
+  three). Packaging and grinding start off for it, since a garment's
+  bag-and-tag and distressing do not belong on a tag. Its yield is 0.008929 yd: the 65" roll is cut into
   16×20 print sheets — a row of 4 upright over a row of 3 turned fills the
   full 36" yard, 7 sheets — each sheet yields 4×4 = 16 cuts of
   3.6218"×4.8306", and one cut is a tag: 16 tags a sheet, 112 a yard, 83.7%
-  of the cloth used. Cutting $0.12. Printing is per project, so it goes under
+  of the cloth used. Printing is per project, so it goes under
   Embellishments; sewing is still unquoted and sits at $0.
 
 A line with a fabric but no yield is excluded from the total and flagged,
